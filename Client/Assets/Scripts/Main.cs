@@ -21,7 +21,7 @@ public class Main : MonoBehaviourInstance<Main> {
         }
         Object prefab = Resources.Load("Player");
         GameObject clone = Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
-        clone.transform.position = new Vector3(0, 5, UnityEngine.Random.Range(0, 10));
+        clone.transform.position = new Vector3(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(10, 20), UnityEngine.Random.Range(0, 10));
         Player newPlayer = clone.GetComponent<Player>();
         newPlayer.Init(playerNum, playerName);
         this.player.Add(newPlayer);
