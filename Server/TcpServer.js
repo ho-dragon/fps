@@ -6,8 +6,15 @@ var timeOutDuration = 5000;
 var net = require('net');
 var color = require("colors");
 var receiver = require('./TcpReceiver.js');
+var clients = [];
+
+module.exports.send = send;
+module.exports.broadcastAll = broadcastAll;
+module.exports.broadcastExcludedMe = broadcastExcludedMe;
 
 var server = net.createServer(function(client) {
+  clients.push(client);
+
   console.log('Client connection: ');
   console.log('   local = %s:%s', client.localAddress, client.localPort);
   console.log('   remote = %s:%s', client.remoteAddress, client.remotePort);
@@ -17,7 +24,7 @@ var server = net.createServer(function(client) {
   client.on('data', function(data) {
     console.log('Received test data from client on port %d: %s', client.remotePort, data.toString());
     console.log('Bytes received: ' + client.bytesRead);
-    Recevie(client, data);
+    receive(client, data);
     console.log('  Bytes sent: ' + client.bytesWritten);
   });
 
@@ -47,18 +54,34 @@ server.listen(connectPort, function() {
   });
 });
 
-function Recevie(socket, data){
-  receiver.recevieFromClient(socket, data);
+function receive(socket, data){
+  receiver.receiveFromClient(socket, data);
 }
 
-function Send(socket, data) {
-console.log(color.yellow('[Send]') + '%s',data.toString());	
+function send(socket, data) {
+console.log(color.yellow('[send]') + '%s',data.toString());	
   var success = !socket.write(data);
   if (!success){ (function(socket, data) {
       	socket.once('drain', function() {
-        Send(socket, data);
+        send(socket, data);
       });
     })(socket, data);
   } 
 }
-module.exports.Send = Send;
+
+function broadcastAll(message) {
+    clients.forEach(function (client) {
+      client.write(message);
+    });
+    process.stdout.write(message)
+}
+
+function broadcastExcludedMe(message, sender) {
+    clients.forEach(function (client) {
+      if (client === sender) {
+           return;
+      }
+      client.write(message);
+    });
+    process.stdout.write(message)
+}
