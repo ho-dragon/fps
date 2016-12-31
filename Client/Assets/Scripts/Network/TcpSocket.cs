@@ -23,7 +23,17 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     private string ReceiveString;                     // Receive bytes to Change string. 
     private bool isConnected = false;
 
-    void Awake () {
+
+    public bool IsConnected {
+        get { return this.isConnected; }
+    }
+
+    public void Connect() {
+        if (isConnected) {
+            Debug.Log("Socket is already connected"); 
+            return;
+        }
+
         //=======================================================
         // Socket create.
 		this.m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -38,8 +48,8 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
             IPEndPoint ipEndPoint = new System.Net.IPEndPoint(ipAddr, kPort);
 			this.m_Socket.Connect(ipEndPoint);
         }
-        catch (SocketException SCE) {
-            Debug.Log("Socket connect error! : " + SCE.ToString() ); 
+        catch (SocketException e) {
+            Debug.Log("Socket connect error! : " + e.ToString() ); 
             return;
         }
         
@@ -92,14 +102,15 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         }
     }
 
-    void Update()
-    {
+    void Update() {
         if(this.isConnected) {
             ReceiveDataStream();
         }
     }
     void OnApplicationQuit () {
-		this.m_Socket.Close();
-		this.m_Socket = null;
+        if(m_Socket != null) {
+            this.m_Socket.Close();
+            this.m_Socket = null;
+        }
     }
 }

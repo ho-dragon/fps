@@ -5,17 +5,6 @@ using System.Net;
 using System.Text;
 public class SocketRequest : MonoBehaviour
 {
-	public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0) {
-	    return new Rect(_width * raw, _height * column, _width, _height);
-	}
-
-	void OnGUI() {
-	   if (GUI.Button(GetRectPos(0, 1, 200, 100), "EnterRoom")) {
-           string testerName = "";
-           EnterRoom(testerName);
-	   }
-	}
-
 	public Socket m_Socket;
 	public void Send(string method, string[] param) {
 		StringBuilder sb = new StringBuilder();
@@ -36,6 +25,9 @@ public class SocketRequest : MonoBehaviour
         Send(sb.ToString());
 	}
     public void Send(string msg) {
+        if(TcpSocket.inst.IsConnected == false) {
+            return;
+        }
         int SenddataLength = Encoding.Default.GetByteCount(msg);
         byte[] Sendbyte = Encoding.Default.GetBytes(msg);
         m_Socket.Send(Sendbyte, Sendbyte.Length, SocketFlags.None);
@@ -44,5 +36,12 @@ public class SocketRequest : MonoBehaviour
 
     public void EnterRoom(string playerName) {
         Send("enterRoom" + "|" + playerName);
+    }
+
+    public void MovePlayer(int playerNum, Vector3 playerPos) {
+        Send("move" + "|" + playerNum.ToString()
+                    + "|" + playerPos.x
+                    + "|" + playerPos.y
+                    + "|" + playerPos.z);
     }
 }

@@ -29,24 +29,19 @@ public class MonoBehaviourInstance<T> : MonoBehaviour where T : MonoBehaviourIns
 	protected virtual void _Awake() {}
 	protected virtual void _OnDestroy() {}
 
-	void Awake()
-	{
-		if (_instance == null)
-		{
+	void Awake() {
+		if (_instance == null) {
 			_instance = this as T;
 		}
-		else if (_instance != this)
-		{
+		else if (_instance != this) {
 			_instance = this as T;
 			return;
 		}
 		_Awake();
 	}
 
-	void OnDestroy()
-	{
-		if (_instance == this)
-		{
+	void OnDestroy() {
+		if (_instance == this) {
 			_instance = null;
 			_OnDestroy();
 		}
