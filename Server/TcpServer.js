@@ -69,14 +69,17 @@ console.log(color.yellow('[send]') + '%s',data.toString());
   } 
 }
 
-function broadcastAll(message) {
+function broadcastAll(message, isShowLog) {
     clients.forEach(function (client) {
       client.write(message);
     });
-    process.stdout.write(message)
+    
+    if(isShowLog) {
+          process.stdout.write(message)
+    }
 }
 
-function broadcastExcludedMe(message, sender) {
+function broadcastExcludedMe(message, sender, isShowLog) {
     clients.forEach(function (client) {
       if (client === sender) {
            return;
@@ -84,4 +87,8 @@ function broadcastExcludedMe(message, sender) {
       client.write(message);
     });
     process.stdout.write(message)
+
+    if(isShowLog) {
+          process.stdout.write(message)
+    }
 }
