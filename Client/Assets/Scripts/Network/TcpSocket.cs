@@ -3,11 +3,64 @@ using System.Collections;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
+using System;
 
 /// <summary>
 /// reference link :  http://blog.naver.com/PostView.nhn?blogId=lene1359&logNo=80106310174
 /// </summary>
 public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
+
+    #region OnGUI
+   //public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0)
+   //{
+   //    return new Rect(_width * raw, _height * column, _width, _height);
+   //}
+
+   //void OnGUI() {
+   //    if (GUI.Button(GetRectPos(0,5, 200, 50), "bufferRecevier_1")) {
+   
+   //    }
+   //    if (GUI.Button(GetRectPos(0, 6, 200, 50), "bufferRecevier_2"))
+   //    {
+ 
+   //    }
+   //}
+
+   //public void TEST_1()
+   //{
+   //    string testData = "asdf";
+   //    byte[] SenddataLength = BitConverter.GetBytes(testData.Length);
+   //    byte[] Sendbyte = Encoding.Default.GetBytes(testData);
+   //    byte[] total = byte_merge(SenddataLength, Sendbyte);
+
+   //    string testData2 = "connected success";
+   //    byte[] SenddataLength2 = BitConverter.GetBytes(testData2.Length);
+   //    byte[] Sendbyte2 = Encoding.Default.GetBytes(testData2);
+   //    byte[] total2 = byte_merge(SenddataLength2, Sendbyte2);
+   //    byte[] total3 = byte_merge(total, total2);
+
+   //    receiver.GetRecevieBuffer(total2);
+   //    return;
+   //    DataResolver x = new DataResolver();
+   //    x.on_receive(total3, 0, total3.Length, receiver.CallbackRecevieBuffer);
+   //}
+
+   //public byte[] byte_merge(byte[] arg1, byte[] arg2)
+   //{
+   //    byte[] tmp = new byte[arg1.Length + arg2.Length];
+   //    for (int i = 0; i < arg1.Length; i++)
+   //    {
+   //        tmp[i] = arg1[i];
+   //    }
+   //    for (int j = 0; j < arg2.Length; j++)
+   //    {
+   //        tmp[arg1.Length + j] = arg2[j];
+   //    }
+   //    return tmp;
+   //}
+
+    #endregion
+
     private Socket m_Socket;
 	public SocketRequest sender;
     public SocketResponse receiver;
@@ -22,7 +75,6 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     private byte[] Receivebyte = new byte[2000];    // Receive data by this array to save.
     private string ReceiveString;                     // Receive bytes to Change string. 
     private bool isConnected = false;
-
 
     public bool IsConnected {
         get { return this.isConnected; }
@@ -40,42 +92,30 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 		sender.m_Socket = this.m_Socket;
 		this.m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, 10000);
 		this.m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 10000);
- 
         //=======================================================
         // Socket connect.
-        try {
-            IPAddress ipAddr = System.Net.IPAddress.Parse(iPAdress); 
-            IPEndPoint ipEndPoint = new System.Net.IPEndPoint(ipAddr, kPort);
+
+        IPAddress ipAddr = System.Net.IPAddress.Parse(iPAdress);
+        IPEndPoint ipEndPoint = new System.Net.IPEndPoint(ipAddr, kPort);
+         try {
 			this.m_Socket.Connect(ipEndPoint);
+            this.ns = new NetworkStream(this.m_Socket);
+            this.isConnected = true;
         }
         catch (SocketException e) {
             Debug.Log("Socket connect error! : " + e.ToString() ); 
             return;
         }
-        
+
         //=======================================================
         // Send data write.
-        StringBuilder sb = new StringBuilder(); // String Builder Create
-        sb.Append("init");
         try {
-             //=======================================================
-            // Send.
-            SenddataLength = Encoding.Default.GetByteCount(sb.ToString());
-            Sendbyte = Encoding.Default.GetBytes(sb.ToString());
-			this.m_Socket.Send(Sendbyte, Sendbyte.Length, 0);
-                 
-            //=======================================================       
-            // Receive.
-			this.m_Socket.Receive(Receivebyte);
-            ReceiveString = Encoding.Default.GetString(Receivebyte);
-            ReceivedataLength = Encoding.Default.GetByteCount(ReceiveString.ToString());
-            Debug.Log("Init Receive Data From Server: " + ReceiveString + "(" + ReceivedataLength + ")");
-            this.isConnected = true;
-        }
-        catch (SocketException err) {
+           this.sender.Send("init");
+           Debug.Log("[TcpSocket.isConntected] SUCCESS");
+        } catch (SocketException err) {
             Debug.Log("Socket send or receive error! : " + err.ToString() );
         }
-        this.ns = new NetworkStream(this.m_Socket);
+    
     }
 
 	public void ReceiveDataStream() {
@@ -84,17 +124,11 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         }
 
         byte[] data = new byte[1024];
-        int recv;
-        string stringData;
-        if (this.ns.CanRead)
-        {
-            recv = ns.Read(data, 0, data.Length);
-            stringData = Encoding.ASCII.GetString(data, 0, recv);
-            Debug.Log("Receviced Data From Server : data = " + stringData);
-            this.receiver.Receiver(stringData);
+        if (this.ns.CanRead) {
+            this.ns.Read(data, 0, data.Length);
+            this.receiver.GetRecevieBuffer(data);
         }
-        else
-        {
+        else {
             Debug.Log("Error: Can't read from this socket");
             ns.Close();
             this.m_Socket.Close();
@@ -103,7 +137,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     }
 
     void Update() {
-        if(this.isConnected) {
+        if (this.isConnected) {
             ReceiveDataStream();
         }
     }

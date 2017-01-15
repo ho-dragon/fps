@@ -14,6 +14,11 @@ public class Main : MonoBehaviourInstance<Main>
     
     void OnGUI()
     {
+        if (isTestOn == false)
+        {
+            return;
+        }
+
         userName = GUI.TextField(GetRectPos(0, 1, 200, 50), userName, 25);
 
         if (GUI.Button(GetRectPos(0, 2, 200, 50), "Connect")) {
@@ -34,7 +39,7 @@ public class Main : MonoBehaviourInstance<Main>
        
     }
     #endregion
-
+    public bool isTestOn = false;
     public void EnterRoom(string userName) {
         TcpSocket.inst.sender.EnterRoom(userName);
     }

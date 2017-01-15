@@ -4,6 +4,7 @@
 var connectPort = 8107;
 var timeOutDuration = 5000;
 var net = require('net');
+var util = require('util');
 var color = require("colors");
 var receiver = require('./TcpReceiver.js');
 var clients = [];
@@ -22,7 +23,7 @@ var server = net.createServer(function(client) {
   client.setEncoding('utf8');
 
   client.on('data', function(data) {
-    console.log('Received test data from client on port %d: %s', client.remotePort, data.toString());
+    //console.log('Received test data from client on port %d: %s', client.remotePort, data.toString());
     console.log('Bytes received: ' + client.bytesRead);
     receive(client, data);
     console.log('  Bytes sent: ' + client.bytesWritten);
@@ -59,7 +60,7 @@ function receive(socket, data){
 }
 
 function send(socket, data) {
-console.log(color.yellow('[send]') + '%s',data.toString());	
+data = makeSendBuffer(data);
   var success = !socket.write(data);
   if (!success){ (function(socket, data) {
       	socket.once('drain', function() {
@@ -70,6 +71,7 @@ console.log(color.yellow('[send]') + '%s',data.toString());
 }
 
 function broadcastAll(message, isShowLog) {
+    message = makeSendBuffer(message);
     clients.forEach(function (client) {
       client.write(message);
     });
@@ -80,6 +82,7 @@ function broadcastAll(message, isShowLog) {
 }
 
 function broadcastExcludedMe(message, sender, isShowLog) {
+    message = makeSendBuffer(message);
     clients.forEach(function (client) {
       if (client === sender) {
            return;
@@ -91,4 +94,21 @@ function broadcastExcludedMe(message, sender, isShowLog) {
     if(isShowLog) {
           process.stdout.write(message)
     }
+}
+
+
+function makeSendBuffer(msg) {
+    var buffMsg = new Buffer(msg);
+    var msgLen = buffMsg.length ;
+    var bufPacketLenInfo = new Buffer(4);
+    bufPacketLenInfo.fill();
+    var headerLen= bufPacketLenInfo.length;
+    bufPacketLenInfo.writeUInt32LE(msgLen, 0); 
+    
+    var bufTotal = new Buffer(  headerLen + msgLen ); //packet length info + msg
+    bufTotal.fill();
+    bufPacketLenInfo.copy(bufTotal, 0, 0, headerLen);
+    buffMsg.copy(bufTotal, headerLen, 0, msgLen );
+    console.log(color.yellow('[send] header length = '+headerLen+' / msg length = '+ msgLen+ '/ total length = '+(headerLen + msgLen) +' /  msg = ' + buffMsg.toString())); 
+    return bufTotal;
 }

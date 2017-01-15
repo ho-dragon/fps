@@ -5,7 +5,10 @@ var room = require('./Room.js');
 module.exports.receiveFromClient = receiveFromClient;
 
 function receiveFromClient(socket, msg) {
-	var msgs = msg.split('|');
+    var buffMsg = new Buffer(msg);
+    msg = buffMsg.slice(4, buffMsg.length);// remove header buffer
+	console.log('receiveFromClient : data = %s', msg.toString());
+	var msgs = msg.toString().split('|');
 	switch(msgs[0]) {
 		case 'init':
 			server.send(socket, "connected success");
