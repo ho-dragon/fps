@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Main.cs" />
+     <Compile Include="Assets\Scripts\Network\DataResolver.cs" />
      <Compile Include="Assets\Scripts\Network\SocketRequest.cs" />
      <Compile Include="Assets\Scripts\Network\SocketResponse.cs" />
      <Compile Include="Assets\Scripts\Network\TcpSocket.cs" />
