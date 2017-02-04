@@ -46,10 +46,18 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Main.cs" />
-     <Compile Include="Assets\Scripts\Network\DataResolver.cs" />
-     <Compile Include="Assets\Scripts\Network\SocketRequest.cs" />
-     <Compile Include="Assets\Scripts\Network\SocketResponse.cs" />
-     <Compile Include="Assets\Scripts\Network\TcpSocket.cs" />
+     <Compile Include="Assets\Scripts\Model\EnterRoomModel.cs" />
+     <Compile Include="Assets\Scripts\Network\IngameClient.Request.cs" />
+     <Compile Include="Assets\Scripts\Network\IngameClient.cs" />
+     <Compile Include="Assets\Scripts\Network\IngameClientStates.cs" />
+     <Compile Include="Assets\Scripts\Network\IngameRequest.cs" />
+     <Compile Include="Assets\Scripts\Network\IngameRequestStates.cs" />
+     <Compile Include="Assets\Scripts\Network\IngameTimeSync.cs" />
+     <Compile Include="Assets\Scripts\Network\TcpSocket\DataResolver.cs" />
+     <Compile Include="Assets\Scripts\Network\TcpSocket\SocketRequest.cs" />
+     <Compile Include="Assets\Scripts\Network\TcpSocket\SocketRequestFormat.cs" />
+     <Compile Include="Assets\Scripts\Network\TcpSocket\SocketResponse.cs" />
+     <Compile Include="Assets\Scripts\Network\TcpSocket\TcpSocket.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\PlayerCamera.cs" />
      <Compile Include="Assets\Scripts\PlayerManager.cs" />
@@ -63,6 +71,9 @@
  </Reference>
  <Reference Include="UnityEngine.Analytics">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="Newtonsoft.Json">
+ <HintPath>C:/Projects/TCP/Client/Assets/Scripts/JsonNet/Newtonsoft.Json.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

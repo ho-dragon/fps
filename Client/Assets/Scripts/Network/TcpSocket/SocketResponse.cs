@@ -1,11 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
+using System.IO;
 
 public class SocketResponse : MonoBehaviour
 {
     private DataResolver resolver;
+    public IngameClient ingameClient;
+
     void Awake() {
         this.resolver = new DataResolver();
     }
@@ -29,7 +35,7 @@ public class SocketResponse : MonoBehaviour
         byte[] body = new byte[dataSize];
         Array.Copy(data, 4, body, 0, dataSize);
         //Debug.Log("[SocketResponse.callback] data size = " + dataSize + " / data = " + Encoding.UTF8.GetString(body));
-        Receiver(Encoding.UTF8.GetString(body));
+        Receiver(Encoding.UTF8.GetString(body), body);
     }
 
     private int get_body_size(byte[] data) {
@@ -37,29 +43,38 @@ public class SocketResponse : MonoBehaviour
         return BitConverter.ToInt32(data, 0);
     }
 
-    public void Receiver(string stringData) {
-        string[] msgs = stringData.Split('|');
-        switch(msgs[0]) {
-            case "joinPlayer" :
-                JoinPlayer(msgs);
-                break;
-            case "move":
-                MovePlayer(msgs);
-                break;
-            case "enterRoomResult":
-                enterRoomResult(msgs);
-                break;
-        }
+    public void Receiver(string stringData, byte[] buffer) {
+        ingameClient.OnMessage(buffer);
+
+        //string[] msgs = stringData.Split('|');
+        //switch(msgs[0]) {
+        //    case "joinPlayer" :
+        //        JoinPlayer(msgs);
+        //        break;
+        //    case "move":
+        //        MovePlayer(msgs);
+        //        break;
+        //    case "enterRoomResult":
+        //        enterRoomResult(TcpSocket.inst.Deserializaer<JoinPlayerResponse>(buffer));
+        //        break;
+        //}
     }
 
-    private void enterRoomResult(string[] msgs) {
-        int playerNum = System.Convert.ToInt32(msgs[1]);
-        string playerName = msgs[2];
-        PlayerManager.inst.player.Init(playerNum
-                                     , playerName
+    private void enterRoomResult(JoinPlayerResponse result) {
+        PlayerManager.inst.player.Init(result.playerNum
+                                     , result.playerName
                                      , (number, movePos) => {
-                                        TcpSocket.inst.sender.MovePlayer(number, movePos);
+                                         TcpSocket.inst.sender.MovePlayer(number, movePos);
                                      });
+
+
+        //int playerNum = System.Convert.ToInt32(msgs[1]);
+        //string playerName = msgs[2];
+        //PlayerManager.inst.player.Init(playerNum
+        //                             , playerName
+        //                             , (number, movePos) => {
+        //                                TcpSocket.inst.sender.MovePlayer(number, movePos);
+        //                             });
     }
 
     private void JoinPlayer(string[] msgs) {
@@ -75,4 +90,9 @@ public class SocketResponse : MonoBehaviour
                                     , System.Convert.ToSingle(msgs[4]));
         PlayerManager.inst.MovePlayer(playerNum, movePos);
     }
+}
+
+public class JoinPlayerResponse {
+    public int playerNum;
+    public string playerName;
 }

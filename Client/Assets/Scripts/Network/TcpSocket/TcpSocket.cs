@@ -1,9 +1,13 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
+using System.IO;
 
 /// <summary>
 /// reference link :  http://blog.naver.com/PostView.nhn?blogId=lene1359&logNo=80106310174
@@ -11,20 +15,88 @@ using System;
 public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 
     #region OnGUI
-   //public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0)
-   //{
-   //    return new Rect(_width * raw, _height * column, _width, _height);
-   //}
+    public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0)
+    {
+        return new Rect(_width * raw, _height * column, _width, _height);
+    }
+    
+    void OnGUI() {
+        if (GUI.Button(GetRectPos(0,5, 200, 50), "ToByte")) {
+            Serializer();
+        }
+    }
+    public class Packet {
+        public enum KIND
+        {
+            LOG_IN,
+            CHATTING,
+            LOBBY,
+            GAME
+        };
+        public KIND kind;
+        public string message;
+        public List<int> itemList = new List<int>();
+    }
 
-   //void OnGUI() {
-   //    if (GUI.Button(GetRectPos(0,5, 200, 50), "bufferRecevier_1")) {
-   
-   //    }
-   //    if (GUI.Button(GetRectPos(0, 6, 200, 50), "bufferRecevier_2"))
-   //    {
- 
-   //    }
-   //}
+    public void Serializer() {
+        // 패킷생성
+        Packet p = new Packet();
+        p.kind = Packet.KIND.CHATTING;
+        p.message = "Hello";
+        p.itemList.Add(123);
+        p.itemList.Add(124);
+        p.itemList.Add(125);
+
+        // Packet클래스를 BSON으로 직렬화
+        MemoryStream ms = new MemoryStream();
+        JsonSerializer serializer = new JsonSerializer();
+        BsonWriter writer = new BsonWriter(ms);
+        serializer.Serialize(writer, p);
+        ms.Seek(0, SeekOrigin.Begin);
+
+        // BSON을 바이트로 전환해 화면에 출력
+        byte[] byteBSON = ms.ToArray();
+        int byteLength = 0;
+
+        foreach (byte a in byteBSON) {
+            byteLength++;
+            //Debug.Log(a);
+        }
+        Debug.Log("[Serializer] byte length : " + byteLength );
+        Packet x = Deserializaer<Packet>(byteBSON);
+        Debug.Log("[Deserializaer] Packet.kind : " + x.kind);
+        Debug.Log("[Deserializaer] Packet.message : " + x.message);
+        Debug.Log("[Deserializaer] Packet.ltemList count : " + x.itemList.Count);
+    }
+
+    public byte[] SerializseToByte(object x){
+        // Packet클래스를 BSON으로 직렬화
+        MemoryStream ms = new MemoryStream();
+        JsonSerializer serializer = new JsonSerializer();
+        BsonWriter writer = new BsonWriter(ms);
+        serializer.Serialize(writer, x);
+        ms.Seek(0, SeekOrigin.Begin);
+
+        // BSON을 바이트로 전환해 화면에 출력
+        return ms.ToArray();
+    }
+
+    public T Deserializaer<T>(byte[] data) {
+        MemoryStream ms = new MemoryStream(data);
+        ms.Seek(0, SeekOrigin.Begin);
+        byte[] byteBSON = ms.ToArray();
+        int byteLength = 0;
+        foreach (byte a in byteBSON) {
+            byteLength++;
+            //Debug.Log(a + " ");
+        }
+        Debug.Log("[Deserializaer] byte length : " + byteLength);
+        JsonSerializer deserializaer = new JsonSerializer();
+        BsonReader reader = new BsonReader(ms);
+        T dp = deserializaer.Deserialize<T>(reader);
+        return dp;
+    }
+
 
    //public void TEST_1()
    //{
@@ -63,6 +135,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 
     private Socket m_Socket;
 	public SocketRequest sender;
+    public IngameClient client;
     public SocketResponse receiver;
     private NetworkStream ns;
     public string iPAdress = "127.0.0.1";
@@ -127,8 +200,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         if (this.ns.CanRead) {
             this.ns.Read(data, 0, data.Length);
             this.receiver.GetRecevieBuffer(data);
-        }
-        else {
+        } else {
             Debug.Log("Error: Can't read from this socket");
             ns.Close();
             this.m_Socket.Close();

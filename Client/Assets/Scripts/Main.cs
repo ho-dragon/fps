@@ -41,6 +41,13 @@ public class Main : MonoBehaviourInstance<Main>
     #endregion
     public bool isTestOn = false;
     public void EnterRoom(string userName) {
-        TcpSocket.inst.sender.EnterRoom(userName);
+        TcpSocket.inst.client.EnterRoom(userName, (req, result) => {
+            Debug.Log("[입장완료]");
+            PlayerManager.inst.player.Init(result.playerNum
+                             , result.playerName
+                             , (number, movePos) => {
+                                 TcpSocket.inst.sender.MovePlayer(number, movePos);
+                             });
+        });
     }
 }

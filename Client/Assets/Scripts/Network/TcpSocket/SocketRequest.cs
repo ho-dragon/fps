@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
@@ -8,7 +9,6 @@ using System;
 public class SocketRequest : MonoBehaviour
 {
 	public Socket m_Socket;
-
     public void Send(string msg) {
         if (TcpSocket.inst.IsConnected == false) {
             return;
@@ -21,6 +21,19 @@ public class SocketRequest : MonoBehaviour
         //Debug.Log("[SocketRequest.Send]: data length = " + totalSendBuffer.Length); 
         m_Socket.Send(totalSendBuffer, totalSendBuffer.Length, SocketFlags.None);
     }
+
+    public void Send(byte[] msg) {
+        if (TcpSocket.inst.IsConnected == false) {
+            return;
+        }
+        int sendDataLength = msg.Length;
+        byte[] header = BitConverter.GetBytes(sendDataLength);
+        byte[] body = msg;
+        byte[] totalSendBuffer = byte_merge(header, body);
+        //Debug.Log("[SocketRequest.Send]: data length = " + totalSendBuffer.Length); 
+        m_Socket.Send(totalSendBuffer, totalSendBuffer.Length, SocketFlags.None);
+    }
+
     private byte[] byte_merge(byte[] arg1, byte[] arg2) {
         byte[] tmp = new byte[arg1.Length + arg2.Length];
         for (int i = 0; i < arg1.Length; i++) {
@@ -50,11 +63,6 @@ public class SocketRequest : MonoBehaviour
 		sb.Append("1");
         Send(sb.ToString());
 	}
-
-
-    public void EnterRoom(string playerName) {
-        Send("enterRoom" + "|" + playerName);
-    }
 
     public void MovePlayer(int playerNum, Vector3 playerPos) {
         Send("move" + "|" + playerNum.ToString()
