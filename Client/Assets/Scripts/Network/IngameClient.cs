@@ -37,6 +37,12 @@ public partial class IngameClient : MonoBehaviour
 		{"StartBossBattle", "Que"}
 	};
 
+    void Awake() {
+        Exception = null;
+        RequestIdQueue = new Queue<long>();
+        State = IngameClientStates.Connecting;
+    }
+
     public IngameRequest Send(string method, params object[] param)
     {
         return Send(method, null, param);
@@ -155,7 +161,7 @@ public partial class IngameClient : MonoBehaviour
         byte[] json = TcpSocket.inst.SerializseToByte(websocketRequest);
         socketRequest.Send(json);
         //ArchLogger.Log("[Send] {0}: {1}", websocketRequest.method, websocketRequest.id);
-        Debug.Log("<color=#86E57F>[Client]</color>" + json);
+        Debug.Log("<color=#86E57F>[Client]</color>" + json.Length);
 
         StartCoroutine(waitingResponse<T>(ingameRequest, response));
     }

@@ -11,29 +11,41 @@ public class SocketRequestFormat
 {
     public string method;
     public long id;
+
+    [JsonIgnoreAttribute]
     public long time;
-    public Hashtable param;
-    public int code;
-    public string msg;
+
+    public int code = 0;
+    public string msg = "123";
+    //public Hashtable param;
+
+    public Dictionary<string, object> param;
 
     [JsonIgnoreAttribute]
     public byte[] bytes;//이건 시리얼라이즈 하지 않음
+
+    [JsonIgnoreAttribute]
     public bool IsNotification { get { return !string.IsNullOrEmpty(method); } }
 
-    public SocketRequestFormat(string method, long id, long time, Hashtable param)
+    public SocketRequestFormat(string method, long id, long time, params object[] args)
     {
         this.method = method;
         this.id = id;
         this.time = time;
-        this.param = param;
-    }
 
-    public SocketRequestFormat(string method, long id, long time, params object[] param)
-    {
-        this.method = method;
-        this.id = id;
-        this.time = time;
-        this.param = new KeyValueList(param).ToHashtable();
+        if(args != null) {
+            param = new Dictionary<string, object>();
+            int length = args.Length;
+            for (int i = 0; i < length; i += 2) {
+               param.Add(args[i] as string, i + 1 >= length ? null : args[i + 1]);
+            }
+
+            foreach (KeyValuePair<string, object> i in param)
+            {
+                Debug.Log("[SocketRequestFormat] key = " + i.Key + " / value = " + i.Value);
+            }
+        }
+        //this.param = new KeyValueList(args).ToHashtable();
     }
 }
 

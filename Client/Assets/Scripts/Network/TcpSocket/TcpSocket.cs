@@ -183,8 +183,9 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         //=======================================================
         // Send data write.
         try {
-           this.sender.Send("init");
-           Debug.Log("[TcpSocket.isConntected] SUCCESS");
+            this.client.Init(1234, (req, result) => {
+                Debug.Log("[TcpSocket.isConntected] SUCCESS");
+            });
         } catch (SocketException err) {
             Debug.Log("Socket send or receive error! : " + err.ToString() );
         }
