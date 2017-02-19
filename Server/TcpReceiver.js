@@ -10,20 +10,18 @@ function receiveFromClient(socket, msg) {
     var buffMsg = new Buffer(msg);
     msg = buffMsg.slice(4, buffMsg.length);// remove header buffer
 	console.log('receiveFromClient : data = %s', msg.toString());
-	
-	var Int32 = BSON.Int32;
 
     var result = bson.deserialize(msg);
-
     console.log("** method  = " + result.method);
     console.log("** id = " + result.id);
-    //console.log("** time = " + result.time);
     console.log("** code = " + result.code);
     console.log("** msg = " + result.msg);
     console.log("** param = " + result.param);
 
     for (var key in result.param) {
-     	console.log("key : " + key +", value : " + new Int32(result.param[key]));
+		console.log("key : " + key +", value : type = " + get_type(result.param[key]));
+		var x = result.param[key];
+		console.log(x);
      }
 
 	switch(result.method) {
@@ -37,6 +35,11 @@ function receiveFromClient(socket, msg) {
 			movePlayer(msg)
 			break;
 	}
+}
+
+function get_type(thing){
+    if(thing===null)return "[object Null]"; // special case
+    return Object.prototype.toString.call(thing);
 }
 
 function enterRoom(enterRoom) {
