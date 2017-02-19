@@ -6,7 +6,9 @@ public partial class IngameClient : MonoBehaviour {
         send<EnterRoomModel>(req("enterRoom", "playerName", playerName), callback);
     }
 
-    public void Init(int testCode, Response<object> callback) {
-        send<object>(req("init", "testCode", testCode), callback);
+    public void Init(string testMsg, bool testBool,long testNum, int testInt, Response<object> callback)
+    {
+       // send<object>(req("init", "testCode", testCode), callback);
+        send<object>(req("init", "testMsg", testMsg, "testBool", testBool, "testNum", testNum, "testInt", testInt), callback);
     }
 }
