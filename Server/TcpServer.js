@@ -20,7 +20,7 @@ var server = net.createServer(function(client) {
   console.log('   local = %s:%s', client.localAddress, client.localPort);
   console.log('   remote = %s:%s', client.remoteAddress, client.remotePort);
   client.setTimeout(timeOutDuration);
-  client.setEncoding('utf8');
+  //client.setEncoding('utf8');
 
   client.on('data', function(data) {
     //console.log('Received test data from client on port %d: %s', client.remotePort, data.toString());
