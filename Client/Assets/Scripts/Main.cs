@@ -39,6 +39,11 @@ public class Main : MonoBehaviourInstance<Main>
        
     }
     #endregion
+
+    void Start() {
+        TcpSocket.inst.SerializerTest();
+    }
+
     public bool isTestOn = false;
     public void EnterRoom(string userName) {
         TcpSocket.inst.client.EnterRoom(userName, (req, result) => {

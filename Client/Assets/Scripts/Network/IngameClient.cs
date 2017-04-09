@@ -160,17 +160,14 @@ public partial class IngameClient : MonoBehaviour
 
         byte[] json = TcpSocket.inst.SerializseToByte(websocketRequest);
         socketRequest.Send(json);
-        //ArchLogger.Log("[Send] {0}: {1}", websocketRequest.method, websocketRequest.id);
-        Debug.Log("<color=#86E57F>[Client]</color>" + json.Length);
-
+        Debug.Log(string.Format("<color=#86E57F>[Send]</color> {0}: {1}", websocketRequest.method, websocketRequest.id));
         StartCoroutine(waitingResponse<T>(ingameRequest, response));
     }
 
     private IEnumerator waitingResponse<T>(IngameRequest ingameRequest, Response<T> response) where T : class
     {
         yield return StartCoroutine(ingameRequest);
-        if (ingameRequest.State.IsDone() == false)
-        {
+        if (ingameRequest.State.IsDone() == false) {
             response(ingameRequest, null);
             yield break;
         }

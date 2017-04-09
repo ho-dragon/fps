@@ -10,16 +10,15 @@ using Newtonsoft.Json;
 public class SocketRequestFormat
 {
     public string method;
-    public long id;
+    public int code = 0;
+    public string msg = "123";
+    public int id;
+
+    //public Hashtable param;
+    public Dictionary<string, object> param;
 
     [JsonIgnoreAttribute]
     public long time;
-
-    public int code = 0;
-    public string msg = "123";
-    //public Hashtable param;
-
-    public Dictionary<string, object> param;
 
     [JsonIgnoreAttribute]
     public byte[] bytes;//이건 시리얼라이즈 하지 않음
@@ -30,7 +29,8 @@ public class SocketRequestFormat
     public SocketRequestFormat(string method, long id, long time, params object[] args)
     {
         this.method = method;
-        this.id = id;
+        this.id = (int)id;
+        //this.id += 3000;//EST
         this.time = time;
 
         if(args != null) {
@@ -40,8 +40,7 @@ public class SocketRequestFormat
                param.Add(args[i] as string, i + 1 >= length ? null : args[i + 1]);
             }
 
-            foreach (KeyValuePair<string, object> i in param)
-            {
+            foreach (KeyValuePair<string, object> i in param) {
                 Debug.Log("[SocketRequestFormat] key = " + i.Key + " / value = " + i.Value);
             }
         }

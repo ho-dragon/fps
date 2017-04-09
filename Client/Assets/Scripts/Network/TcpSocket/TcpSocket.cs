@@ -22,7 +22,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     
     void OnGUI() {
         if (GUI.Button(GetRectPos(0,5, 200, 50), "ToByte")) {
-            Serializer();
+            SerializerTest();
         }
     }
     public class Packet {
@@ -36,9 +36,10 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         public KIND kind;
         public string message;
         public List<int> itemList = new List<int>();
+        public Int32 x;
     }
 
-    public void Serializer() {
+    public void SerializerTest() {
         // 패킷생성
         Packet p = new Packet();
         p.kind = Packet.KIND.CHATTING;
@@ -46,6 +47,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         p.itemList.Add(123);
         p.itemList.Add(124);
         p.itemList.Add(125);
+        p.x = Convert.ToInt32(2000);
 
         // Packet클래스를 BSON으로 직렬화
         MemoryStream ms = new MemoryStream();
@@ -67,6 +69,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         Debug.Log("[Deserializaer] Packet.kind : " + x.kind);
         Debug.Log("[Deserializaer] Packet.message : " + x.message);
         Debug.Log("[Deserializaer] Packet.ltemList count : " + x.itemList.Count);
+        Debug.Log("[Deserializaer] Packet.x type : " + x.x.GetType().ToString());
     }
 
     public byte[] SerializseToByte(object x){
@@ -139,7 +142,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     public SocketResponse receiver;
     private NetworkStream ns;
     public string iPAdress = "127.0.0.1";
-    public const int kPort = 8107;
+    public int kPort = 8107;
     
     private int SenddataLength;                     // Send Data Length. (byte)
     private int ReceivedataLength;                     // Receive Data Length. (byte)
@@ -174,8 +177,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 			this.m_Socket.Connect(ipEndPoint);
             this.ns = new NetworkStream(this.m_Socket);
             this.isConnected = true;
-        }
-        catch (SocketException e) {
+        } catch (SocketException e) {
             Debug.Log("Socket connect error! : " + e.ToString() ); 
             return;
         }
@@ -183,13 +185,12 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         //=======================================================
         // Send data write.
         try {
-            this.client.Init(1234, (req, result) => {
+            this.client.Init("hoho~!", true, 15, 150, (req, result) => {
                 Debug.Log("[TcpSocket.isConntected] SUCCESS");
             });
         } catch (SocketException err) {
             Debug.Log("Socket send or receive error! : " + err.ToString() );
         }
-    
     }
 
 	public void ReceiveDataStream() {
