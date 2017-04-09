@@ -7,6 +7,8 @@ var net = require('net');
 var util = require('util');
 var color = require("colors");
 var receiver = require('./TcpReceiver.js');
+var BSON = require('bson');
+var bson = new BSON();
 var clients = [];
 
 module.exports.send = send;
@@ -60,7 +62,7 @@ function receive(socket, data){
 }
 
 function send(socket, data) {
-data = makeSendBuffer(data);
+data = makeSendBuffer(bson.serialize(data));
   var success = !socket.write(data);
   if (!success){ (function(socket, data) {
       	socket.once('drain', function() {
@@ -71,7 +73,7 @@ data = makeSendBuffer(data);
 }
 
 function broadcastAll(message, isShowLog) {
-    message = makeSendBuffer(message);
+    message = makeSendBuffer(bson.serialize(message));
     clients.forEach(function (client) {
       client.write(message);
     });
@@ -82,7 +84,7 @@ function broadcastAll(message, isShowLog) {
 }
 
 function broadcastExcludedMe(message, sender, isShowLog) {
-    message = makeSendBuffer(message);
+    message = makeSendBuffer(bson.serialize(message));
     clients.forEach(function (client) {
       if (client === sender) {
            return;
