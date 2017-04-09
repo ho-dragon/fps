@@ -40,14 +40,10 @@ public class Main : MonoBehaviourInstance<Main>
     }
     #endregion
 
-    void Start() {
-        TcpSocket.inst.SerializerTest();
-    }
-
     public bool isTestOn = false;
     public void EnterRoom(string userName) {
         TcpSocket.inst.client.EnterRoom(userName, (req, result) => {
-            Debug.Log("[입장완료]");
+            Debug.Log("complated joinRoom");
             PlayerManager.inst.player.Init(result.playerNum
                              , result.playerName
                              , (number, movePos) => {

@@ -100,17 +100,17 @@ public partial class IngameClient : MonoBehaviour
     }
 
 
-    public void OnMessage(byte[] data)
-    {
+    public void OnMessage(byte[] data) {
         SocketRequestFormat webSocketMsg = TcpSocket.inst.Deserializaer<SocketRequestFormat>(data);
         webSocketMsg.bytes = data;
-
+        Debug.Log("[OnMessage] webSocketMsg.id = " + webSocketMsg.id + " / data length = " + data.Length);
         timeSync.Adjust(webSocketMsg.time);
    
         if (webSocketMsg.IsNotification) {
+            Debug.Log("[OnMessage] IsNotification = true");
             OnNotification(webSocketMsg);
-        }
-        else  {
+        } else  {
+            Debug.Log("[OnMessage] IsNotification = false");
             DequeueRequestId(webSocketMsg.id);
             OnResponse(webSocketMsg);
         }
@@ -140,25 +140,19 @@ public partial class IngameClient : MonoBehaviour
     }
 
 
-    public SocketRequestFormat req(string method, params object[] _params)
-    {
+    public SocketRequestFormat req(string method, params object[] _params) {
         return new SocketRequestFormat(method, ++lastRequestId, timeSync.PosixTime, _params);
     }
 
     public delegate void Response<T>(IngameRequest req, T result = null) where T : class;
 
-    public void send<T>(SocketRequestFormat websocketRequest, Response<T> response) where T : class
-    {
+    public void send<T>(SocketRequestFormat websocketRequest, Response<T> response) where T : class {
         IngameRequest ingameRequest = new IngameRequest(websocketRequest, typeof(T));
-        //if (ws == null || ws.State != WebSocketStates.Open)
-        //{
-        //    return;
-        //}
         ingameRequest.RequestTime = DateTime.UtcNow;
         requests.Add(ingameRequest);
         EnqueueRequestId(lastRequestId);
 
-        byte[] json = TcpSocket.inst.SerializseToByte(websocketRequest);
+        byte[] json = TcpSocket.inst.SerializeToByte(websocketRequest);
         socketRequest.Send(json);
         Debug.Log(string.Format("<color=#86E57F>[Send]</color> {0}: {1}", websocketRequest.method, websocketRequest.id));
         StartCoroutine(waitingResponse<T>(ingameRequest, response));
@@ -166,41 +160,21 @@ public partial class IngameClient : MonoBehaviour
 
     private IEnumerator waitingResponse<T>(IngameRequest ingameRequest, Response<T> response) where T : class
     {
+        Debug.Log("waitingResponse--0");
         yield return StartCoroutine(ingameRequest);
+        Debug.Log("waitingResponse--1");
         if (ingameRequest.State.IsDone() == false) {
             response(ingameRequest, null);
             yield break;
         }
+        Debug.Log("waitingResponse--2");
 
         T result = ingameRequest.Result<T>();
-        if (result == null && typeof(T) == typeof(object))
-        {
+        if (result == null && typeof(T) == typeof(object)) {
             result = (T)new object();
         }
         response(ingameRequest, result);
     }
-
-    //IngameRequest Send(string method, Type resultType, params object[] param)
-    //{
-    //    SocketRequestFormat msg = new SocketRequestFormat(method, ++lastRequestId, timeSync.PosixTime, param);
-    //    IngameRequest req = new IngameRequest(msg, resultType);
-    //    EnqueueRequestId(lastRequestId);
-    //    if (ws != null && ws.State == WebSocketStates.Open)
-    //    {
-    //        requests.Add(req);
-    //        string json = JsonConvert.SerializeObject(msg);
-    //        ws.Send(json);
-    //        Debug.Log("<color=#86E57F>[Client]</color> "+json);
-    //        req.RequestTime = DateTime.UtcNow;
-    //    }
-    //    else
-    //    {
-    //        DequeueRequestId(lastRequestId);
-    //        req.Exception = new Exception("WebSocket is not open");
-    //    }
-    //    //ArchLatencyLogger.Save(lastRequestId);
-    //    return req;
-    //}
 
     IEnumerator DelaySend(string method, Type resultType, params object[] param)
     {
@@ -229,15 +203,18 @@ public partial class IngameClient : MonoBehaviour
         }
     }
 
-    void OnResponse(SocketRequestFormat res)
-    {
+    void OnResponse(SocketRequestFormat res) {
+        Debug.Log("[OnResponse]");
         IngameRequest req = requests.Find(r => r.RequestId == res.id);
-        if (req != null)
-        {
+        if (req != null) {
+            Debug.Log("[onresponse] response id = " + req.RequestId);
             requests.Remove(req);
             timeSync.Update(res.time, (long)req.Elasped.TotalMilliseconds);
             req.Response = res;
+        } else {
+            Debug.Log("[onresponse] response is null");
         }
+
     }
 
     Queue<long> RequestIdQueue;

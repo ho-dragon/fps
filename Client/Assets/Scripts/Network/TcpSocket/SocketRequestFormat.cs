@@ -14,23 +14,19 @@ public class SocketRequestFormat
     public string msg = "123";
     public int id;
 
-    //public Hashtable param;
     public Dictionary<string, object> param;
 
     [JsonIgnoreAttribute]
     public long time;
 
-    [JsonIgnoreAttribute]
-    public byte[] bytes;//이건 시리얼라이즈 하지 않음
+    public byte[] bytes;
 
     [JsonIgnoreAttribute]
     public bool IsNotification { get { return !string.IsNullOrEmpty(method); } }
 
-    public SocketRequestFormat(string method, long id, long time, params object[] args)
-    {
+    public SocketRequestFormat(string method, long id, long time, params object[] args) {
         this.method = method;
         this.id = (int)id;
-        //this.id += 3000;//EST
         this.time = time;
 
         if(args != null) {

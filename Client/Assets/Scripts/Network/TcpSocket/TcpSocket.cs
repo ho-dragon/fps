@@ -14,6 +14,9 @@ using System.IO;
 /// </summary>
 public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 
+
+    public int testInt = 200;
+
     #region OnGUI
     public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0)
     {
@@ -21,10 +24,11 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     }
     
     void OnGUI() {
-        if (GUI.Button(GetRectPos(0,5, 200, 50), "ToByte")) {
-            SerializerTest();
+        if (GUI.Button(GetRectPos(0,5, 200, 50), "int Test")) {
+            TestInteger(this.testInt);
         }
     }
+
     public class Packet {
         public enum KIND
         {
@@ -71,8 +75,59 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         Debug.Log("[Deserializaer] Packet.ltemList count : " + x.itemList.Count);
         Debug.Log("[Deserializaer] Packet.x type : " + x.x.GetType().ToString());
     }
+    private class TestClass {
+        public int x;
+    }
+    public void TestInteger(int testInt) {
+        TestClass x = new TestClass();
+        x.x = testInt;
 
-    public byte[] SerializseToByte(object x){
+        byte[] y = SerializeToByte(x);
+        for(int i = 0; i < y.Length; i++) {
+            Debug.Log("[test] [" + i + "] = " + y[i]);
+        }
+
+        TestClass result = Deserializaer<TestClass>(y);
+
+        Debug.Log("[result] int = " + result.x);
+    }
+
+    //public void TEST_1()
+    //{
+    //    string testData = "asdf";
+    //    byte[] SenddataLength = BitConverter.GetBytes(testData.Length);
+    //    byte[] Sendbyte = Encoding.Default.GetBytes(testData);
+    //    byte[] total = byte_merge(SenddataLength, Sendbyte);
+
+    //    string testData2 = "connected success";
+    //    byte[] SenddataLength2 = BitConverter.GetBytes(testData2.Length);
+    //    byte[] Sendbyte2 = Encoding.Default.GetBytes(testData2);
+    //    byte[] total2 = byte_merge(SenddataLength2, Sendbyte2);
+    //    byte[] total3 = byte_merge(total, total2);
+
+    //    receiver.GetRecevieBuffer(total2);
+    //    return;
+    //    DataResolver x = new DataResolver();
+    //    x.on_receive(total3, 0, total3.Length, receiver.CallbackRecevieBuffer);
+    //}
+
+    //public byte[] byte_merge(byte[] arg1, byte[] arg2)
+    //{
+    //    byte[] tmp = new byte[arg1.Length + arg2.Length];
+    //    for (int i = 0; i < arg1.Length; i++)
+    //    {
+    //        tmp[i] = arg1[i];
+    //    }
+    //    for (int j = 0; j < arg2.Length; j++)
+    //    {
+    //        tmp[arg1.Length + j] = arg2[j];
+    //    }
+    //    return tmp;
+    //}
+
+    #endregion
+
+    public byte[] SerializeToByte(object x){
         // Packet클래스를 BSON으로 직렬화
         MemoryStream ms = new MemoryStream();
         JsonSerializer serializer = new JsonSerializer();
@@ -100,41 +155,6 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         return dp;
     }
 
-
-   //public void TEST_1()
-   //{
-   //    string testData = "asdf";
-   //    byte[] SenddataLength = BitConverter.GetBytes(testData.Length);
-   //    byte[] Sendbyte = Encoding.Default.GetBytes(testData);
-   //    byte[] total = byte_merge(SenddataLength, Sendbyte);
-
-   //    string testData2 = "connected success";
-   //    byte[] SenddataLength2 = BitConverter.GetBytes(testData2.Length);
-   //    byte[] Sendbyte2 = Encoding.Default.GetBytes(testData2);
-   //    byte[] total2 = byte_merge(SenddataLength2, Sendbyte2);
-   //    byte[] total3 = byte_merge(total, total2);
-
-   //    receiver.GetRecevieBuffer(total2);
-   //    return;
-   //    DataResolver x = new DataResolver();
-   //    x.on_receive(total3, 0, total3.Length, receiver.CallbackRecevieBuffer);
-   //}
-
-   //public byte[] byte_merge(byte[] arg1, byte[] arg2)
-   //{
-   //    byte[] tmp = new byte[arg1.Length + arg2.Length];
-   //    for (int i = 0; i < arg1.Length; i++)
-   //    {
-   //        tmp[i] = arg1[i];
-   //    }
-   //    for (int j = 0; j < arg2.Length; j++)
-   //    {
-   //        tmp[arg1.Length + j] = arg2[j];
-   //    }
-   //    return tmp;
-   //}
-
-    #endregion
 
     private Socket m_Socket;
 	public SocketRequest sender;
@@ -184,13 +204,10 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 
         //=======================================================
         // Send data write.
-        try {
-            this.client.Init("hoho~!", true, 15, 150, (req, result) => {
-                Debug.Log("[TcpSocket.isConntected] SUCCESS");
-            });
-        } catch (SocketException err) {
-            Debug.Log("Socket send or receive error! : " + err.ToString() );
-        }
+        this.client.Init("hoho~!", true, 15, 150, (req, result) => {
+            Debug.Log("[TcpSocket.isConntected] SUCCESS");
+        });
+
     }
 
 	public void ReceiveDataStream() {

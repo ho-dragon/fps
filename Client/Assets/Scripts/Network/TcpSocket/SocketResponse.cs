@@ -45,19 +45,6 @@ public class SocketResponse : MonoBehaviour
 
     public void Receiver(string stringData, byte[] buffer) {
         ingameClient.OnMessage(buffer);
-
-        //string[] msgs = stringData.Split('|');
-        //switch(msgs[0]) {
-        //    case "joinPlayer" :
-        //        JoinPlayer(msgs);
-        //        break;
-        //    case "move":
-        //        MovePlayer(msgs);
-        //        break;
-        //    case "enterRoomResult":
-        //        enterRoomResult(TcpSocket.inst.Deserializaer<JoinPlayerResponse>(buffer));
-        //        break;
-        //}
     }
 
     private void enterRoomResult(JoinPlayerResponse result) {
@@ -66,15 +53,6 @@ public class SocketResponse : MonoBehaviour
                                      , (number, movePos) => {
                                          TcpSocket.inst.sender.MovePlayer(number, movePos);
                                      });
-
-
-        //int playerNum = System.Convert.ToInt32(msgs[1]);
-        //string playerName = msgs[2];
-        //PlayerManager.inst.player.Init(playerNum
-        //                             , playerName
-        //                             , (number, movePos) => {
-        //                                TcpSocket.inst.sender.MovePlayer(number, movePos);
-        //                             });
     }
 
     private void JoinPlayer(string[] msgs) {

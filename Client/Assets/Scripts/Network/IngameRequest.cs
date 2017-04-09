@@ -19,8 +19,8 @@ public class IngameRequest : IEnumerator
                     Exception = new Exception("Null response");
                 else if (response.code == 200)
                     State = IngameRequestStates.Done;
-                //else
-                   // Exce//ion = new IngameException(response);
+               // else
+                    //Exception = new IngameException(response);
             }
         }
     }

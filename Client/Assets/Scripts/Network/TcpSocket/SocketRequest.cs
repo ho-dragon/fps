@@ -34,6 +34,13 @@ public class SocketRequest : MonoBehaviour
         m_Socket.Send(totalSendBuffer, totalSendBuffer.Length, SocketFlags.None);
     }
 
+    private void DeserializaeTEST(byte[] bytes) {
+      SocketRequestFormat x =  TcpSocket.inst.Deserializaer<SocketRequestFormat>(bytes);
+      foreach (KeyValuePair<string, object> i in x.param) {
+          Debug.Log("[TEST.param] key = " + i.Key + " / value = " + i.Value);
+      }
+    }
+
     private byte[] byte_merge(byte[] arg1, byte[] arg2) {
         byte[] tmp = new byte[arg1.Length + arg2.Length];
         for (int i = 0; i < arg1.Length; i++) {
