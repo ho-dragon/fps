@@ -48,7 +48,8 @@ public class SocketResponse : MonoBehaviour
     }
 
     private void enterRoomResult(JoinPlayerResponse result) {
-        PlayerManager.inst.player.Init(result.playerNum
+        PlayerManager.inst.localPlayer.Init(null
+                                     , result.playerNum
                                      , result.playerName
                                      , (number, movePos) => {
                                          TcpSocket.inst.sender.MovePlayer(number, movePos);

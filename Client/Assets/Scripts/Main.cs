@@ -44,11 +44,12 @@ public class Main : MonoBehaviourInstance<Main>
     public void EnterRoom(string userName) {
         TcpSocket.inst.client.EnterRoom(userName, (req, result) => {
             Debug.Log("complated joinRoom");
-            PlayerManager.inst.player.Init(result.playerNum
-                             , result.playerName
-                             , (number, movePos) => {
-                                 TcpSocket.inst.sender.MovePlayer(number, movePos);
-                             });
+            PlayerManager.inst.localPlayer.Init(null
+                                              , result.playerNum
+                                              , result.playerName
+                                              , (number, movePos) => {
+                                                  TcpSocket.inst.sender.MovePlayer(number, movePos);
+                                               });
         });
     }
 }

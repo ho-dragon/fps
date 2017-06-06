@@ -11,14 +11,14 @@ public class PlayerCamera : MonoBehaviourInstance<PlayerCamera> {
     public float maximumX = 360F;
     public float minimumY = -60F;
     public float maximumY = 60F;
-    float rotationX = 0F;
-    float rotationY = 0F;
-    float lockPos = 0F;
+    private float rotationX = 0F;
+    private float rotationY = 0F;
+    private float lockPos = 0F;
 
-    Quaternion originalRotation;
+    private Quaternion originalRotation;
 
     void Start() {
-        originalRotation = transform.localRotation;
+        this.originalRotation = this.transform.localRotation;
     }
 
     public void Look(Transform targetRotation) {

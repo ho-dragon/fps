@@ -3,26 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
-    private List<Player> players;
-    public Player player;
+    public List<Player> remotePlayers;
+    public Player localPlayer;
 
     protected override void _Awake() {
-        this.players = new List<Player>();
+        this.remotePlayers = new List<Player>();
     }
 
     private void Start() {
-        if (this.player != null) {
-            this.player.AddCamera(PlayerCamera.inst);
-            this.player.isPlayable = true;
+        if (this.localPlayer != null) {
+            this.localPlayer.EnableCamera(PlayerCamera.inst);
+            this.localPlayer.IsPlayable = true;
+            RayCastGun rayCastGun = localPlayer.weaponGameObject.AddComponent<RayCastGun>();
+            //Test
+            this.localPlayer.Init(rayCastGun, 1, "localTestPlayer", null);
         }
     }
 
     public bool IsExsitPlayer(int playerNum) {
-        return this.players.Exists(x => x.Number == playerNum);
+        return this.remotePlayers.Exists(x => x.Number == playerNum);
     }
 
     public void JoinedPlayer(int playerNum, string playerName) {
-        if (this.players.Exists(x => x.Number == playerNum)) {
+        if (this.remotePlayers.Exists(x => x.Number == playerNum)) {
             Debug.LogError("[Main.JoinPlayer] already exist player = " + playerNum);
             return;
         }
@@ -30,17 +33,19 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         GameObject clone = Instantiate(Resources.Load("Player"), Vector3.zero, Quaternion.identity) as GameObject;
         clone.transform.position = new Vector3(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(10, 20), UnityEngine.Random.Range(0, 10));
         Player newPlayer = clone.GetComponent<Player>();
-        newPlayer.Init(playerNum
-                     , playerName
-                     , null);
-        this.players.Add(newPlayer);
+        newPlayer.Init(null//Todo. set weapon from server
+                      , playerNum
+                      , playerName
+                      , null);
+
+        this.remotePlayers.Add(newPlayer);
     }
 
     public void MovePlayer(int playerNumb, Vector3 movePosition) {
-        Player player = this.players.Find(x => x.Number == playerNumb);
+        Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if(player != null) {
-            if(player.isPlayable == false) {
-                player.SetMovePosition(movePosition);
+            if (player.IsPlayable == false) {
+                player.ActionController.move.SetMovePosition(movePosition);
             }
         }
     }
