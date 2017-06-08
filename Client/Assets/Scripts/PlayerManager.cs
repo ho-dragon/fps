@@ -11,12 +11,11 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
     }
 
     private void Start() {
-        if (this.localPlayer != null) {
-            this.localPlayer.EnableCamera(PlayerCamera.inst);
-            this.localPlayer.IsPlayable = true;
+        if (this.localPlayer != null) {            
             RayCastGun rayCastGun = localPlayer.weaponGameObject.AddComponent<RayCastGun>();
-            //Test
             this.localPlayer.Init(rayCastGun, 1, "localTestPlayer", null);
+			this.localPlayer.EnableCamera(PlayerCamera.inst);
+			this.localPlayer.IsPlayable = true;
         }
     }
 

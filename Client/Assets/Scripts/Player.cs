@@ -37,11 +37,12 @@ public class Player : MonoBehaviour {
         this.number = number;
         this.name = name;
         this.textMesh.text = name;
+		this.actionController.move.Init(number, moveCallback);
+
         if (weapon != null) {
             this.weapon = weapon;
             this.weapon.Init(this.muzzleTransform);
-        }
-        this.actionController.move.Init(number, moveCallback);
+        }        
         //this.actionController.shoot.Init(weapon);
     }
 
@@ -53,6 +54,9 @@ public class Player : MonoBehaviour {
             this.cam.MoveChildTrans(this.eyes);
             this.cam.Look(this.camDerection);
             this.actionController.move.CameraTransform = this.cam.transform;
+			if(this.weapon != null){
+				this.weapon.SetCamera(cam);
+			}			
         }
     }
 }

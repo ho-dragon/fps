@@ -6,9 +6,16 @@ public class Weapon : MonoBehaviour {
     public Transform muzzleTransform;
     public string playerTag = "Player";
     public string groundTag = "Ground";
-    public virtual void Init(Transform muzzleTransform) {
+	public PlayerCamera playerCam;
+
+    public void Init(Transform muzzleTransform) {
         Debug.Log("[Weapon] Init");
+		this.muzzleTransform = muzzleTransform;
     }
+
+	public void SetCamera(PlayerCamera camera) {
+		this.playerCam = camera;
+	}
 
     public virtual void Shoot() {
         Debug.Log("[Weapon] shoot");

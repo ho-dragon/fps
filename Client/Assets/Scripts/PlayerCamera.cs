@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Collections;
 
 public class PlayerCamera : MonoBehaviourInstance<PlayerCamera> {
+	public Camera camera;
     public GameObject target;
     public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
     public RotationAxes axes = RotationAxes.MouseXAndY;
@@ -17,7 +19,8 @@ public class PlayerCamera : MonoBehaviourInstance<PlayerCamera> {
 
     private Quaternion originalRotation;
 
-    void Start() {
+    void Awake() {
+		Assert.IsNotNull(this.camera);
         this.originalRotation = this.transform.localRotation;
     }
 
