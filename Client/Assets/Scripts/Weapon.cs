@@ -7,7 +7,8 @@ public class Weapon : MonoBehaviour {
     public string playerTag = "Player";
     public string groundTag = "Ground";
 	public PlayerCamera playerCam;
-
+	public bool isPlayable = false;
+	public bool IsPlayable { set { this.isPlayable = value; } }
     public void Init(Transform muzzleTransform) {
         Debug.Log("[Weapon] Init");
 		this.muzzleTransform = muzzleTransform;

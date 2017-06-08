@@ -27,6 +27,9 @@ public class Player : MonoBehaviour {
         get { return this.isPlayable; }
         set { this.isPlayable = value;
             this.actionController.move.IsPlayable = value;
+			if(this.weapon != null) {
+				this.weapon.IsPlayable = value;
+			}			
         }
     }
     public int Number { get { return this.number; } }
