@@ -27,16 +27,6 @@ public partial class IngameClient : MonoBehaviour
     Queue<SocketRequestFormat> notifications = new Queue<SocketRequestFormat>();
     IngameTimeSync timeSync = new IngameTimeSync();
     public  SocketRequest socketRequest;
-
-
-    Dictionary<string, string> NotiExecuteType = new Dictionary<string, string>(){
-		{"Dead", "Que"},
-		{"Fight","Que"},
-		{"Win", "Que"},
-		{"GunSound", "Que"},
-		{"StartBossBattle", "Que"}
-	};
-
     void Awake() {
         Exception = null;
         RequestIdQueue = new Queue<long>();
@@ -64,16 +54,6 @@ public partial class IngameClient : MonoBehaviour
 
         webSocketMsg = null;
         return false;
-    }
-
-    public string GetExecuteType(string method)
-    {
-        if (NotiExecuteType.ContainsKey(method))
-        {
-            return NotiExecuteType[method];
-        }
-        else
-            return "";
     }
 
     public bool TryGetNextNoti(out SocketRequestFormat webSocketMsg)
@@ -108,7 +88,8 @@ public partial class IngameClient : MonoBehaviour
    
         if (webSocketMsg.IsNotification) {
             Debug.Log("[OnMessage] IsNotification = true");
-            OnNotification(webSocketMsg);
+           // OnNotification(webSocketMsg);
+            TcpSocket.inst.receiver.RecevieNotification(webSocketMsg);
         } else  {
             Debug.Log("[OnMessage] IsNotification = false");
             DequeueRequestId(webSocketMsg.id);
@@ -158,16 +139,12 @@ public partial class IngameClient : MonoBehaviour
         StartCoroutine(waitingResponse<T>(ingameRequest, response));
     }
 
-    private IEnumerator waitingResponse<T>(IngameRequest ingameRequest, Response<T> response) where T : class
-    {
-        Debug.Log("waitingResponse--0");
+    private IEnumerator waitingResponse<T>(IngameRequest ingameRequest, Response<T> response) where T : class {
         yield return StartCoroutine(ingameRequest);
-        Debug.Log("waitingResponse--1");
         if (ingameRequest.State.IsDone() == false) {
             response(ingameRequest, null);
             yield break;
         }
-        Debug.Log("waitingResponse--2");
 
         T result = ingameRequest.Result<T>();
         if (result == null && typeof(T) == typeof(object)) {

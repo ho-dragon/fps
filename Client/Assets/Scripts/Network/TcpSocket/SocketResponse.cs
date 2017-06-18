@@ -7,8 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 using System.IO;
 
-public class SocketResponse : MonoBehaviour
-{
+public class SocketResponse : MonoBehaviour {
     private DataResolver resolver;
     public IngameClient ingameClient;
 
@@ -47,31 +46,32 @@ public class SocketResponse : MonoBehaviour
         ingameClient.OnMessage(buffer);
     }
 
-    private void enterRoomResult(JoinPlayerResponse result) {
-        PlayerManager.inst.localPlayer.Init(null
-                                     , result.playerNum
-                                     , result.playerName
-                                     , (number, movePos) => {
-                                         TcpSocket.inst.sender.MovePlayer(number, movePos);
-                                     });
+
+    public void RecevieNotification(SocketRequestFormat result) {
+        switch(result.method){
+            case "damagedPlayer":
+                DamagedPlayer(TcpSocket.inst.Deserializaer<DamageModel>(result.bytes));
+                break;
+            case "joinPlayer":
+                JoinPlayer(TcpSocket.inst.Deserializaer<EnterRoomModel>(result.bytes));
+                break;
+            case "MovePlayer":
+                MovePlayer(TcpSocket.inst.Deserializaer<PlayerMoveModel>(result.bytes));
+                break;
+        }
     }
 
-    private void JoinPlayer(string[] msgs) {
-        int playerNum = System.Convert.ToInt32(msgs[1]);
-        string playerName = msgs[2];
-        PlayerManager.inst.JoinedPlayer(playerNum, playerName);
+    public void DamagedPlayer(DamageModel result) {
+        PlayerManager.inst.DamagedPlayer(result);
     }
 
-    private void MovePlayer(string[] msgs) {
-        int playerNum = System.Convert.ToInt32(msgs[1]);
-        Vector3 movePos = new Vector3(System.Convert.ToSingle(msgs[2])
-                                    , System.Convert.ToSingle(msgs[3])
-                                    , System.Convert.ToSingle(msgs[4]));
-        PlayerManager.inst.MovePlayer(playerNum, movePos);
+    public void JoinPlayer(EnterRoomModel result) {
+        PlayerManager.inst.JoinedPlayer(result, false);
     }
-}
 
-public class JoinPlayerResponse {
-    public int playerNum;
-    public string playerName;
+    private void MovePlayer(PlayerMoveModel result) {
+        PlayerManager.inst.MovePlayer(result.playerNum, new Vector3(result.playerPosX
+                                                                    , result.playerPosY
+                                                                    , result.playerPosZ));
+    }
 }

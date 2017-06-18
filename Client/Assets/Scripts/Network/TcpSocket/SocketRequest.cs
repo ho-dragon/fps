@@ -6,22 +6,8 @@ using System.Net;
 using System.Text;
 using System;
 
-public class SocketRequest : MonoBehaviour
-{
+public class SocketRequest : MonoBehaviour {
 	public Socket m_Socket;
-    public void Send(string msg) {
-        if (TcpSocket.inst.IsConnected == false) {
-            return;
-        }
-
-        int sendDataLength = Encoding.Default.GetByteCount(msg);
-        byte[] header = BitConverter.GetBytes(sendDataLength);
-        byte[] body = Encoding.Default.GetBytes(msg);
-        byte[] totalSendBuffer = byte_merge(header, body);
-        //Debug.Log("[SocketRequest.Send]: data length = " + totalSendBuffer.Length); 
-        m_Socket.Send(totalSendBuffer, totalSendBuffer.Length, SocketFlags.None);
-    }
-
     public void Send(byte[] msg) {
         if (TcpSocket.inst.IsConnected == false) {
             return;
@@ -30,15 +16,7 @@ public class SocketRequest : MonoBehaviour
         byte[] header = BitConverter.GetBytes(sendDataLength);
         byte[] body = msg;
         byte[] totalSendBuffer = byte_merge(header, body);
-        //Debug.Log("[SocketRequest.Send]: data length = " + totalSendBuffer.Length); 
         m_Socket.Send(totalSendBuffer, totalSendBuffer.Length, SocketFlags.None);
-    }
-
-    private void DeserializaeTEST(byte[] bytes) {
-      SocketRequestFormat x =  TcpSocket.inst.Deserializaer<SocketRequestFormat>(bytes);
-      foreach (KeyValuePair<string, object> i in x.param) {
-          Debug.Log("[TEST.param] key = " + i.Key + " / value = " + i.Value);
-      }
     }
 
     private byte[] byte_merge(byte[] arg1, byte[] arg2) {
@@ -50,31 +28,5 @@ public class SocketRequest : MonoBehaviour
             tmp[arg1.Length + j] = arg2[j];
         }
         return tmp;
-    }
-
-	public void Send(string method, string[] param) {
-		StringBuilder sb = new StringBuilder();
-		sb.Append(method);
-		sb.Append("|");
-		for (int count = 0; count < param.Length; count++) {
-			sb.Append(param[count]);
-			if (count != param.Length - 1) {
-				sb.Append("*");
-			}
-		}
-        Send(sb.ToString());
-	}
-
-	public void SendPosition(Vector3 position) {
-		StringBuilder sb = new StringBuilder();
-		sb.Append("1");
-        Send(sb.ToString());
-	}
-
-    public void MovePlayer(int playerNum, Vector3 playerPos) {
-        Send("move" + "|" + playerNum.ToString()
-                    + "|" + playerPos.x
-                    + "|" + playerPos.y
-                    + "|" + playerPos.z);
     }
 }

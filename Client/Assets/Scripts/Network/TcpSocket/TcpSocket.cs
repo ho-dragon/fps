@@ -161,8 +161,8 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     public IngameClient client;
     public SocketResponse receiver;
     private NetworkStream ns;
-    public string iPAdress = "127.0.0.1";
-    public int kPort = 8107;
+    public string ip = "127.0.0.1";
+    public int port = 8107;
     
     private int SenddataLength;                     // Send Data Length. (byte)
     private int ReceivedataLength;                     // Receive Data Length. (byte)
@@ -176,7 +176,10 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         get { return this.isConnected; }
     }
 
-    public void Connect() {
+    public void Connect(string ip, int port) {
+        this.ip = ip;
+        this.port = port;
+
         if (isConnected) {
             Debug.Log("Socket is already connected"); 
             return;
@@ -191,8 +194,8 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         //=======================================================
         // Socket connect.
 
-        IPAddress ipAddr = System.Net.IPAddress.Parse(iPAdress);
-        IPEndPoint ipEndPoint = new System.Net.IPEndPoint(ipAddr, kPort);
+        IPAddress ipAddr = System.Net.IPAddress.Parse(ip);
+        IPEndPoint ipEndPoint = new System.Net.IPEndPoint(ipAddr, port);
          try {
 			this.m_Socket.Connect(ipEndPoint);
             this.ns = new NetworkStream(this.m_Socket);
@@ -204,9 +207,9 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 
         //=======================================================
         // Send data write.
-        this.client.Init("hoho~!", true, 15, 150, (req, result) => {
-            Debug.Log("[TcpSocket.isConntected] SUCCESS");
-        });
+        //this.client.Init("hoho~!", true, 15, 150, (req, result) => {
+        //    Debug.Log("[TcpSocket.isConntected] SUCCESS");
+        //});
 
     }
 

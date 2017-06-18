@@ -5,6 +5,7 @@ using UnityEngine.Assertions;
 public class Player : MonoBehaviour {
     private bool isPlayable = false;
     public int number = 0;
+    private int teamCode = 0;
     public string name = "";
     public TextMesh textMesh;
     public Transform eyes;
@@ -14,6 +15,8 @@ public class Player : MonoBehaviour {
     private PlayerCamera cam;
     private Weapon weapon;
     public PlayerActionController actionController;
+    private PlayerStatus status;
+    public HpGage hpBar;
 
     void Awake() {
         Assert.IsNotNull(this.actionController);
@@ -21,6 +24,10 @@ public class Player : MonoBehaviour {
         Assert.IsNotNull(this.textMesh);
         Assert.IsNotNull(this.muzzleTransform);
         Assert.IsNotNull(this.weaponGameObject);
+        Assert.IsNotNull(this.hpBar);
+    }
+    public bool IsSameTeam(int teamCode) {
+        return this.teamCode == teamCode;
     }
 
     public bool IsPlayable {
@@ -35,18 +42,28 @@ public class Player : MonoBehaviour {
     public int Number { get { return this.number; } }
     public string Name { get { return this.name; } }
     public PlayerActionController ActionController { get { return this.actionController; } }
-    public void Init(Weapon weapon, int number, string name, System.Action<int, Vector3> moveCallback) {
+    public void Init(int teamCode, Weapon weapon, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3> moveCallback) {
         Debug.Log("[Player] Init number = " + number + " / name = " + name);
+        this.teamCode = teamCode;
         this.number = number;
         this.name = name;
         this.textMesh.text = name;
 		this.actionController.move.Init(number, moveCallback);
+        this.status = new PlayerStatus(currentHP, maxHP);
+        SetHealth(currentHP, maxHP);
 
         if (weapon != null) {
             this.weapon = weapon;
-            this.weapon.Init(this.muzzleTransform);
-        }        
+            this.weapon.Init(this.number, this.muzzleTransform);
+        }
         //this.actionController.shoot.Init(weapon);
+    }
+
+    public void SetHealth(float currentHP, float maxHP) {
+        if(this.isPlayable) {
+            UIManager.inst.hud.hp.SetHP(currentHP, maxHP);
+        }
+        this.hpBar.SetHP(currentHP, maxHP);
     }
 
     public void EnableCamera(PlayerCamera cam) {
@@ -59,7 +76,7 @@ public class Player : MonoBehaviour {
             this.actionController.move.CameraTransform = this.cam.transform;
 			if(this.weapon != null){
 				this.weapon.SetCamera(cam);
-			}			
+			}
         }
     }
 }
