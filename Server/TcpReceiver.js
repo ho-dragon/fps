@@ -32,8 +32,11 @@ function receiveFromClient(socket, msg) {
 		case 'enterRoom':
 			enterRoom(socket, result);
 			break;
-		case 'move' :
-			//movePlayer(msg)
+		case 'movePlayer' :
+			movePlayer(socket, msg);
+			break;
+		case 'attackPlayer' :
+			attackPlayer(socket, result);
 			break;
 	}
 }
@@ -49,23 +52,58 @@ function init(socket, receivedData){
 
 function enterRoom(socket, receivedData) {
 	var playerName = receivedData.param["playerName"];
-	var playerNum = room.addPlayer(playerName);
+	var player = room.addPlayer(playerName);
+	var model = new EnterRoomModel(player.teamCode, player.playerNum, player.playerName, player.currentHP, player.maxHP);
+	var bytes = bson.serialize(model);
 
-	var model = new EnterRoomModel(playerNum, playerName);
-	var response = new SocketRequestFormat('', 200, receivedData.id, "success", bson.serialize(model));
+	var response = new SocketRequestFormat('', 200, receivedData.id, "success", bytes);
 	server.send(socket, response);
 
-	//var notiResult = new SocketRequestFormat('joinPlayer',200, 0, "success",null);
-	//server.broadcastExcludedMe(notiResult, socket,  true);
+	var notiResult = new SocketRequestFormat('joinPlayer',200, 0, "success", bytes);
+	server.broadcastExcludedMe(notiResult, socket,  true);
 }
 
-function movePlayer(msg) {
-	server.broadcastAll(msg, false);
+function movePlayer(socket, msg) {
+	server.broadcastExcludedMe(msg, socket, false);
 }
 
-function EnterRoomModel(playerNum, playerName){
+function attackPlayer(socket, receivedData) {
+	var attackPlayer = receivedData.param["attackPlayer"];
+	var damagedPlayer = receivedData.param["damagedPlayer"];
+	var attackPosition = receivedData.param["attackPosition"];
+
+	var player = room.attackPlayer(attackPlayer, damagedPlayer, attackPosition);
+	var model = new DamageModel(attackPlayer, damagedPlayer, 10, player.currentHP, player.maxHP);
+	var bytes = bson.serialize(model);
+
+	var response = new SocketRequestFormat('', 200, receivedData.id, "success", bytes);
+	server.send(socket, response);
+
+	var notiResult = new SocketRequestFormat('damagedPlayer',200, 0, "success", bytes);
+	server.broadcastExcludedMe(notiResult, socket,  true);
+}
+
+function MovePlayerModel(playerNum, playerPosX, playerPosY, playerPosZ) {
+	this.playerNum = playerNum;
+	this.playerPosX = playerPosX;
+	this.playerPosY = playerPosY;
+	this.playerPosZ = playerPosZ;
+}
+
+function DamageModel(attackPlayer, damagedPlayer, damage, currentHP, maxHP) {
+	this.attackPlayer = attackPlayer;
+	this.damagedPlayer = damagedPlayer;
+	this.damage = damage;
+	this.currentHP = currentHP;
+	this.maxHP = maxHP;
+}
+
+function EnterRoomModel(teamCode, playerNum, playerName, currentHP, maxHP) {
+	this.teamCdoe = teamCode;
 	this.playerNum = playerNum;
 	this.playerName = playerName;
+	this.currentHP = currentHP;
+	this.maxHP = maxHP;
 }
 
 function SocketRequestFormat(method, code, id, msg, bytes) {
