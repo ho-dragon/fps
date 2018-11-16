@@ -50,6 +50,10 @@ public class Main : MonoBehaviourInstance<Main>
     public bool isTestOn = false;
     public void EnterRoom(string userName) {
         TcpSocket.inst.client.EnterRoom(userName, (req, result) => {
+            if (result == null) {
+                Debug.LogError("[TcpSocket.EnterRoom] result is null");
+                return;
+            }
             Debug.Log("complated localPlayer joinRoom");
             PlayerManager.inst.JoinedPlayer(result, true);
         });

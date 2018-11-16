@@ -74,50 +74,62 @@ public partial class IngameClient : MonoBehaviour
     }
 
 
-    void OnDestroy()
-    {
-        ReleaseWebSocket(true);
+    void OnDestroy() {
+        State = IngameClientStates.Closed;
     }
 
 
     public void OnMessage(byte[] data) {
-        SocketRequestFormat webSocketMsg = TcpSocket.inst.Deserializaer<SocketRequestFormat>(data);
-        webSocketMsg.bytes = data;
-        Debug.Log("[OnMessage] webSocketMsg.id = " + webSocketMsg.id + " / data length = " + data.Length);
-        timeSync.Adjust(webSocketMsg.time);
+        SocketRequestFormat msg = TcpSocket.inst.Deserializaer<SocketRequestFormat>(data);
+        msg.bytes = data;
+        Debug.Log("[OnMessage] webSocketMsg.id = " + msg.id + " / data length = " + data.Length);
+        timeSync.Adjust(msg.time);
    
-        if (webSocketMsg.IsNotification) {
+        if (msg.IsNotification) {
             Debug.Log("[OnMessage] IsNotification = true");
-           // OnNotification(webSocketMsg);
-            TcpSocket.inst.receiver.RecevieNotification(webSocketMsg);
+            TcpSocket.inst.receiver.RecevieNotification(msg);
         } else  {
             Debug.Log("[OnMessage] IsNotification = false");
-            DequeueRequestId(webSocketMsg.id);
-            OnResponse(webSocketMsg);
+            DequeueRequestId(msg.id);
+            OnResponse(msg);
         }
     }
 
-    void ReleaseWebSocket(bool close)
-    {
-        //if (ws != null)
-        //{
-        //    while (notifications.Count > 0)
-        //    {
-        //        Ingame_Socket.Instance.EndSocketMessage(notifications.Dequeue());
-        //    }
-        //    CancelRequests(new Exception("WebSocket is closed"));
+    public interface IResponse {
+        long GetRid();
+        void ExcuteCallback();
+    }
 
-        //    notifications.Clear();
-        //    ws.OnMessage -= OnMessage;
-        //    ws.OnBinary -= OnBinary;
-        //    ws.OnOpen -= OnOpen;
-        //    ws.OnClose -= OnClose;
-        //    ws.OnError -= OnError;
-        //    if (close)
-        //        ws.Close();
-        //    ws = null;
-        //}
-        State = IngameClientStates.Closed;
+    public class ResponseEntry<T> : IResponse where T : class {
+        public IngameRequest ingameRequest;
+        public Response<T> responseCallback;
+
+        public long GetRid() {
+            return this.ingameRequest.RequestId;
+        }
+
+        public void ExcuteCallback() {
+            if (ingameRequest.State == IngameRequestStates.Error) {//ex NO_ENEMY_EXIST
+                Debug.LogError("[INgameClinet.ResponseEntry.ExcuteCallback] error / state = " + ingameRequest.State.ToString());
+                responseCallback(this.ingameRequest, null);
+                return;
+            }
+
+            if (ingameRequest.State.IsDone() == false) {
+                Debug.LogError("[INgameClinet.ResponseEntry.ExcuteCallback] failed / not done / state = " + ingameRequest.State.ToString());
+                responseCallback(this.ingameRequest, null);
+                return;
+            }
+         
+            T result = this.ingameRequest.Result<T>();
+            if (result == null && typeof(T) == typeof(object)) {
+                result = (T)new object();
+            }
+
+            if (responseCallback != null) {
+                responseCallback(this.ingameRequest, result);
+            }
+        }
     }
 
 
@@ -126,73 +138,66 @@ public partial class IngameClient : MonoBehaviour
     }
 
     public delegate void Response<T>(IngameRequest req, T result = null) where T : class;
-
-    public void send<T>(SocketRequestFormat websocketRequest, Response<T> response) where T : class {
-        IngameRequest ingameRequest = new IngameRequest(websocketRequest, typeof(T));
+    public List<IResponse> responseList = new List<IResponse>();
+    public void send<T>(SocketRequestFormat request, Response<T> response) where T : class {
+        IngameRequest ingameRequest = new IngameRequest(request, typeof(T));
         ingameRequest.RequestTime = DateTime.UtcNow;
         requests.Add(ingameRequest);
         EnqueueRequestId(lastRequestId);
 
-        byte[] json = TcpSocket.inst.SerializeToByte(websocketRequest);
+        byte[] json = TcpSocket.inst.SerializeToByte(request);
         socketRequest.Send(json);
-        Debug.Log(string.Format("<color=#86E57F>[Send]</color> {0}: {1}", websocketRequest.method, websocketRequest.id));
-        StartCoroutine(waitingResponse<T>(ingameRequest, response));
+        Debug.Log(string.Format("<color=#86E57F>[Send]</color> method = {0} rid = {1}", request.method, request.id));
+        this.responseList.Add(new ResponseEntry<T>() { ingameRequest = ingameRequest, responseCallback = response });
     }
 
-    private IEnumerator waitingResponse<T>(IngameRequest ingameRequest, Response<T> response) where T : class {
-        yield return StartCoroutine(ingameRequest);
-        if (ingameRequest.State.IsDone() == false) {
-            response(ingameRequest, null);
-            yield break;
+    private class CanceledRequest {
+        public long rid = 0;
+        public string method = "";
+    }
+
+
+    private List<CanceledRequest> canceledRequests;
+    void CancelRequests(Exception ex) {
+        canceledRequests = new List<CanceledRequest>();
+        if (this.requests != null && this.requests.Count > 0) {
+            foreach (IngameRequest i in this.requests) {
+                canceledRequests.Add(new CanceledRequest() {
+                    rid = i.RequestId,
+                    method = i.RequestMethod
+                });
+            }
         }
-
-        T result = ingameRequest.Result<T>();
-        if (result == null && typeof(T) == typeof(object)) {
-            result = (T)new object();
-        }
-        response(ingameRequest, result);
+        this.requests.ForEach(req => req.Exception = ex);
+        this.requests = new List<IngameRequest>();
+        this.responseList = new List<IResponse>();
     }
 
-    IEnumerator DelaySend(string method, Type resultType, params object[] param)
-    {
-        yield return new WaitForSeconds(.1f);
-        Send(method, resultType, param);
-    }
-
-    void CancelRequests(Exception ex)
-    {
-        requests.ForEach(req => req.Exception = ex);
-        requests = new List<IngameRequest>();
-    }
-
-    Type GetResponseResultType(long id)
-    {
-        IngameRequest req = requests.Find(r => r.RequestId == id);
-        return req == null ? null : req.ResultType;
-    }
-
-    void OnNotification(SocketRequestFormat notification)
-    {
-        if (notification != null)
-        {
-           // GlobalData.AddNotiMessage(notification);
-            notifications.Enqueue(notification);
-        }
-    }
 
     void OnResponse(SocketRequestFormat res) {
-        Debug.Log("[OnResponse]");
-        IngameRequest req = requests.Find(r => r.RequestId == res.id);
+        IngameRequest req = this.requests.Find(r => r.RequestId == res.id);
         if (req != null) {
-            Debug.Log("[onresponse] response id = " + req.RequestId);
-            requests.Remove(req);
+            this.requests.Remove(req);
             timeSync.Update(res.time, (long)req.Elasped.TotalMilliseconds);
             req.Response = res;
-        } else {
-            Debug.Log("[onresponse] response is null");
-        }
 
+            if (req .Equals("ping")) {
+                return;
+            }
+
+            IResponse response = this.responseList.Find(x => x.GetRid() == res.id);
+            if (response == null) {
+                Debug.LogError("[IngameClient.OnResponse] response is not found");
+                return;
+            }
+
+            if (this.responseList.Remove(response) == false) {
+                Debug.LogError("[IngameClient.OnResponse] remove failed.");
+            }
+            response.ExcuteCallback();
+        }
     }
+
 
     Queue<long> RequestIdQueue;
     public int GetQueueCount()

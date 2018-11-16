@@ -38,7 +38,6 @@ public class SocketResponse : MonoBehaviour {
     }
 
     private int get_body_size(byte[] data) {
-        Type type = Defines.HEADERSIZE.GetType();
         return BitConverter.ToInt32(data, 0);
     }
 

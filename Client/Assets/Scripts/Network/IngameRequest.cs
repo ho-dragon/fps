@@ -7,6 +7,7 @@ public class IngameRequest : IEnumerator
     public long RequestId { get; private set; }
     public IngameRequestStates State { get; private set; }
     public Type ResultType { get; private set; }
+    public string RequestMethod { get; protected set; }
     public SocketRequestFormat Response
     {
         get { return response; }
@@ -66,6 +67,7 @@ public class IngameRequest : IEnumerator
     {
         RequestId = req.id;
         ResultType = responseType;
+        RequestMethod = req.method;
         State = IngameRequestStates.Unsent;
     }
 
@@ -73,8 +75,8 @@ public class IngameRequest : IEnumerator
     {
         try
         {
-            WebSocketResult<T> res = TcpSocket.inst.Deserializaer<WebSocketResult<T>>(Response.bytes);
-            return res.result;
+            T result = TcpSocket.inst.Deserializaer<T>(Response.bytes);
+            return result;
         }
         catch (System.Exception e)
         {
