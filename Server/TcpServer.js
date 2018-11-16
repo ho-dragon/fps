@@ -8,7 +8,6 @@ var util = require('util');
 var color = require("colors");
 var receiver = require('./TcpReceiver.js');
 var BSON = require('bson');
-var bson = new BSON();
 var clients = [];
 
 module.exports.send = send;
@@ -26,7 +25,9 @@ var server = net.createServer(function(client) {
 
   client.on('data', function(data) {
     //console.log('Received test data from client on port %d: %s', client.remotePort, data.toString());
-    console.log('Bytes received: ' + client.bytesRead);
+    console.log('received from client / bytesRead = : ' + client.bytesRead);
+    console.log('received from client / data length = : ' + data.length);
+    
     receive(client, data);
     console.log('  Bytes sent: ' + client.bytesWritten);
   });
@@ -62,7 +63,7 @@ function receive(socket, data){
 }
 
 function send(socket, data) {
-data = makeSendBuffer(bson.serialize(data));
+data = makeSendBuffer(BSON.serialize(data));
   var success = !socket.write(data);
   if (!success){ (function(socket, data) {
       	socket.once('drain', function() {
@@ -73,7 +74,7 @@ data = makeSendBuffer(bson.serialize(data));
 }
 
 function broadcastAll(message, isShowLog) {
-    message = makeSendBuffer(bson.serialize(message));
+    message = makeSendBuffer(BSON.serialize(message));
     clients.forEach(function (client) {
       client.write(message);
     });
@@ -84,7 +85,7 @@ function broadcastAll(message, isShowLog) {
 }
 
 function broadcastExcludedMe(message, sender, isShowLog) {
-    message = makeSendBuffer(bson.serialize(message));
+    message = makeSendBuffer(BSON.serialize(message));
     clients.forEach(function (client) {
       if (client === sender) {
            return;

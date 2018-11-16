@@ -3,27 +3,28 @@ var server = require('./TcpServer.js');
 var room = require('./Room.js');
 var BSON = require('bson');
 var color = require("colors");
-var bson = new BSON();
 
 module.exports.receiveFromClient = receiveFromClient;
 
 function receiveFromClient(socket, msg) {
     var buffMsg = new Buffer(msg);
     msg = buffMsg.slice(4, buffMsg.length);// remove header buffer
-	console.log('receiveFromClient : index = %d /  data = %s', msg.length, msg.toString());
-    var result = bson.deserialize(msg);
+
+
+	console.log('receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
+    var result = BSON.deserialize(msg);
     console.log("** method  = " + result.method);
     console.log("** id = " + result.id);
     console.log("** code = " + result.code);
     console.log("** msg = " + result.msg);
     console.log("** param = " + result.param);
 
-/*
+
     for (var key in result.param) {
 		console.log("key : " + key +", value : type = " + get_type(result.param[key]));
 		var x = result.param[key];
 		console.log(x);
-     }*/
+     }
 
 	switch(result.method) {
 		case 'init':
@@ -54,7 +55,7 @@ function enterRoom(socket, receivedData) {
 	var playerName = receivedData.param["playerName"];
 	var player = room.addPlayer(playerName);
 	var model = new EnterRoomModel(player.teamCode, player.playerNum, player.playerName, player.currentHP, player.maxHP);
-	var bytes = bson.serialize(model);
+	var bytes = BSON.serialize(model);
 
 	var response = new SocketRequestFormat('', 200, receivedData.id, "success", bytes);
 	server.send(socket, response);
@@ -74,7 +75,7 @@ function attackPlayer(socket, receivedData) {
 
 	var player = room.attackPlayer(attackPlayer, damagedPlayer, attackPosition);
 	var model = new DamageModel(attackPlayer, damagedPlayer, 10, player.currentHP, player.maxHP);
-	var bytes = bson.serialize(model);
+	var bytes = BSON.serialize(model);
 
 	var response = new SocketRequestFormat('', 200, receivedData.id, "success", bytes);
 	server.send(socket, response);
