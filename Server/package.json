@@ -4,9 +4,10 @@
   "description": "This is TCP project.",
   "main": "TcpServer.js",
   "dependencies": {
-    "net": "^1.0.2",
+    "bson": "^4.0.0",
     "colors": "^1.3.2",
-    "bson": "^4.0.0"
+    "debug": "^4.1.0",
+    "net": "^1.0.2"
   },
   "devDependencies": {},
   "scripts": {

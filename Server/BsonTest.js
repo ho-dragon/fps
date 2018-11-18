@@ -2,16 +2,6 @@
   start();
 
   function start() {
-    // Get the Long type
-    var Long = BSON.Long;
-    // Create a bson parser instance
-    var bson = new BSON();
-
-    // Serialize document
-    //var doc = { long: Long.fromNumber(100) }
-
-
-
 
   var SocketRequestFormat = {
     method : 'testMethod1',
@@ -21,9 +11,9 @@
   }
 
     // Serialize a document
-    var data = bson.serialize(SocketRequestFormat)
+    var data = BSON.serialize(SocketRequestFormat)
     // De serialize it again
-    var result = bson.deserialize(data)
+    var result = BSON.deserialize(data)
 
     console.log("method = "+ result.method);
     console.log("id = "+ result.id);

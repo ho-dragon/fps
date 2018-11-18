@@ -7,6 +7,7 @@ var net = require('net');
 var util = require('util');
 var color = require("colors");
 var receiver = require('./TcpReceiver.js');
+const Networker = require('./networker');
 var BSON = require('bson');
 var clients = [];
 
@@ -15,14 +16,24 @@ module.exports.broadcastAll = broadcastAll;
 module.exports.broadcastExcludedMe = broadcastExcludedMe;
 
 var server = net.createServer(function(client) {
+
+  let networker = new Networker(client, (data) => {
+  	console.log('received:', data.toString());
+  	console.log('received from client / bytesRead = : ' + client.bytesRead);
+    console.log('received from client / data length = : ' + data.length);    
+    receive(client, data);
+  });
+
+  networker.init();
   clients.push(client);
+  networker.send('ok! success from networker moudule!');
 
   console.log('Client connection: ');
   console.log('   local = %s:%s', client.localAddress, client.localPort);
   console.log('   remote = %s:%s', client.remoteAddress, client.remotePort);
   client.setTimeout(timeOutDuration);
   //client.setEncoding('utf8');
-
+/*
   client.on('data', function(data) {
     //console.log('Received test data from client on port %d: %s', client.remotePort, data.toString());
     console.log('received from client / bytesRead = : ' + client.bytesRead);
@@ -31,7 +42,7 @@ var server = net.createServer(function(client) {
     receive(client, data);
     console.log('  Bytes sent: ' + client.bytesWritten);
   });
-
+*/
   client.on('end', function() {
     console.log('Client disconnected');
     server.getConnections(function(err, count){

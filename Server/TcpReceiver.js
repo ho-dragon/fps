@@ -9,9 +9,8 @@ module.exports.receiveFromClient = receiveFromClient;
 function receiveFromClient(socket, msg) {
     var buffMsg = new Buffer(msg);
     msg = buffMsg.slice(4, buffMsg.length);// remove header buffer
-
-
-	console.log('receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
+	console.log('[TcpReciver] receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
+	
     var result = BSON.deserialize(msg);
     console.log("** method  = " + result.method);
     console.log("** id = " + result.id);
