@@ -12,15 +12,15 @@ function receiveFromClient(socket, msg) {
 
 	console.log('[TcpRecevier] receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
     var result = BSON.deserialize(msg);
-    console.log("** method  = " + result.method);
-    console.log("** id = " + result.id);
-    console.log("** code = " + result.code);
-    console.log("** msg = " + result.msg);
-    console.log("** param = " + result.param);
 
+    console.log("** [TcpRecevier] method  = " + result.method);
+    console.log("** [TcpRecevier] id = " + result.id);
+    console.log("** [TcpRecevier] code = " + result.code);
+    console.log("** [TcpRecevier] msg = " + result.msg);
+    console.log("** [TcpRecevier] param = " + result.param);
 
     for (var key in result.param) {
-		console.log("key : " + key +", value : type = " + get_type(result.param[key]));
+		console.log("[TcpRecevier] key : " + key +", value : type = " + get_type(result.param[key]));
 		var x = result.param[key];
 		console.log(x);
      }
@@ -41,11 +41,14 @@ function receiveFromClient(socket, msg) {
 	}
 }
 
-function get_type(thing){
-    if(thing===null)return "[object Null]"; // special case
+function get_type(thing) {
+    if (thing===null) { 
+    	return "[object Null]";
+    }
     return Object.prototype.toString.call(thing);
 }
-function init(socket, receivedData){
+ 
+function init(socket, receivedData) {
 	var snedData = new SocketRequestFormat('',200, receivedData.id, "success", null);
 	server.send(socket, snedData);
 }

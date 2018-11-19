@@ -9,52 +9,50 @@ var color = require("colors");
 var receiver = require('./TcpReceiver.js');
 const Networker = require('./networker');
 var BSON = require('bson');
-var clients = [];
+var sockets = [];
 
 module.exports.send = send;
 module.exports.broadcastAll = broadcastAll;
 module.exports.broadcastExcludedMe = broadcastExcludedMe;
 
-var server = net.createServer(function(client) {
+var server = net.createServer(function(socket) {
 
-  let networker = new Networker(client, (data) => {
-  	console.log('received:', data.toString());
-  	console.log('received from client / bytesRead = : ' + client.bytesRead);
-    console.log('received from client / data length = : ' + data.length);    
-    receive(client, data);
+  let networker = new Networker(socket, (data) => {
+  	console.log('[TcpServer] received:', data.toString());
+  	console.log('[TcpServer] received from socket / bytesRead = ' + socket.bytesRead + " / data length = " + data.length);
+    receive(socket, data);
   });
 
   networker.init();
-  clients.push(client);
-  networker.send('ok! success from networker moudule!');
-
+  sockets.push(socket);
+  
   console.log('Client connection: ');
-  console.log('   local = %s:%s', client.localAddress, client.localPort);
-  console.log('   remote = %s:%s', client.remoteAddress, client.remotePort);
-  client.setTimeout(timeOutDuration);
-  //client.setEncoding('utf8');
+  console.log('   local = %s:%s', socket.localAddress, socket.localPort);
+  console.log('   remote = %s:%s', socket.remoteAddress, socket.remotePort);
+  socket.setTimeout(timeOutDuration);
+  //socket.setEncoding('utf8');
 /*
-  client.on('data', function(data) {
-    //console.log('Received test data from client on port %d: %s', client.remotePort, data.toString());
-    console.log('received from client / bytesRead = : ' + client.bytesRead);
-    console.log('received from client / data length = : ' + data.length);
+  socket.on('data', function(data) {
+    //console.log('Received test data from socket on port %d: %s', socket.remotePort, data.toString());
+    console.log('received from socket / bytesRead = : ' + socket.bytesRead);
+    console.log('received from socket / data length = : ' + data.length);
     
-    receive(client, data);
-    console.log('  Bytes sent: ' + client.bytesWritten);
+    receive(socket, data);
+    console.log('  Bytes sent: ' + socket.bytesWritten);
   });
 */
-  client.on('end', function() {
+  socket.on('end', function() {
     console.log('Client disconnected');
     server.getConnections(function(err, count){
       console.log('Remaining Connections: ' + count);
     });
   });
 
-  client.on('error', function(err) {
+  socket.on('error', function(err) {
     console.log('Socket Error: ', JSON.stringify(err));
   });
 
-  client.on('timeout', function() {
+  socket.on('timeout', function() {
     console.log('Socket Timed out');
   });
 });
@@ -86,8 +84,8 @@ data = makeSendBuffer(BSON.serialize(data));
 
 function broadcastAll(message, isShowLog) {
     message = makeSendBuffer(BSON.serialize(message));
-    clients.forEach(function (client) {
-      client.write(message);
+    sockets.forEach(function (socket) {
+      socket.write(message);
     });
     
     if(isShowLog) {
@@ -97,11 +95,11 @@ function broadcastAll(message, isShowLog) {
 
 function broadcastExcludedMe(message, sender, isShowLog) {
     message = makeSendBuffer(BSON.serialize(message));
-    clients.forEach(function (client) {
-      if (client === sender) {
+    sockets.forEach(function (socket) {
+      if (socket === sender) {
            return;
       }
-      client.write(message);
+      socket.write(message);
     });
     process.stdout.write(message)
 

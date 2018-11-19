@@ -15,19 +15,18 @@ using System.IO;
 public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 
 
-    public int testInt = 200;
-
-    #region OnGUI
-    public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0)
-    {
-        return new Rect(_width * raw, _height * column, _width, _height);
-    }
+    //public int testInt = 200;
+    //#region OnGUI
+    //public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0)
+    //{
+    //    return new Rect(_width * raw, _height * column, _width, _height);
+    //}
     
-    void OnGUI() {
-        if (GUI.Button(GetRectPos(0,5, 200, 50), "int Test")) {
-            TestInteger(this.testInt);
-        }
-    }
+    //void OnGUI() {
+    //    if (GUI.Button(GetRectPos(0,5, 200, 50), "int Test")) {
+    //        TestInteger(this.testInt);
+    //    }
+    //}
 
     public class Packet {
         public enum KIND
@@ -125,7 +124,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     //    return tmp;
     //}
 
-    #endregion
+    //#endregion
 
     public byte[] SerializeToByte(object x){
         // Packet클래스를 BSON으로 직렬화
