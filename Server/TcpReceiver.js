@@ -3,6 +3,7 @@ var server = require('./TcpServer.js');
 var room = require('./Room.js');
 var BSON = require('bson');
 var color = require("colors");
+const debug = require('debug')('TcpRecevier');
 
 module.exports.receiveFromClient = receiveFromClient;
 
@@ -10,19 +11,19 @@ function receiveFromClient(socket, msg) {
     var buffMsg = new Buffer(msg);
     //msg = buffMsg.slice(4, buffMsg.length);// remove header buffer// 불피요 : 기존 2.0.0에서 Bson 4.2.0 업그레이드 이후 Bson에서 알아서 앞에 버퍼 부분을 인식하고 디시리얼라이즈해줌
 
-	console.log('[TcpRecevier] receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
+	debug('[TcpRecevier] receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
     var result = BSON.deserialize(msg);
 
-    console.log("** [TcpRecevier] method  = " + result.method);
-    console.log("** [TcpRecevier] id = " + result.id);
-    console.log("** [TcpRecevier] code = " + result.code);
-    console.log("** [TcpRecevier] msg = " + result.msg);
-    console.log("** [TcpRecevier] param = " + result.param);
+    debug("** [TcpRecevier] method  = " + result.method);
+    debug("** [TcpRecevier] id = " + result.id);
+    debug("** [TcpRecevier] code = " + result.code);
+    debug("** [TcpRecevier] msg = " + result.msg);
+    debug("** [TcpRecevier] param = " + result.param);
 
     for (var key in result.param) {
-		console.log("[TcpRecevier] key : " + key +", value : type = " + get_type(result.param[key]));
+		debug("[TcpRecevier] key : " + key +", value : type = " + get_type(result.param[key]));
 		var x = result.param[key];
-		console.log(x);
+		debug(x);
      }
 
 	switch(result.method) {

@@ -3,7 +3,7 @@
 const debug = require('debug')('network');
 
 function Networker(socket, handler) {
-  console.log('[Networker] _onData =');
+  debug('[Networker] _onData =');
 
   this.socket = socket;
   this._packet = {};
@@ -18,7 +18,7 @@ function Networker(socket, handler) {
 }
 
 Networker.prototype.init = function () {
-console.log('[Networker] init');	
+debug('[Networker] init');	
   this.socket.on('data', (data) => {
     this._bufferedBytes += data.length;
     this.queue.push(data);
@@ -79,7 +79,7 @@ Networker.prototype._getHeader = function () {
   if (this._hasEnough(4)) {
     //this._payloadLength = this._readBytes(2).readUInt16BE(0, true);
     this._payloadLength = this._readBytes(4).readUInt32LE(0, true);
-    console.log('[Networker] _getHeader...|| this._payloadLength =', this._payloadLength);
+    debug('[Networker] _getHeader...|| this._payloadLength =', this._payloadLength);
     this._state = 'PAYLOAD';
   }
 }
@@ -93,7 +93,7 @@ Networker.prototype._getPayload = function () {
 }
 
 Networker.prototype._onData = function (data) {
-  console.log('[Networker] _onData...|| this._process =', this._process);
+  debug('[Networker] _onData...|| this._process =', this._process);
 
   while (this._process) {
     switch (this._state) {
@@ -123,7 +123,6 @@ Networker.prototype._send = function () {
   //contentLength.writeUInt16BE(this._packet.header.length);
   let contentLength = Buffer.allocUnsafe(4);
   contentLength.writeUInt32LE(this._packet.header.length);
-  debug('Attempting to write...', this._packet);
   this.socket.write(contentLength);
   this.socket.write(this._packet.message);
   this._packet = {};

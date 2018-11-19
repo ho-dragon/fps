@@ -6,6 +6,7 @@ var timeOutDuration = 5000;
 var net = require('net');
 var util = require('util');
 var color = require("colors");
+const debug = require('debug')('TcpServer');
 var receiver = require('./TcpReceiver.js');
 const Networker = require('./networker');
 var BSON = require('bson');
@@ -16,54 +17,55 @@ module.exports.broadcastAll = broadcastAll;
 module.exports.broadcastExcludedMe = broadcastExcludedMe;
 
 var server = net.createServer(function(socket) {
+debug('[TcpServer] CreateServer');
 
   let networker = new Networker(socket, (data) => {
-  	console.log('[TcpServer] received:', data.toString());
-  	console.log('[TcpServer] received from socket / bytesRead = ' + socket.bytesRead + " / data length = " + data.length);
+  	debug('[TcpServer] received:', data.toString());
+  	debug('[TcpServer] received from socket / bytesRead = ' + socket.bytesRead + " / data length = " + data.length);
     receive(socket, data);
   });
 
   networker.init();
   sockets.push(socket);
   
-  console.log('Client connection: ');
-  console.log('   local = %s:%s', socket.localAddress, socket.localPort);
-  console.log('   remote = %s:%s', socket.remoteAddress, socket.remotePort);
+  debug('Client connection: ');
+  debug('   local = %s:%s', socket.localAddress, socket.localPort);
+  debug('   remote = %s:%s', socket.remoteAddress, socket.remotePort);
   socket.setTimeout(timeOutDuration);
   //socket.setEncoding('utf8');
 /*
   socket.on('data', function(data) {
-    //console.log('Received test data from socket on port %d: %s', socket.remotePort, data.toString());
-    console.log('received from socket / bytesRead = : ' + socket.bytesRead);
-    console.log('received from socket / data length = : ' + data.length);
+    //debug('Received test data from socket on port %d: %s', socket.remotePort, data.toString());
+    debug('received from socket / bytesRead = : ' + socket.bytesRead);
+    debug('received from socket / data length = : ' + data.length);
     
     receive(socket, data);
-    console.log('  Bytes sent: ' + socket.bytesWritten);
+    debug('  Bytes sent: ' + socket.bytesWritten);
   });
 */
   socket.on('end', function() {
-    console.log('Client disconnected');
+    debug('Client disconnected');
     server.getConnections(function(err, count){
-      console.log('Remaining Connections: ' + count);
+      debug('Remaining Connections: ' + count);
     });
   });
 
   socket.on('error', function(err) {
-    console.log('Socket Error: ', JSON.stringify(err));
+    debug('Socket Error: ', JSON.stringify(err));
   });
 
   socket.on('timeout', function() {
-    console.log('Socket Timed out');
+    debug('Socket Timed out');
   });
 });
 
 server.listen(connectPort, function() {
-  console.log('Server listening: ' + JSON.stringify(server.address()));
+  debug('Server listening: ' + JSON.stringify(server.address()));
   server.on('close', function(){
-    console.log('Server Terminated');
+    debug('Server Terminated');
   });
   server.on('error', function(err){
-    console.log('Server Error: ', JSON.stringify(err));
+    debug('Server Error: ', JSON.stringify(err));
   });
 });
 
@@ -82,30 +84,23 @@ data = makeSendBuffer(BSON.serialize(data));
   } 
 }
 
-function broadcastAll(message, isShowLog) {
+function broadcastAll(message) {
     message = makeSendBuffer(BSON.serialize(message));
     sockets.forEach(function (socket) {
       socket.write(message);
+      debug('broadcastAll / msg = ', message);
     });
-    
-    if(isShowLog) {
-          process.stdout.write(message)
-    }
 }
 
-function broadcastExcludedMe(message, sender, isShowLog) {
+function broadcastExcludedMe(message, sender) {
     message = makeSendBuffer(BSON.serialize(message));
     sockets.forEach(function (socket) {
       if (socket === sender) {
            return;
       }
       socket.write(message);
-    });
-    process.stdout.write(message)
-
-    if(isShowLog) {
-          process.stdout.write(message)
-    }
+      debug('broadcastExcludedMe / msg = ', message);
+    });  
 }
 
 
@@ -121,6 +116,6 @@ function makeSendBuffer(msg) {
     bufTotal.fill();
     bufPacketLenInfo.copy(bufTotal, 0, 0, headerLen);
     buffMsg.copy(bufTotal, headerLen, 0, msgLen );
-    //console.log(color.yellow('[send] header length = '+headerLen+' / msg length = '+ msgLen+ '/ total length = '+(headerLen + msgLen) +' /  msg = ' + buffMsg.toString())); 
+    //debug(color.yellow('[send] header length = '+headerLen+' / msg length = '+ msgLen+ '/ total length = '+(headerLen + msgLen) +' /  msg = ' + buffMsg.toString())); 
     return bufTotal;
 }
