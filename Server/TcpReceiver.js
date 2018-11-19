@@ -8,9 +8,9 @@ module.exports.receiveFromClient = receiveFromClient;
 
 function receiveFromClient(socket, msg) {
     var buffMsg = new Buffer(msg);
-    msg = buffMsg.slice(4, buffMsg.length);// remove header buffer
-	console.log('[TcpReciver] receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
-	
+    //msg = buffMsg.slice(4, buffMsg.length);// remove header buffer// 불피요 : 기존 2.0.0에서 Bson 4.2.0 업그레이드 이후 Bson에서 알아서 앞에 버퍼 부분을 인식하고 디시리얼라이즈해줌
+
+	console.log('[TcpRecevier] receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
     var result = BSON.deserialize(msg);
     console.log("** method  = " + result.method);
     console.log("** id = " + result.id);
