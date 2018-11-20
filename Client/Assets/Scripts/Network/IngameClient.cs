@@ -81,8 +81,7 @@ public partial class IngameClient : MonoBehaviour
 
     public void OnMessage(byte[] data) {
         SocketRequestFormat msg = TcpSocket.inst.Deserializaer<SocketRequestFormat>(data);
-        msg.bytes = data;
-        Logger.Debug("[OnMessage] webSocketMsg.id = " + msg.id + " / data length = " + data.Length);
+        Logger.Debug("[OnMessage] webSocketMsg.id = " + msg.id + " / data length = " + data.Length +" / bates length = " + msg.bytes.Length);
         timeSync.Adjust(msg.time);
    
         if (msg.IsNotification) {
@@ -122,11 +121,17 @@ public partial class IngameClient : MonoBehaviour
             }
          
             T result = this.ingameRequest.Result<T>();
+
+            if (result == null) {
+                Logger.Error("[IngameClinet.ResponseEntry.ExcuteCallback] result is null -- 1");
+            }
+
             if (result == null && typeof(T) == typeof(object)) {
+                Logger.Error("[IngameClinet.ResponseEntry.ExcuteCallback] result is null -- 2");
                 result = (T)new object();
             }
 
-            if (responseCallback != null) {
+            if (responseCallback != null) {                
                 responseCallback(this.ingameRequest, result);
             }
         }
@@ -145,8 +150,8 @@ public partial class IngameClient : MonoBehaviour
         requests.Add(ingameRequest);
         EnqueueRequestId(lastRequestId);
 
-        byte[] json = TcpSocket.inst.SerializeToByte(request);
-        socketRequest.Send(json);
+        byte[] bytes = TcpSocket.inst.SerializeToByte(request);
+        socketRequest.Send(bytes);
         Logger.Debug(string.Format("<color=#86E57F>[Send]</color> method = {0} rid = {1}", request.method, request.id));
         this.responseList.Add(new ResponseEntry<T>() { ingameRequest = ingameRequest, responseCallback = response });
     }

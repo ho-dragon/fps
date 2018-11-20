@@ -1,10 +1,16 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class EnterRoomModel {
+    public PlayerModel player;
+    public PlayerModel[] otherPlayers;
+}
+
+public class PlayerModel {
+    public string name;
+    public int number;
     public int teamCode;
-    public int playerNum;
-    public string playerName;
     public float currentHP;
     public float maxHP;
+    public Vector3 lastPosition;
 }

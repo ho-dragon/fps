@@ -26,22 +26,36 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         return this.remotePlayers.Exists(x => x.Number == playerNum);
     }
 
-    public void JoinedPlayer(EnterRoomModel result, bool isLocalPlayer) {
+    public void JoinedPlayer(PlayerModel player, bool isLocalPlayer) {
+        if (player == null) {
+            Logger.Error("[PlayerManager.JoinedPlayer] player is null");
+            return;
+        }
+
         GameObject clone = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity) as GameObject;
-        clone.transform.position = new Vector3(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(10, 20), UnityEngine.Random.Range(0, 10));
+        if (clone == null) {
+            Logger.Error("[PlayerManager.JoinedPlayer] clone is null");
+            return;
+        }
+
+        if (player.lastPosition != null) {
+            clone.transform.position = player.lastPosition;
+        } else {
+            clone.transform.position = new Vector3(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(10, 20), UnityEngine.Random.Range(0, 10));
+        }
+        
         Player newPlayer = clone.GetComponent<Player>();
-        newPlayer.Init(result.teamCode
+        newPlayer.Init(player.teamCode
                                      ,  null
-                                     , result.playerNum
-                                     , result.playerName
-                                     , result.currentHP
-                                     , result.maxHP
+                                     , player.number
+                                     , player.name
+                                     , player.currentHP
+                                     , player.maxHP
                                      , (number, movePos) => {
                                          TcpSocket.inst.client.MovePlayer(number, movePos);
                                      });
 
-
-        if(isLocalPlayer) {
+        if (isLocalPlayer) {
             this.localPlayer = newPlayer;
             this.localPlayer.EnableCamera(PlayerCamera.inst);
             this.localPlayer.IsPlayable = true;
@@ -49,8 +63,8 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             return;
         }
 
-         if (this.remotePlayers.Exists(x => x.Number == result.playerNum)) {
-             Logger.Error("[Main.JoinPlayer] already exist player = " + result.playerNum);
+         if (this.remotePlayers.Exists(x => x.Number == player.number)) {
+             Logger.Error("[Main.JoinPlayer] already exist player = " + player.number);
              return;
          }
 
@@ -60,15 +74,16 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
 
     public void MovePlayer(int playerNumb, Vector3 movePosition) {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
-        if(player != null) {
+        if (player != null) {
             if (player.IsPlayable == false) {
+                Logger.DebugHighlight("[PlayerManager.MovePlayer] playerNumb = " + playerNumb);
                 player.ActionController.move.SetMovePosition(movePosition);
             }
         }
     }
 
     public void DamagedPlayer(DamageModel result) {
-        if(this.localPlayer.Number == result.damagedPlayer) {
+        if (this.localPlayer.Number == result.damagedPlayer) {
             Logger.Debug("내가 맞았다");
             this.localPlayer.SetHealth(result.currentHP, result.maxHP);
             return;

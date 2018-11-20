@@ -8,21 +8,21 @@ const debug = require('debug')('TcpRecevier');
 module.exports.receiveFromClient = receiveFromClient;
 
 function receiveFromClient(socket, msg) {
-    var buffMsg = new Buffer(msg);
+    let buffMsg = new Buffer(msg);
     //msg = buffMsg.slice(4, buffMsg.length);// remove header buffer// 불피요 : 기존 2.0.0에서 Bson 4.2.0 업그레이드 이후 Bson에서 알아서 앞에 버퍼 부분을 인식하고 디시리얼라이즈해줌
 
-	debug('[TcpRecevier] receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
-    var result = BSON.deserialize(msg);
+	debug(' receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
+    let result = BSON.deserialize(msg);
 
-    debug("** [TcpRecevier] method  = " + result.method);
-    debug("** [TcpRecevier] id = " + result.id);
-    debug("** [TcpRecevier] code = " + result.code);
-    debug("** [TcpRecevier] msg = " + result.msg);
-    debug("** [TcpRecevier] param = " + result.param);
+    debug("** method  = " + result.method);
+    debug("** id = " + result.id);
+    debug("** code = " + result.code);
+    debug("** msg = " + result.msg);
+    debug("** param = " + result.param);
 
-    for (var key in result.param) {
-		debug("[TcpRecevier] key : " + key +", value : type = " + get_type(result.param[key]));
-		var x = result.param[key];
+    for (let key in result.param) {
+		debug(" key : " + key +", value : type = " + get_type(result.param[key]));
+		let x = result.param[key];
 		debug(x);
      }
 
@@ -34,7 +34,7 @@ function receiveFromClient(socket, msg) {
 			enterRoom(socket, result);
 			break;
 		case 'movePlayer' :
-			movePlayer(socket, msg);
+			movePlayer(socket, result);
 			break;
 		case 'attackPlayer' :
 			attackPlayer(socket, result);
@@ -50,44 +50,67 @@ function get_type(thing) {
 }
  
 function init(socket, receivedData) {
-	var snedData = new SocketRequestFormat('',200, receivedData.id, "success", null);
+	let snedData = new ResponseFormat(200, receivedData.id, "success", null);
 	server.send(socket, snedData);
 }
 
 function enterRoom(socket, receivedData) {
-	var playerName = receivedData.param["playerName"];
-	var player = room.addPlayer(playerName);
-	var model = new EnterRoomModel(player.teamCode, player.playerNum, player.playerName, player.currentHP, player.maxHP);
-	var bytes = BSON.serialize(model);
+	let playerName = receivedData.param["playerName"];
+	let player = room.addPlayer(playerName);
+ 
+	if (player == null) {
+		debug("[enterRoom] added player is null")
+		return;
+	}
 
-	var response = new SocketRequestFormat('', 200, receivedData.id, "success", bytes);
+	let model = new EnterRoomModel(player, room.getOtherPlayers(player.number));
+
+	if (model.player == null) {
+		debug("[enterRoom] model.player is null")
+		return;
+	} else {
+		debug("[enterRoom] model.player.name = " + model.player.name);
+	}
+
+	let bytes = BSON.serialize(model);
+
+   debug("[enterRoom] bytes length = " + bytes.length);
+
+	let response = new ResponseFormat(200, receivedData.id, "success", bytes);
 	server.send(socket, response);
 
-	var notiResult = new SocketRequestFormat('joinPlayer',200, 0, "success", bytes);
-	server.broadcastExcludedMe(notiResult, socket,  true);
+	let notiResult = new NotificationFormat('joinPlayer',200, 0, "success", bytes);
+	server.broadcastExcludedMe(notiResult, socket);
 }
 
-function movePlayer(socket, msg) {
-	server.broadcastExcludedMe(msg, socket, false);
+function movePlayer(socket, receivedData) {
+	let model = new PlayerMoveModel(receivedData.param["playerNum"]
+		, receivedData.param["playerPosX"]
+		, receivedData.param["playerPosY"]
+		, receivedData.param["playerPosZ"]);
+
+	let bytes = BSON.serialize(model);
+	let notiResult = new NotificationFormat('movePlayer', 200, 0, "success", bytes);
+	server.broadcastExcludedMe(notiResult, socket);
 }
 
 function attackPlayer(socket, receivedData) {
-	var attackPlayer = receivedData.param["attackPlayer"];
-	var damagedPlayer = receivedData.param["damagedPlayer"];
-	var attackPosition = receivedData.param["attackPosition"];
+	let attackPlayer = receivedData.param["attackPlayer"];
+	let damagedPlayer = receivedData.param["damagedPlayer"];
+	let attackPosition = receivedData.param["attackPosition"];
 
-	var player = room.attackPlayer(attackPlayer, damagedPlayer, attackPosition);
-	var model = new DamageModel(attackPlayer, damagedPlayer, 10, player.currentHP, player.maxHP);
-	var bytes = BSON.serialize(model);
+	let player = room.attackPlayer(attackPlayer, damagedPlayer, attackPosition);
+	let model = new DamageModel(attackPlayer, damagedPlayer, 10, player.currentHP, player.maxHP);
+	let bytes = BSON.serialize(model);
 
-	var response = new SocketRequestFormat('', 200, receivedData.id, "success", bytes);
+	let response = new ResponseFormat(200, receivedData.id, "success", bytes);
 	server.send(socket, response);
 
-	var notiResult = new SocketRequestFormat('damagedPlayer',200, 0, "success", bytes);
+	let notiResult = new NotificationFormat('damagedPlayer',200, 0, "success", bytes);
 	server.broadcastExcludedMe(notiResult, socket,  true);
 }
 
-function MovePlayerModel(playerNum, playerPosX, playerPosY, playerPosZ) {
+function PlayerMoveModel(playerNum, playerPosX, playerPosY, playerPosZ) {
 	this.playerNum = playerNum;
 	this.playerPosX = playerPosX;
 	this.playerPosY = playerPosY;
@@ -102,15 +125,20 @@ function DamageModel(attackPlayer, damagedPlayer, damage, currentHP, maxHP) {
 	this.maxHP = maxHP;
 }
 
-function EnterRoomModel(teamCode, playerNum, playerName, currentHP, maxHP) {
-	this.teamCdoe = teamCode;
-	this.playerNum = playerNum;
-	this.playerName = playerName;
-	this.currentHP = currentHP;
-	this.maxHP = maxHP;
+function EnterRoomModel(player, otherPlayers) {
+	this.player = player;
+	this.otherPlayers = otherPlayers;
 }
 
-function SocketRequestFormat(method, code, id, msg, bytes) {
+function ResponseFormat(code, id, msg, bytes) {
+	this.method = "";
+	this.code = code;
+	this.id = id;
+	this.msg = msg;
+	this.bytes = bytes;
+}
+
+function NotificationFormat(method, code, id, msg, bytes) {
 	this.method = method;
 	this.code = code;
 	this.id = id;

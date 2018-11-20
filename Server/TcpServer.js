@@ -17,11 +17,11 @@ module.exports.broadcastAll = broadcastAll;
 module.exports.broadcastExcludedMe = broadcastExcludedMe;
 
 var server = net.createServer(function(socket) {
-debug('[TcpServer] CreateServer');
+debug(' CreateServer');
 
   let networker = new Networker(socket, (data) => {
-  	debug('[TcpServer] received:', data.toString());
-  	debug('[TcpServer] received from socket / bytesRead = ' + socket.bytesRead + " / data length = " + data.length);
+  	debug(' received:', data.toString());
+  	debug(' received from socket / bytesRead = ' + socket.bytesRead + " / data length = " + data.length);
     receive(socket, data);
   });
 

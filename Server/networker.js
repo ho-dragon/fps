@@ -1,9 +1,9 @@
 'use strict';//hoisting을 막기위해 
 
-const debug = require('debug')('network');
+const debug = require('debug')('Networker');
 
 function Networker(socket, handler) {
-  debug('[Networker] _onData =');
+  debug(' _onData =');
 
   this.socket = socket;
   this._packet = {};
@@ -18,7 +18,7 @@ function Networker(socket, handler) {
 }
 
 Networker.prototype.init = function () {
-debug('[Networker] init');	
+debug(' init');	
   this.socket.on('data', (data) => {
     this._bufferedBytes += data.length;
     this.queue.push(data);
@@ -79,7 +79,7 @@ Networker.prototype._getHeader = function () {
   if (this._hasEnough(4)) {
     //this._payloadLength = this._readBytes(2).readUInt16BE(0, true);
     this._payloadLength = this._readBytes(4).readUInt32LE(0, true);
-    debug('[Networker] _getHeader...|| this._payloadLength =', this._payloadLength);
+    debug(' _getHeader...|| this._payloadLength =', this._payloadLength);
     this._state = 'PAYLOAD';
   }
 }
@@ -93,7 +93,7 @@ Networker.prototype._getPayload = function () {
 }
 
 Networker.prototype._onData = function (data) {
-  debug('[Networker] _onData...|| this._process =', this._process);
+  debug(' _onData...|| this._process =', this._process);
 
   while (this._process) {
     switch (this._state) {

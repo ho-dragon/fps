@@ -71,15 +71,13 @@ public class IngameRequest : IEnumerator
         State = IngameRequestStates.Unsent;
     }
 
-    public T Result<T>()
-    {
-        try
-        {
+    public T Result<T>() {
+        try {
+            Logger.Debug("[ingameRequest.Result<T>] Response.bytes.length = " + Response.bytes.Length);
             T result = TcpSocket.inst.Deserializaer<T>(Response.bytes);
             return result;
-        }
-        catch (System.Exception e)
-        {
+        } catch (System.Exception e) {
+            Logger.Error("[ingameRequest.Result<T>] deserialize failed / msg = " + e.Message);
             return default(T);
         }
     }

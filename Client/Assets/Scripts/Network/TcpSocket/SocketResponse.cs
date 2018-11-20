@@ -47,6 +47,7 @@ public class SocketResponse : MonoBehaviour {
 
 
     public void RecevieNotification(SocketRequestFormat result) {
+        Logger.DebugHighlight("[RecevieNtotication] method = " + result.method);
         switch(result.method){
             case "damagedPlayer":
                 DamagedPlayer(TcpSocket.inst.Deserializaer<DamageModel>(result.bytes));
@@ -65,7 +66,7 @@ public class SocketResponse : MonoBehaviour {
     }
 
     public void JoinPlayer(EnterRoomModel result) {
-        PlayerManager.inst.JoinedPlayer(result, false);
+        PlayerManager.inst.JoinedPlayer(result.player, false);
     }
 
     private void MovePlayer(PlayerMoveModel result) {

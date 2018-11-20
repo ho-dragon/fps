@@ -53,11 +53,24 @@ public class Main : MonoBehaviourInstance<Main>
     public void EnterRoom(string userName) {
         TcpSocket.inst.client.EnterRoom(userName, (req, result) => {
             if (result == null) {
-                Logger.Error("[TcpSocket.EnterRoom] result is null");
+                Logger.Error("[Main.EnterRoom] result is null");
                 return;
             }
-            Logger.Debug("complated localPlayer joinRoom");
-            PlayerManager.inst.JoinedPlayer(result, true);
+
+
+            if (result.player == null) {
+                Logger.Debug("[Main.EnterRoom] player is null");
+            }
+            
+            PlayerManager.inst.JoinedPlayer(result.player, true);
+
+            if (result.otherPlayers != null) {
+                foreach (PlayerModel i in result.otherPlayers) {
+                    PlayerManager.inst.JoinedPlayer(i, false);
+                }
+            }  else {
+                Logger.Debug("[Main] otherPlayers is null");
+            }        
         });
     }
 }
