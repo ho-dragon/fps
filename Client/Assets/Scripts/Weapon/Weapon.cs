@@ -11,7 +11,7 @@ public class Weapon : MonoBehaviour {
 	public bool isPlayable = false;
 	public bool IsPlayable { set { this.isPlayable = value; } }
     public void Init(int playerNum, Transform muzzleTransform) {
-        Debug.Log("[Weapon] Init");
+        Logger.Debug("[Weapon] Init");
 		this.muzzleTransform = muzzleTransform;
         this.playerNum = playerNum;
     }
@@ -21,7 +21,7 @@ public class Weapon : MonoBehaviour {
 	}
 
     public virtual void Shoot() {
-        Debug.Log("[Weapon] shoot");
+        Logger.Debug("[Weapon] shoot");
     }
 
     void Update() {

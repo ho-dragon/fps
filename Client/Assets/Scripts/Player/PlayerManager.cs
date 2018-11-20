@@ -50,7 +50,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
 
          if (this.remotePlayers.Exists(x => x.Number == result.playerNum)) {
-             Debug.LogError("[Main.JoinPlayer] already exist player = " + result.playerNum);
+             Logger.Error("[Main.JoinPlayer] already exist player = " + result.playerNum);
              return;
          }
 
@@ -69,13 +69,13 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
 
     public void DamagedPlayer(DamageModel result) {
         if(this.localPlayer.Number == result.damagedPlayer) {
-            Debug.Log("내가 맞았다");
+            Logger.Debug("내가 맞았다");
             this.localPlayer.SetHealth(result.currentHP, result.maxHP);
             return;
         }
         Player player = this.remotePlayers.Find(x => x.Number == result.damagedPlayer);
         if (player == null) {
-            Debug.LogError("[PlayerManager.SetDamage] player is null");
+            Logger.Error("[PlayerManager.SetDamage] player is null");
             return;
         }
         player.SetHealth(result.currentHP, result.maxHP);

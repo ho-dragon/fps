@@ -37,7 +37,7 @@ public class SocketRequestFormat
             }
 
             foreach (KeyValuePair<string, object> i in param) {
-                Debug.Log("[SocketRequestFormat] key = " + i.Key + " / value = " + i.Value);
+                Logger.Debug("[SocketRequestFormat] key = " + i.Key + " / value = " + i.Value);
             }
         }
         //this.param = new KeyValueList(args).ToHashtable();

@@ -65,14 +65,14 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 
         foreach (byte a in byteBSON) {
             byteLength++;
-            //Debug.Log(a);
+            //Logger.Debug(a);
         }
-        Debug.Log("[Serializer] byte length : " + byteLength );
+        Logger.Debug("[Serializer] byte length : " + byteLength );
         Packet x = Deserializaer<Packet>(byteBSON);
-        Debug.Log("[Deserializaer] Packet.kind : " + x.kind);
-        Debug.Log("[Deserializaer] Packet.message : " + x.message);
-        Debug.Log("[Deserializaer] Packet.ltemList count : " + x.itemList.Count);
-        Debug.Log("[Deserializaer] Packet.x type : " + x.x.GetType().ToString());
+        Logger.Debug("[Deserializaer] Packet.kind : " + x.kind);
+        Logger.Debug("[Deserializaer] Packet.message : " + x.message);
+        Logger.Debug("[Deserializaer] Packet.ltemList count : " + x.itemList.Count);
+        Logger.Debug("[Deserializaer] Packet.x type : " + x.x.GetType().ToString());
     }
     private class TestClass {
         public int x;
@@ -83,12 +83,12 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 
         byte[] y = SerializeToByte(x);
         for(int i = 0; i < y.Length; i++) {
-            Debug.Log("[test] [" + i + "] = " + y[i]);
+            Logger.Debug("[test] [" + i + "] = " + y[i]);
         }
 
         TestClass result = Deserializaer<TestClass>(y);
 
-        Debug.Log("[result] int = " + result.x);
+        Logger.Debug("[result] int = " + result.x);
     }
 
     //public void TEST_1()
@@ -145,9 +145,9 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         int byteLength = 0;
         foreach (byte a in byteBSON) {
             byteLength++;
-            //Debug.Log(a + " ");
+            //Logger.Debug(a + " ");
         }
-        Debug.Log("[Deserializaer] byte length : " + byteLength);
+        Logger.Debug("[Deserializaer] byte length : " + byteLength);
         JsonSerializer deserializaer = new JsonSerializer();
         BsonReader reader = new BsonReader(ms);
         T dp = deserializaer.Deserialize<T>(reader);
@@ -160,8 +160,8 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     public IngameClient client;
     public SocketResponse receiver;
     private NetworkStream ns;
-    public string ip = "127.0.0.1";
-    public int port = 8107;
+    private string ip = "";
+    private int port = 0;
     
     private int SenddataLength;                     // Send Data Length. (byte)
     private int ReceivedataLength;                     // Receive Data Length. (byte)
@@ -180,7 +180,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         this.port = port;
 
         if (isConnected) {
-            Debug.Log("Socket is already connected"); 
+            Logger.Debug("Socket is already connected"); 
             return;
         }
 
@@ -200,14 +200,14 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
             this.ns = new NetworkStream(this.m_Socket);
             this.isConnected = true;
         } catch (SocketException e) {
-            Debug.Log("Socket connect error! : " + e.ToString() ); 
+            Logger.Debug("Socket connect error! : " + e.ToString() ); 
             return;
         }
 
         //=======================================================
         // Send data write.
         //this.client.Init("hoho~!", true, 15, 150, (req, result) => {
-        //    Debug.Log("[TcpSocket.isConntected] SUCCESS");
+        //    Logger.Debug("[TcpSocket.isConntected] SUCCESS");
         //});
 
     }
@@ -222,7 +222,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
             this.ns.Read(data, 0, data.Length);
             this.receiver.GetRecevieBuffer(data);
         } else {
-            Debug.Log("Error: Can't read from this socket");
+            Logger.Debug("Error: Can't read from this socket");
             ns.Close();
             this.m_Socket.Close();
             return;

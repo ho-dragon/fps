@@ -43,7 +43,7 @@ public class Player : MonoBehaviour {
     public string Name { get { return this.name; } }
     public PlayerActionController ActionController { get { return this.actionController; } }
     public void Init(int teamCode, Weapon weapon, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3> moveCallback) {
-        Debug.Log("[Player] Init number = " + number + " / name = " + name);
+        Logger.Debug("[Player] Init number = " + number + " / name = " + name);
         this.teamCode = teamCode;
         this.number = number;
         this.name = name;
@@ -68,7 +68,7 @@ public class Player : MonoBehaviour {
 
     public void EnableCamera(PlayerCamera cam) {
         if (this.cam == null) {
-            Debug.Log("[Player.AddCamera]");
+            Logger.Debug("[Player.AddCamera]");
             this.cam = cam;
             this.cam.target = this.gameObject;
             this.cam.MoveChildTrans(this.eyes);

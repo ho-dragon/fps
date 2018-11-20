@@ -82,14 +82,14 @@ public partial class IngameClient : MonoBehaviour
     public void OnMessage(byte[] data) {
         SocketRequestFormat msg = TcpSocket.inst.Deserializaer<SocketRequestFormat>(data);
         msg.bytes = data;
-        Debug.Log("[OnMessage] webSocketMsg.id = " + msg.id + " / data length = " + data.Length);
+        Logger.Debug("[OnMessage] webSocketMsg.id = " + msg.id + " / data length = " + data.Length);
         timeSync.Adjust(msg.time);
    
         if (msg.IsNotification) {
-            Debug.Log("[OnMessage] IsNotification = true");
+            Logger.Debug("[OnMessage] IsNotification = true");
             TcpSocket.inst.receiver.RecevieNotification(msg);
         } else  {
-            Debug.Log("[OnMessage] IsNotification = false");
+            Logger.Debug("[OnMessage] IsNotification = false");
             DequeueRequestId(msg.id);
             OnResponse(msg);
         }
@@ -110,13 +110,13 @@ public partial class IngameClient : MonoBehaviour
 
         public void ExcuteCallback() {
             if (ingameRequest.State == IngameRequestStates.Error) {//ex NO_ENEMY_EXIST
-                Debug.LogError("[INgameClinet.ResponseEntry.ExcuteCallback] error / state = " + ingameRequest.State.ToString());
+                Logger.Error("[INgameClinet.ResponseEntry.ExcuteCallback] error / state = " + ingameRequest.State.ToString());
                 responseCallback(this.ingameRequest, null);
                 return;
             }
 
             if (ingameRequest.State.IsDone() == false) {
-                Debug.LogError("[INgameClinet.ResponseEntry.ExcuteCallback] failed / not done / state = " + ingameRequest.State.ToString());
+                Logger.Error("[INgameClinet.ResponseEntry.ExcuteCallback] failed / not done / state = " + ingameRequest.State.ToString());
                 responseCallback(this.ingameRequest, null);
                 return;
             }
@@ -147,7 +147,7 @@ public partial class IngameClient : MonoBehaviour
 
         byte[] json = TcpSocket.inst.SerializeToByte(request);
         socketRequest.Send(json);
-        Debug.Log(string.Format("<color=#86E57F>[Send]</color> method = {0} rid = {1}", request.method, request.id));
+        Logger.Debug(string.Format("<color=#86E57F>[Send]</color> method = {0} rid = {1}", request.method, request.id));
         this.responseList.Add(new ResponseEntry<T>() { ingameRequest = ingameRequest, responseCallback = response });
     }
 
@@ -187,12 +187,12 @@ public partial class IngameClient : MonoBehaviour
 
             IResponse response = this.responseList.Find(x => x.GetRid() == res.id);
             if (response == null) {
-                Debug.LogError("[IngameClient.OnResponse] response is not found");
+                Logger.Error("[IngameClient.OnResponse] response is not found");
                 return;
             }
 
             if (this.responseList.Remove(response) == false) {
-                Debug.LogError("[IngameClient.OnResponse] remove failed.");
+                Logger.Error("[IngameClient.OnResponse] remove failed.");
             }
             response.ExcuteCallback();
         }

@@ -64,7 +64,7 @@ public class DataResolver {
         {
             copy_size = this.remain_bytes;
         }
-        // Debug.Log("[read_until] src_position =" + src_position + " / copy size =" + copy_size + "/ this.current_position =" + this.current_position);
+        // Logger.Debug("[read_until] src_position =" + src_position + " / copy size =" + copy_size + "/ this.current_position =" + this.current_position);
         // 버퍼에 복사.  
         Array.Copy(buffer, src_position, this.message_buffer, this.current_position, copy_size);
 
@@ -123,7 +123,7 @@ public class DataResolver {
 
                 // 헤더 하나를 온전히 읽어왔으므로 메시지 사이즈를 구한다.  
                 this.message_size = get_body_size();
-                //Debug.Log("[resolver] messageSize = " + this.message_size);
+                //Logger.Debug("[resolver] messageSize = " + this.message_size);
                 if (this.message_size == 0) {
                     break;
                 }

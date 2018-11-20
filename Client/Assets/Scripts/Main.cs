@@ -8,31 +8,27 @@ public class Main : MonoBehaviourInstance<Main>
     public string userName = "PlayerName";
     public string ip = "127.0.0.1";
     public string port = "8107";
+    public Logger.LogLevel logLevel = Logger.LogLevel.debug;
+    public bool isDebugMuted = false;
 
-    public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0)
-    {
+    public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0) {
         return new Rect(_width * raw, _height * column, _width, _height);
     }
 
-    void OnGUI()
-    {
-        if (isTestOn == false)
-        {
+    void OnGUI() {
+        if (isTestOn == false) {
             return;
         }
-
 
         ip = GUI.TextField(GetRectPos(0, 1, 200, 50), ip, 25);
         port = GUI.TextField(GetRectPos(0, 2, 200, 50), port, 25);
         userName = GUI.TextField(GetRectPos(0, 3, 200, 50), userName, 25);
 
-        if (GUI.Button(GetRectPos(0, 4, 200, 50), "Connect Socket"))
-        {
+        if (GUI.Button(GetRectPos(0, 4, 200, 50), "Connect Socket")) {
             TcpSocket.inst.Connect(this.ip, System.Convert.ToInt32(this.port));
         }
 
-        if (GUI.Button(GetRectPos(0, 5, 200, 50), "EnterRoom"))
-        {
+        if (GUI.Button(GetRectPos(0, 5, 200, 50), "EnterRoom")) {
             EnterRoom(userName);
         }
 
@@ -47,14 +43,20 @@ public class Main : MonoBehaviourInstance<Main>
     }
     #endregion
 
+    private void Start() {
+        Logger.Debug("[Main] Start!");
+        Logger.isMuted = isDebugMuted;
+        Logger.SetLogLevel(this.logLevel);
+    }
+
     public bool isTestOn = false;
     public void EnterRoom(string userName) {
         TcpSocket.inst.client.EnterRoom(userName, (req, result) => {
             if (result == null) {
-                Debug.LogError("[TcpSocket.EnterRoom] result is null");
+                Logger.Error("[TcpSocket.EnterRoom] result is null");
                 return;
             }
-            Debug.Log("complated localPlayer joinRoom");
+            Logger.Debug("complated localPlayer joinRoom");
             PlayerManager.inst.JoinedPlayer(result, true);
         });
     }

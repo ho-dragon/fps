@@ -16,15 +16,15 @@ public class SocketResponse : MonoBehaviour {
     }
 
     public void GetRecevieBuffer(byte[] buffer) {
-        //Debug.Log("[SocketResponse.GetRecevieBuffer] buffer size = " + buffer.Length);
+        //Logger.Debug("[SocketResponse.GetRecevieBuffer] buffer size = " + buffer.Length);
         //for (int i = 0; i < buffer.Length; i++) {
-        //    Debug.Log("buffer[{" + i + "}] = " + buffer[i]);
+        //    Logger.Debug("buffer[{" + i + "}] = " + buffer[i]);
         //}
         this.resolver.on_receive(buffer, 0, buffer.Length, CallbackRecevieBuffer);
     }
 
     public void CallbackRecevieBuffer(byte[] data) {
-        //Debug.Log("[SocketResponse.CallbackRecevieBuffer] data size = " + data.Length);
+        //Logger.Debug("[SocketResponse.CallbackRecevieBuffer] data size = " + data.Length);
         byte[] header = new byte[4];
         Array.Copy(data, header, 4);
         int dataSize = get_body_size(header);
@@ -33,7 +33,7 @@ public class SocketResponse : MonoBehaviour {
         }
         byte[] body = new byte[dataSize];
         Array.Copy(data, 4, body, 0, dataSize);
-        //Debug.Log("[SocketResponse.callback] data size = " + dataSize + " / data = " + Encoding.UTF8.GetString(body));
+        //Logger.Debug("[SocketResponse.callback] data size = " + dataSize + " / data = " + Encoding.UTF8.GetString(body));
         Receiver(Encoding.UTF8.GetString(body), body);
     }
 
