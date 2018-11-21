@@ -11,7 +11,7 @@ public partial class IngameClient : MonoBehaviour {
     }
 
     public void Attack(int attackPlayer, int damagedPlayer, int attackPosition, Response<DamageModel> callback) {
-        send<DamageModel>(req("attack", "attackPlayer", attackPlayer
+        send<DamageModel>(req("attackPlayer", "attackPlayer", attackPlayer
                                       , "damagedPlayer", damagedPlayer
                                       , "attackPosition" , attackPosition), callback);
     }

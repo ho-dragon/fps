@@ -9,4 +9,8 @@ public class UIManager : MonoBehaviourInstance<UIManager> {
     void Awake() {
         Assert.IsNotNull(this.hud);
     }
+    public void PlayerHP(float currentHP, float maxHP) {
+        Logger.DebugHighlight("[UIManager.PlayerHP] Main UI ----");
+        this.hud.hp.SetHP(currentHP, maxHP);
+    }
 }

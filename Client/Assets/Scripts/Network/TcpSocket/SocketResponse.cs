@@ -70,7 +70,7 @@ public class SocketResponse : MonoBehaviour {
     }
 
     private void MovePlayer(PlayerMoveModel result) {
-        Logger.DebugHighlight("[RecevieNtotication.MovePlayer]  = " + result.playerNum + " / movePosition X : {0} Y : {1} : Z : {2}" , result.playerPosX, result.playerPosY, result.playerPosZ);
+        //Logger.DebugHighlight("[RecevieNtotication.MovePlayer]  = " + result.playerNum + " / movePosition X : {0} Y : {1} : Z : {2}" , result.playerPosX, result.playerPosY, result.playerPosZ);
         PlayerManager.inst.MovePlayer(result.playerNum, new Vector3(result.playerPosX
                                                                     , result.playerPosY
                                                                     , result.playerPosZ));

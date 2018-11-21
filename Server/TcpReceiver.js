@@ -107,6 +107,8 @@ function attackPlayer(socket, receivedData) {
 	let attackPosition = receivedData.param["attackPosition"];
 
 	let player = room.attackPlayer(attackPlayer, damagedPlayer, attackPosition);
+	debug("[attackPlayer] damaged player name = " + player.number);
+
 	let model = new DamageModel(attackPlayer, damagedPlayer, 10, player.currentHP, player.maxHP);
 	let bytes = BSON.serialize(model);
 

@@ -7,7 +7,7 @@ using System.Text;
 using System;
 
 public class SocketRequest : MonoBehaviour {
-	public Socket m_Socket;
+	public Socket socket;
     public void Send(byte[] msg) {
         if (TcpSocket.inst.IsConnected == false) {
             return;
@@ -16,7 +16,12 @@ public class SocketRequest : MonoBehaviour {
         byte[] header = BitConverter.GetBytes(sendDataLength);
         byte[] body = msg;
         byte[] totalSendBuffer = byte_merge(header, body);
-        m_Socket.Send(totalSendBuffer, totalSendBuffer.Length, SocketFlags.None);
+
+        if (socket.Connected == false) {
+            Logger.Error("[SocketRequest] disconnected from server");
+            return;
+        }
+        socket.Send(totalSendBuffer, totalSendBuffer.Length, SocketFlags.None);
     }
 
     private byte[] byte_merge(byte[] arg1, byte[] arg2) {

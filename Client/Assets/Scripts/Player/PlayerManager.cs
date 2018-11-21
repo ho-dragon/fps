@@ -33,34 +33,32 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             clone.transform.position = new Vector3(player.lastPosition[0], player.lastPosition[1], player.lastPosition[2]);
         } else {
             clone.transform.position = new Vector3(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(10, 20), UnityEngine.Random.Range(0, 10));
-        }
-        
+        }        
         Player newPlayer = clone.GetComponent<Player>();
-        newPlayer.Init(player.teamCode
-                     , player.number
-                     , player.name
-                     , player.currentHP
-                     , player.maxHP
-                     , (number, movePos) => {
-                         TcpSocket.inst.client.MovePlayer(number, movePos);
-                     });
+        //newPlayer.hpBar.facing.SetCamara(PlayerCamera.inst.camera);//HP카메라 보는 부분 일단 주석
 
         if (isLocalPlayer) {
             this.localPlayer = newPlayer;
             this.localPlayer.EnableCamera(PlayerCamera.inst);
             this.localPlayer.IsPlayable = true;
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.name, player.number);
-            return;
+        } else {
+            if (this.remotePlayers.Exists(x => x.Number == player.number)) {
+                Logger.Error("[Main.JoinPlayer] already exist player = " + player.number);
+                return;
+            }
+            this.remotePlayers.Add(newPlayer);
+            Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.name, player.number);
         }
 
-         if (this.remotePlayers.Exists(x => x.Number == player.number)) {
-             Logger.Error("[Main.JoinPlayer] already exist player = " + player.number);
-             return;
-         }
-
-        newPlayer.hpBar.facing.SetCamara(PlayerCamera.inst.camera);
-        this.remotePlayers.Add(newPlayer);
-        Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.name, player.number);
+        newPlayer.Init(player.teamCode
+             , player.number
+             , player.name
+             , player.currentHP
+             , player.maxHP
+             , (number, movePos) => {
+                 TcpSocket.inst.client.MovePlayer(number, movePos);
+             });        
     }
 
     public void MovePlayer(int playerNumb, Vector3 movePosition) {
@@ -73,8 +71,12 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
     }
 
     public void DamagedPlayer(DamageModel result) {
+        Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------result / damagedPlayerNumb = " + result.damagedPlayer);
+
         if (this.localPlayer.Number == result.damagedPlayer) {
             Logger.Debug("내가 맞았다");
+
+            Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------SetLocalHP / damagedPlayerNumb = " + result.damagedPlayer);
             this.localPlayer.SetHealth(result.currentHP, result.maxHP);
             return;
         }
@@ -83,6 +85,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             Logger.Error("[PlayerManager.SetDamage] player is null");
             return;
         }
+        Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------SetRemoteHP / damagedPlayerNumb = " + result.damagedPlayer);
         player.SetHealth(result.currentHP, result.maxHP);
     }
 }

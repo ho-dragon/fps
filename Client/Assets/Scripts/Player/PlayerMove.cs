@@ -27,7 +27,7 @@ public class PlayerMove : MonoBehaviour {
     public void SetMovePosition(Vector3 targetPos) {
         this.isStartMove = true;        
         this.targetPos = targetPos;
-        Logger.DebugHighlight("[PlayerManager.SetMovePosition] playerNumb = " + playerNumber);
+        //Logger.DebugHighlight("[PlayerManager.SetMovePosition] playerNumb = " + playerNumber);
     }
 
    void FixedUpdate() {
@@ -36,7 +36,7 @@ public class PlayerMove : MonoBehaviour {
         } else {
             if (isStartMove) {
                 this.playerTrans.position = Vector3.Lerp(this.playerTrans.position, this.targetPos, Time.deltaTime * speed);
-                Logger.DebugHighlight("[PlayerManager.SetMovePosition] moving playerNum = {0} / pos = {1} ", playerNumber, this.playerTrans.position);
+                //Logger.DebugHighlight("[PlayerManager.SetMovePosition] moving playerNum = {0} / pos = {1} ", playerNumber, this.playerTrans.position);
             }
         }
     }

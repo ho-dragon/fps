@@ -18,6 +18,11 @@ public class RayCastGun : Weapon {
 			Logger.Debug("[RayCastGun.Shoot] Yes! hit detected : Tag = " + hit.transform.tag.ToString());
             if (hit.transform.tag.Equals(playerTag)) {
                 Player hitPlayer = hit.transform.GetComponent<Player>();
+                if(this.playerNum == hitPlayer.Number) {
+                    Logger.DebugHighlight("[내몸통맞았다..............]");
+                    return;
+                }
+
                 TcpSocket.inst.client.Attack(this.playerNum, hitPlayer.Number, 0, (req, result) => {
                     PlayerManager.inst.DamagedPlayer(result);
                 });

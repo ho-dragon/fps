@@ -57,8 +57,8 @@ public class Player : MonoBehaviour {
     }
 
     public void SetHealth(float currentHP, float maxHP) {
-        if(this.isPlayable) {
-            UIManager.inst.hud.hp.SetHP(currentHP, maxHP);
+        if (this.isPlayable) {
+            UIManager.inst.PlayerHP(currentHP, maxHP);
         }
         this.hpBar.SetHP(currentHP, maxHP);
     }
@@ -71,7 +71,7 @@ public class Player : MonoBehaviour {
             this.cam.MoveChildTrans(this.eyes);
             this.cam.Look(this.camDerection);
             this.actionController.move.CameraTransform = this.cam.transform;
-			if(this.weapon != null){
+			if (this.weapon != null){
 				this.weapon.SetCamera(cam);
 			}
         }

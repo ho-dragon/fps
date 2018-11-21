@@ -147,7 +147,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
             byteLength++;
             //Logger.Debug(a + " ");
         }
-        Logger.Debug("[Deserializaer] byte length : " + byteLength);
+        //Logger.Debug("[Deserializaer] byte length : " + byteLength);
         JsonSerializer deserializaer = new JsonSerializer();
         BsonReader reader = new BsonReader(ms);
         T dp = deserializaer.Deserialize<T>(reader);
@@ -187,7 +187,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         //=======================================================
         // Socket create.
 		this.m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-		sender.m_Socket = this.m_Socket;
+		sender.socket = this.m_Socket;
 		this.m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, 10000);
 		this.m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 10000);
         //=======================================================

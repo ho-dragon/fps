@@ -6,6 +6,7 @@ var room = {
 module.exports.addPlayer = addPlayer;
 module.exports.getOtherPlayers = getOtherPlayers;
 module.exports.updateLastPosition = updateLastPosition;
+module.exports.attackPlayer = attackPlayer;
 
 function addPlayer(playerName) {
 	var playerNum = room.players.length;
@@ -41,14 +42,16 @@ function updateLastPosition(playerNum, lastPosition) {
 }
 
 function attackPlayer(attackPlayer, damagedPlayer, attackPosition) {
-	var player;
-	for(var i in room.players) {
-		if(i.playerNum == damagedPlayer) {
-			i.currentHP -= 10;
-			player = i;
+	for(var key in room.players) {
+		if (room.players[key].number == damagedPlayer) {
+			room.players[key].currentHP -= 10;
+			if (room.players[key].currentHP < 0) {
+				room.players[key].currentHP = 0;
+			}
+			return room.players[key];
 		}
-	}
-	return player;
+	}	
+	return null;
 }
 
 function Player(name, number, teamCode, currentHP, maxHP, lastPosition) {

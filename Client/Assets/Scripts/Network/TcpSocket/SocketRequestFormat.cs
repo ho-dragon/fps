@@ -36,11 +36,12 @@ public class SocketRequestFormat
                param.Add(args[i] as string, i + 1 >= length ? null : args[i + 1]);
             }
 
-            foreach (KeyValuePair<string, object> i in param) {
-                Logger.Debug("[SocketRequestFormat] key = " + i.Key + " / value = " + i.Value);
-            }
+            if(method.Equals("movePlayer") == false) {
+                foreach (KeyValuePair<string, object> i in param) {
+                    Logger.Debug("[SocketRequestFormat] key = " + i.Key + " / value = " + i.Value);
+                }
+            }            
         }
-        //this.param = new KeyValueList(args).ToHashtable();
     }
 }
 

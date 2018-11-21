@@ -81,14 +81,20 @@ public partial class IngameClient : MonoBehaviour
 
     public void OnMessage(byte[] data) {
         SocketRequestFormat msg = TcpSocket.inst.Deserializaer<SocketRequestFormat>(data);
-        Logger.Debug("[OnMessage] webSocketMsg.id = " + msg.id + " / data length = " + data.Length +" / bates length = " + msg.bytes.Length);
+        if (msg.method.Equals("movePlayer") == false) {
+            Logger.Debug("[OnMessage] webSocketMsg.id = " + msg.id + " / data length = " + data.Length + " / bates length = " + msg.bytes.Length);
+        }        
         timeSync.Adjust(msg.time);
    
         if (msg.IsNotification) {
-            Logger.Debug("[OnMessage] IsNotification = true");
+            if (msg.method.Equals("movePlayer") == false) {
+                Logger.Debug("[OnMessage] IsNotification = true");
+            }
             TcpSocket.inst.receiver.RecevieNotification(msg);
         } else  {
-            Logger.Debug("[OnMessage] IsNotification = false");
+            if (msg.method.Equals("movePlayer") == false) {
+                Logger.Debug("[OnMessage] IsNotification = false");
+            }
             DequeueRequestId(msg.id);
             OnResponse(msg);
         }
@@ -152,7 +158,10 @@ public partial class IngameClient : MonoBehaviour
 
         byte[] bytes = TcpSocket.inst.SerializeToByte(request);
         socketRequest.Send(bytes);
-        Logger.Debug(string.Format("<color=#86E57F>[Send]</color> method = {0} rid = {1}", request.method, request.id));
+
+        if (request.method.Equals("movePlayer") == false) {
+            Logger.Debug(string.Format("<color=#86E57F>[Send]</color> method = {0} rid = {1}", request.method, request.id));
+        }        
         this.responseList.Add(new ResponseEntry<T>() { ingameRequest = ingameRequest, responseCallback = response });
     }
 
