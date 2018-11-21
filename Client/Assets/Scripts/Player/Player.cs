@@ -48,7 +48,7 @@ public class Player : MonoBehaviour {
         this.number = number;
         this.name = name;
         this.textMesh.text = name;
-		this.actionController.move.Init(number, moveCallback);
+		this.actionController.move.Init(this.transform, number, moveCallback);
         this.status = new PlayerStatus(currentHP, maxHP);
         SetHealth(currentHP, maxHP);
 

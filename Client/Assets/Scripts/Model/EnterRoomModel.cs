@@ -12,5 +12,5 @@ public class PlayerModel {
     public int teamCode;
     public float currentHP;
     public float maxHP;
-    public float[] lastPosition;
+    public List<float> lastPosition;
 }

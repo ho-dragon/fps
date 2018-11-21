@@ -60,6 +60,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             this.localPlayer.EnableCamera(PlayerCamera.inst);
             this.localPlayer.IsPlayable = true;
             localPlayer.weaponGameObject.AddComponent<RayCastGun>();
+            Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.name, player.number);
             return;
         }
 
@@ -70,13 +71,13 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
 
         newPlayer.hpBar.facing.SetCamara(PlayerCamera.inst.camera);
         this.remotePlayers.Add(newPlayer);
+        Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.name, player.number);
     }
 
     public void MovePlayer(int playerNumb, Vector3 movePosition) {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if (player != null) {
-            if (player.IsPlayable == false) {
-                Logger.DebugHighlight("[PlayerManager.MovePlayer] playerNumb = " + playerNumb);
+            if (player.IsPlayable == false) {                
                 player.ActionController.move.SetMovePosition(movePosition);
             }
         }

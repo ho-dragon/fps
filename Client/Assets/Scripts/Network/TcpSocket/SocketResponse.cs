@@ -45,9 +45,7 @@ public class SocketResponse : MonoBehaviour {
         ingameClient.OnMessage(buffer);
     }
 
-
-    public void RecevieNotification(SocketRequestFormat result) {
-        Logger.DebugHighlight("[RecevieNtotication] method = " + result.method);
+    public void RecevieNotification(SocketRequestFormat result) {        
         switch(result.method){
             case "damagedPlayer":
                 DamagedPlayer(TcpSocket.inst.Deserializaer<DamageModel>(result.bytes));
@@ -55,21 +53,24 @@ public class SocketResponse : MonoBehaviour {
             case "joinPlayer":
                 JoinPlayer(TcpSocket.inst.Deserializaer<EnterRoomModel>(result.bytes));
                 break;
-            case "MovePlayer":
+            case "movePlayer":
                 MovePlayer(TcpSocket.inst.Deserializaer<PlayerMoveModel>(result.bytes));
                 break;
         }
     }
 
     public void DamagedPlayer(DamageModel result) {
+        Logger.DebugHighlight("[RecevieNtotication.DamagedPlayer]");
         PlayerManager.inst.DamagedPlayer(result);
     }
 
     public void JoinPlayer(EnterRoomModel result) {
+        Logger.DebugHighlight("[RecevieNtotication.JoinPlayer]");
         PlayerManager.inst.JoinedPlayer(result.player, false);
     }
 
     private void MovePlayer(PlayerMoveModel result) {
+        Logger.DebugHighlight("[RecevieNtotication.MovePlayer]  = " + result.playerNum + " / movePosition X : {0} Y : {1} : Z : {2}" , result.playerPosX, result.playerPosY, result.playerPosZ);
         PlayerManager.inst.MovePlayer(result.playerNum, new Vector3(result.playerPosX
                                                                     , result.playerPosY
                                                                     , result.playerPosZ));

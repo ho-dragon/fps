@@ -7,32 +7,36 @@ public class PlayerMove : MonoBehaviour {
     private bool isPlayable = false;
     private System.Action<int, Vector3> moveCallback;
     private Transform cameraTransform;
+    private Transform playerTrans;
     private bool isStartMove = false;
     private Vector3 targetPos;
     private float speed = 3f;
     private float tilt = 1f;
     public Rigidbody rigidbody;
-
+    
     void Awake() {
         Assert.IsNotNull(this.rigidbody);
     }
-    public void Init(int number, System.Action<int, Vector3> moveCallback) {
+    public void Init(Transform playerTrans, int number, System.Action<int, Vector3> moveCallback) {
+        this.playerTrans = playerTrans;
         this.playerNumber = number;
         this.moveCallback = moveCallback;
     }
     public bool IsPlayable { set { this.isPlayable = value; } }
     public Transform CameraTransform {set { this.cameraTransform = value; } }
     public void SetMovePosition(Vector3 targetPos) {
-        this.isStartMove = true;
+        this.isStartMove = true;        
         this.targetPos = targetPos;
+        Logger.DebugHighlight("[PlayerManager.SetMovePosition] playerNumb = " + playerNumber);
     }
 
    void FixedUpdate() {
         if (isPlayable) {
             MoveInput();
         } else {
-            if (isStartMove) {//Todo. 선형보간 들어가야함
-                this.transform.position = Vector3.Lerp(this.transform.position, this.targetPos, Time.deltaTime * speed);
+            if (isStartMove) {
+                this.playerTrans.position = Vector3.Lerp(this.playerTrans.position, this.targetPos, Time.deltaTime * speed);
+                Logger.DebugHighlight("[PlayerManager.SetMovePosition] moving playerNum = {0} / pos = {1} ", playerNumber, this.playerTrans.position);
             }
         }
     }
@@ -55,7 +59,7 @@ public class PlayerMove : MonoBehaviour {
         this.rigidbody.rotation = Quaternion.Euler(0.0f, 0.0f, this.rigidbody.velocity.x * -tilt);
 
         if (moveCallback != null) {
-            moveCallback(this.playerNumber, this.transform.position);
+            moveCallback(this.playerNumber, this.playerTrans.position);
         }
     }
 

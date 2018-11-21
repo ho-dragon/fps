@@ -4,6 +4,7 @@ var room = {
 
 module.exports.addPlayer = addPlayer;
 module.exports.getOtherPlayers = getOtherPlayers;
+module.exports.updateLastPosition = updateLastPosition;
 
 function addPlayer(playerName) {
 	var playerNum = room.players.length;
@@ -29,6 +30,14 @@ function getOtherPlayers(playerNum) {
 	return otherPlayers;
 }
 
+function updateLastPosition(playerNum, lastPosition) {
+	for (let key in room.players) {
+		if (room.players[key].number == playerNum) {
+			room.players[key].lastPosition = lastPosition;
+		}
+	}
+}
+
 function attackPlayer(attackPlayer, damagedPlayer, attackPosition) {
 	var player;
 	for(var i in room.players) {
@@ -40,7 +49,7 @@ function attackPlayer(attackPlayer, damagedPlayer, attackPosition) {
 	return player;
 }
 
-function Player(name, number, teamCode, currentHP, maxHP, lastPosition){
+function Player(name, number, teamCode, currentHP, maxHP, lastPosition) {
 	this.name = name;
 	this.number = number;
 	this.teamCode = teamCode;
