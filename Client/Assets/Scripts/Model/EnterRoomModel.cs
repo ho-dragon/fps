@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class EnterRoomModel {
     public PlayerModel player;
-    public List<PlayerModel> otherPlayers;
+    public PlayerModel[] otherPlayers;
 }
 
 public class PlayerModel {
@@ -12,5 +12,5 @@ public class PlayerModel {
     public int teamCode;
     public float currentHP;
     public float maxHP;
-    public List<float> lastPosition;
+    public float[] lastPosition;
 }

@@ -33,7 +33,8 @@ public class PlayerCamera : MonoBehaviourInstance<PlayerCamera> {
        this.transform.localPosition = Vector3.zero;
     }
 
-    void LateUpdate() {
+    //void LateUpdate() {
+    void Update() {
         if (axes == RotationAxes.MouseXAndY) {
             // Read the mouse input axis
             rotationX += Input.GetAxis("Mouse X") * sensitivityX;

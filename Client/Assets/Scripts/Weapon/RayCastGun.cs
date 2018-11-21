@@ -16,7 +16,7 @@ public class RayCastGun : Weapon {
 		if (Physics.Raycast(ray, out hit, distance)) {
             Debug.DrawLine(ray.origin, hit.point, Color.green, 2f);
 			Logger.Debug("[RayCastGun.Shoot] Yes! hit detected : Tag = " + hit.transform.tag.ToString());
-            if(hit.transform.tag.Equals(playerTag)) {
+            if (hit.transform.tag.Equals(playerTag)) {
                 Player hitPlayer = hit.transform.GetComponent<Player>();
                 TcpSocket.inst.client.Attack(this.playerNum, hitPlayer.Number, 0, (req, result) => {
                     PlayerManager.inst.DamagedPlayer(result);

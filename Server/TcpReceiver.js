@@ -10,11 +10,11 @@ module.exports.receiveFromClient = receiveFromClient;
 function receiveFromClient(socket, msg) {
     let buffMsg = new Buffer(msg);
     //msg = buffMsg.slice(4, buffMsg.length);// remove header buffer// 불피요 : 기존 2.0.0에서 Bson 4.2.0 업그레이드 이후 Bson에서 알아서 앞에 버퍼 부분을 인식하고 디시리얼라이즈해줌
-
-	debug(' receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
+	//debug(' receiveFromClient : length = %d /  data = %s', msg.length, msg.toString());
     let result = BSON.deserialize(msg);
 
-    debug("** method  = " + result.method);
+    if (result.method != 'movePlayer') {//movePlayer는 너무 빈번함
+	debug("** method  = " + result.method);
     debug("** id = " + result.id);
     debug("** code = " + result.code);
     debug("** msg = " + result.msg);
@@ -25,6 +25,7 @@ function receiveFromClient(socket, msg) {
 		let x = result.param[key];
 		debug(x);
      }
+    }    
 
 	switch(result.method) {
 		case 'init':
@@ -54,7 +55,7 @@ function init(socket, receivedData) {
 	server.send(socket, snedData);
 }
 
-function enterRoom(socket, receivedData) {
+function enterRoom(socket, receivedData) {	
 	let playerName = receivedData.param["playerName"];
 	let player = room.addPlayer(playerName);
  
@@ -95,7 +96,7 @@ function movePlayer(socket, receivedData) {
 
 	let bytes = BSON.serialize(model);
 	let notiResult = new NotificationFormat('movePlayer', 200, "success", bytes);
-	room.updateLastPosition(playerNum, {posX, posY, posZ});
+	room.updateLastPosition(playerNum, [posX, posY, posZ]);
 	server.broadcastExcludedMe(notiResult, socket);
 
 }

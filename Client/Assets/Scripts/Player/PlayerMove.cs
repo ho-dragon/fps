@@ -44,9 +44,6 @@ public class PlayerMove : MonoBehaviour {
     private void MoveInput() {
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
-        if ((moveHorizontal > 0.05f || moveVertical > 0.05f) == false) {
-            return;
-        }
 
         Vector3 movement = new Vector3(moveHorizontal, 0f, moveVertical);
         if (this.cameraTransform != null) {

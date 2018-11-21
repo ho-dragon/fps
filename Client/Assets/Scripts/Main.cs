@@ -10,28 +10,35 @@ public class Main : MonoBehaviourInstance<Main>
     public string port = "8107";
     public Logger.LogLevel logLevel = Logger.LogLevel.debug;
     public bool isDebugMuted = false;
+    private bool isOnGUI = true;
+    private bool isConnected = false;
 
     public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0) {
         return new Rect(_width * raw, _height * column, _width, _height);
     }
 
     void OnGUI() {
-        if (isTestOn == false) {
+        if (isOnGUI == false) {
             return;
         }
 
-        ip = GUI.TextField(GetRectPos(0, 1, 200, 50), ip, 25);
-        port = GUI.TextField(GetRectPos(0, 2, 200, 50), port, 25);
-        userName = GUI.TextField(GetRectPos(0, 3, 200, 50), userName, 25);
+        if (this.isConnected == false) {
+            ip = GUI.TextField(GetRectPos(0, 1, 200, 50), ip, 25);
+            port = GUI.TextField(GetRectPos(0, 2, 200, 50), port, 25);
+            userName = GUI.TextField(GetRectPos(0, 3, 200, 50), userName, 25);
 
-        if (GUI.Button(GetRectPos(0, 4, 200, 50), "Connect Socket")) {
-            TcpSocket.inst.Connect(this.ip, System.Convert.ToInt32(this.port));
+            if (GUI.Button(GetRectPos(0, 4, 200, 50), "Connect Socket")) {
+                TcpSocket.inst.Connect(this.ip, System.Convert.ToInt32(this.port), (isConnected) => {
+                    this.isConnected = isConnected;
+                });
+            }
+        }        
+
+        if (this.isConnected) {
+            if (GUI.Button(GetRectPos(0, 5, 200, 50), "EnterRoom")) {
+                EnterRoom(userName);
+            }
         }
-
-        if (GUI.Button(GetRectPos(0, 5, 200, 50), "EnterRoom")) {
-            EnterRoom(userName);
-        }
-
         //if (GUI.Button(GetRectPos(0, 6, 200, 50), "JoinRoom(dummy)")) {
         //    int playerRandomNum = UnityEngine.Random.Range(0,1000);
         //    while (PlayerManager.inst.IsExsitPlayer(playerRandomNum)) {
@@ -49,7 +56,7 @@ public class Main : MonoBehaviourInstance<Main>
         Logger.SetLogLevel(this.logLevel);
     }
 
-    public bool isTestOn = false;
+    
     public void EnterRoom(string userName) {
         TcpSocket.inst.client.EnterRoom(userName, (req, result) => {
             if (result == null) {
@@ -70,7 +77,10 @@ public class Main : MonoBehaviourInstance<Main>
                 }
             }  else {
                 Logger.Debug("[Main] otherPlayers is null");
-            }        
+            }
+            
+            Cursor.visible = false;
+            isOnGUI = false;
         });
     }
 }

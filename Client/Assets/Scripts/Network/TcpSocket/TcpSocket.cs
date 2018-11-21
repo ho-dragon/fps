@@ -175,7 +175,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         get { return this.isConnected; }
     }
 
-    public void Connect(string ip, int port) {
+    public void Connect(string ip, int port, System.Action<bool> callback) {
         this.ip = ip;
         this.port = port;
 
@@ -199,8 +199,11 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 			this.m_Socket.Connect(ipEndPoint);
             this.ns = new NetworkStream(this.m_Socket);
             this.isConnected = true;
+            callback(this.isConnected);
         } catch (SocketException e) {
-            Logger.Debug("Socket connect error! : " + e.ToString() ); 
+            Logger.Debug("Socket connect error! : " + e.ToString() );
+            this.isConnected = false;
+            callback(this.isConnected);
             return;
         }
 

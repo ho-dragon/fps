@@ -11,9 +11,8 @@ public class Player : MonoBehaviour {
     public Transform eyes;
     public Transform camDerection;
     public Transform muzzleTransform;
-    public GameObject weaponGameObject;
     private PlayerCamera cam;
-    private Weapon weapon;
+    public Weapon weapon;
     public PlayerActionController actionController;
     private PlayerStatus status;
     public HpGage hpBar;
@@ -23,7 +22,6 @@ public class Player : MonoBehaviour {
         Assert.IsNotNull(this.camDerection);
         Assert.IsNotNull(this.textMesh);
         Assert.IsNotNull(this.muzzleTransform);
-        Assert.IsNotNull(this.weaponGameObject);
         Assert.IsNotNull(this.hpBar);
     }
     public bool IsSameTeam(int teamCode) {
@@ -42,7 +40,7 @@ public class Player : MonoBehaviour {
     public int Number { get { return this.number; } }
     public string Name { get { return this.name; } }
     public PlayerActionController ActionController { get { return this.actionController; } }
-    public void Init(int teamCode, Weapon weapon, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3> moveCallback) {
+    public void Init(int teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3> moveCallback) {
         Logger.Debug("[Player] Init number = " + number + " / name = " + name);
         this.teamCode = teamCode;
         this.number = number;
@@ -53,7 +51,6 @@ public class Player : MonoBehaviour {
         SetHealth(currentHP, maxHP);
 
         if (weapon != null) {
-            this.weapon = weapon;
             this.weapon.Init(this.number, this.muzzleTransform);
         }
         //this.actionController.shoot.Init(weapon);

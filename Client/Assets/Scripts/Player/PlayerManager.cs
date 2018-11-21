@@ -13,15 +13,6 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         this.remotePlayers = new List<Player>();
     }
 
-    private void Start() {
-        if (this.localPlayer != null) {//Test용     
-            RayCastGun rayCastGun = localPlayer.weaponGameObject.AddComponent<RayCastGun>();
-            //this.localPlayer.Init(0, rayCastGun, 1, "localTestPlayer", 100, 100, null);
-            //this.localPlayer.EnableCamera(PlayerCamera.inst);
-            //this.localPlayer.IsPlayable = true;
-        }
-    }
-
     public bool IsExsitPlayer(int playerNum) {
         return this.remotePlayers.Exists(x => x.Number == playerNum);
     }
@@ -46,20 +37,18 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         
         Player newPlayer = clone.GetComponent<Player>();
         newPlayer.Init(player.teamCode
-                                     ,  null
-                                     , player.number
-                                     , player.name
-                                     , player.currentHP
-                                     , player.maxHP
-                                     , (number, movePos) => {
-                                         TcpSocket.inst.client.MovePlayer(number, movePos);
-                                     });
+                     , player.number
+                     , player.name
+                     , player.currentHP
+                     , player.maxHP
+                     , (number, movePos) => {
+                         TcpSocket.inst.client.MovePlayer(number, movePos);
+                     });
 
         if (isLocalPlayer) {
             this.localPlayer = newPlayer;
             this.localPlayer.EnableCamera(PlayerCamera.inst);
             this.localPlayer.IsPlayable = true;
-            localPlayer.weaponGameObject.AddComponent<RayCastGun>();
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.name, player.number);
             return;
         }
