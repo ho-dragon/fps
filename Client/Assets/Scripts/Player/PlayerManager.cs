@@ -39,7 +39,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
 
         if (player.lastPosition != null) {
-            clone.transform.position = player.lastPosition;
+            clone.transform.position = new Vector3(player.lastPosition[0], player.lastPosition[1], player.lastPosition[2]);
         } else {
             clone.transform.position = new Vector3(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(10, 20), UnityEngine.Random.Range(0, 10));
         }

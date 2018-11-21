@@ -85,22 +85,21 @@ data = makeSendBuffer(BSON.serialize(data));
 }
 
 function broadcastAll(message) {
+  debug('broadcastAll / msg = ', message);
     message = makeSendBuffer(BSON.serialize(message));
     sockets.forEach(function (socket) {
-      socket.write(message);
-      debug('broadcastAll / msg = ', message);
+      socket.write(message);      
     });
 }
 
 function broadcastExcludedMe(message, sender) {
+  debug('broadcastExcludedMe / msg = ', message);
     message = makeSendBuffer(BSON.serialize(message));
     sockets.forEach(function (socket) {
-      if (socket === sender) {
-           return;
-      }
-      socket.write(message);
-      debug('broadcastExcludedMe / msg = ', message);
-    });  
+      if (socket != sender) {
+          socket.write(message);          
+      }      
+    });
 }
 
 

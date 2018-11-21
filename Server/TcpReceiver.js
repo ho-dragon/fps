@@ -79,19 +79,25 @@ function enterRoom(socket, receivedData) {
 	let response = new ResponseFormat(200, receivedData.id, "success", bytes);
 	server.send(socket, response);
 
-	let notiResult = new NotificationFormat('joinPlayer',200, 0, "success", bytes);
+	let notiResult = new NotificationFormat('joinPlayer',200, "success", bytes);
 	server.broadcastExcludedMe(notiResult, socket);
 }
 
 function movePlayer(socket, receivedData) {
-	let model = new PlayerMoveModel(receivedData.param["playerNum"]
-		, receivedData.param["playerPosX"]
-		, receivedData.param["playerPosY"]
-		, receivedData.param["playerPosZ"]);
+	let playerNum = receivedData.param["playerNum"];
+	let posX = receivedData.param["playerPosX"];
+	let posY = receivedData.param["playerPosY"];
+	let posZ = receivedData.param["playerPosZ"];
+	let model = new PlayerMoveModel(playerNum
+		, posX
+		, posY
+		, posZ);
 
 	let bytes = BSON.serialize(model);
-	let notiResult = new NotificationFormat('movePlayer', 200, 0, "success", bytes);
+	let notiResult = new NotificationFormat('movePlayer', 200, "success", bytes);
+	room.updateLastPosition(playerNum, {posX, posY, posZ});
 	server.broadcastExcludedMe(notiResult, socket);
+
 }
 
 function attackPlayer(socket, receivedData) {
@@ -106,8 +112,8 @@ function attackPlayer(socket, receivedData) {
 	let response = new ResponseFormat(200, receivedData.id, "success", bytes);
 	server.send(socket, response);
 
-	let notiResult = new NotificationFormat('damagedPlayer',200, 0, "success", bytes);
-	server.broadcastExcludedMe(notiResult, socket,  true);
+	let notiResult = new NotificationFormat('damagedPlayer', 200, "success", bytes);
+	server.broadcastExcludedMe(notiResult, socket);
 }
 
 function PlayerMoveModel(playerNum, playerPosX, playerPosY, playerPosZ) {
@@ -138,10 +144,10 @@ function ResponseFormat(code, id, msg, bytes) {
 	this.bytes = bytes;
 }
 
-function NotificationFormat(method, code, id, msg, bytes) {
+function NotificationFormat(method, code, msg, bytes) {
 	this.method = method;
 	this.code = code;
-	this.id = id;
+	this.id = 0;
 	this.msg = msg;
 	this.bytes = bytes;
 }
