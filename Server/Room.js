@@ -1,3 +1,4 @@
+const debug = require('debug')('Room');
 var room = {
 	players : []
 }
@@ -10,6 +11,7 @@ function addPlayer(playerName) {
 	var playerNum = room.players.length;
 	var player = new Player(playerName, playerNum, getTeamCode(playerNum), 100, 100, null);
 	room.players.push(player);
+	debug("added player :: name = " + player.name + " / number = " + player.number);
 	return player;
 }
 

@@ -10,7 +10,7 @@ public class PlayerMove : MonoBehaviour {
     private Transform playerTrans;
     private bool isStartMove = false;
     private Vector3 targetPos;
-    private float speed = 3f;
+    private float speed = 10f;
     private float tilt = 1f;
     public Rigidbody rigidbody;
     

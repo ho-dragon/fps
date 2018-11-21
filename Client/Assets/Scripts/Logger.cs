@@ -17,20 +17,15 @@ public static class Logger {
 	}
 
 	public static void DebugHighlight(string msg) {
-		if (logLevel > (int)LogLevel.debug) {
+		if (logLevel > (int)LogLevel.debug || isMuted) {
 			return;
 		}
 
 		UnityEngine.Debug.Log("<color=#FF0000>" + msg + "</color>");
 	}
 
-
-	public static void DebugRed(string fmt, params object[] param) {
-		DebugHighlight(fmt, param);
-	}
-
 	public static void DebugHighlight(string fmt, params object[] param) {
-		if (logLevel > (int)LogLevel.debug) {
+		if (logLevel > (int)LogLevel.debug || isMuted) {
 			return;
 		}
 
