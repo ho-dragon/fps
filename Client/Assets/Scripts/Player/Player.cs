@@ -53,7 +53,6 @@ public class Player : MonoBehaviour {
         if (weapon != null) {
             this.weapon.Init(this.number, this.muzzleTransform);
         }
-        //this.actionController.shoot.Init(weapon);
     }
 
     public void SetHealth(float currentHP, float maxHP) {

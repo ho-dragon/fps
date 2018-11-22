@@ -80,6 +80,8 @@ public class Main : MonoBehaviourInstance<Main>
             }
             
             Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+
             isOnGUI = false;
         });
     }

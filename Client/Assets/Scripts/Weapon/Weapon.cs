@@ -25,6 +25,10 @@ public class Weapon : MonoBehaviour {
     }
 
     void Update() {
+        if (this.playerCam != null) {
+            this.transform.forward = - this.playerCam.transform.forward;
+        }
+
         if (Input.GetMouseButtonDown(0)) {
             Shoot();
         }
