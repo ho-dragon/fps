@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.Assertions;
 
 public class PlayerMove : MonoBehaviour {
+    public Transform head;
     private int playerNumber = 0;
     private bool isPlayable = false;
     private System.Action<int, Vector3> moveCallback;
@@ -31,6 +32,7 @@ public class PlayerMove : MonoBehaviour {
     }
 
    void FixedUpdate() {
+
         if (isPlayable) {
             MoveInput();
         } else {

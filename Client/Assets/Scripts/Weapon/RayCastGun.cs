@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class RayCastGun : Weapon {
-    private float distance = 100f;
+    private float distance = 1000f;
     public override void Shoot() {
 		Logger.Debug("[RayCastGun] called Shoot");
 		if(this.playerCam == null) {
@@ -27,7 +27,8 @@ public class RayCastGun : Weapon {
                     PlayerManager.inst.DamagedPlayer(result);
                 });
             }
-		} else {
+            EffectManager.inst.OnBulletTail(this.muzzleTransform.position, hit.point, 2f);
+        } else {
 			Logger.Debug("[RayCastGun.Shoot] No! hit not detected");
 		}
     }
