@@ -9,94 +9,57 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-public partial class IngameClient : MonoBehaviour
-{
-    public IngameClientStates State
-    {
+public partial class IngameClient : MonoBehaviour {
+    public IngameClientStates State {
         get { return state; }
         private set { state = value; }
     }
 
     private const int RequestTimeout = 5000;
     private const int RECONNECT_TIMEOUT = 20;
-
     public Exception Exception { get; private set; }
     static long lastRequestId = 0;
     IngameClientStates state = IngameClientStates.Unconnected;
     List<IngameRequest> requests = new List<IngameRequest>();
     Queue<SocketRequestFormat> notifications = new Queue<SocketRequestFormat>();
-    IngameTimeSync timeSync = new IngameTimeSync();
+    private Queue<long> RequestIdQueue;
     public  SocketRequest socketRequest;
+
     void Awake() {
         Exception = null;
         RequestIdQueue = new Queue<long>();
         State = IngameClientStates.Connecting;
     }
 
-    public IngameRequest Send(string method, params object[] param)
-    {
+    public IngameRequest Send(string method, params object[] param) {
         return Send(method, null, param);
     }
 
-    public IngameRequest Send<T>(string method, params object[] param)
-    {
+    public IngameRequest Send<T>(string method, params object[] param) {
         return Send(method, typeof(T), param);
     }
-
-
-    public bool TryGetNextNotification(out SocketRequestFormat webSocketMsg)
-    {
-        if (notifications.Count > 0)
-        {
-            webSocketMsg = notifications.Dequeue();
-            return true;
-        }
-
-        webSocketMsg = null;
-        return false;
-    }
-
-    public bool TryGetNextNoti(out SocketRequestFormat webSocketMsg)
-    {
-        if (notifications.Count > 0)
-        {
-            webSocketMsg = notifications.Dequeue();
-            return true;
-        }
-
-        webSocketMsg = null;
-        return false;
-    }
-
-    public int GetNoticeCount()
-    {
-        return notifications.Count;
-    }
-
 
     void OnDestroy() {
         State = IngameClientStates.Closed;
     }
 
-
     public void OnMessage(byte[] data) {
-        SocketRequestFormat msg = TcpSocket.inst.Deserializaer<SocketRequestFormat>(data);
-        if (msg.method.Equals("movePlayer") == false) {
-            Logger.Debug("[OnMessage] webSocketMsg.id = " + msg.id + " / data length = " + data.Length + " / bates length = " + msg.bytes.Length);
-        }        
-        timeSync.Adjust(msg.time);
-   
-        if (msg.IsNotification) {
-            if (msg.method.Equals("movePlayer") == false) {
+        SocketResponsePormat response = TcpSocket.inst.Deserializaer<SocketResponsePormat>(data);
+        if (Logger.IsMutePacket(response.method) == false) {
+            Logger.Debug("[OnMessage] webSocketMsg.id = " + response.id + " / data length = " + data.Length + " / bates length = " + response.bytes.Length);
+        }
+
+        if (response.IsNotification) {
+            if (Logger.IsMutePacket(response.method) == false) {
                 Logger.Debug("[OnMessage] IsNotification = true");
             }
-            TcpSocket.inst.receiver.RecevieNotification(msg);
+            TcpSocket.inst.receiver.RecevieNotification(response);
         } else  {
-            if (msg.method.Equals("movePlayer") == false) {
+            if (Logger.IsMutePacket(response.method) == false) {
                 Logger.Debug("[OnMessage] IsNotification = false");
             }
-            DequeueRequestId(msg.id);
-            OnResponse(msg);
+            DequeueRequestId(response.id);
+            OnResponse(response);
         }
     }
 
@@ -145,7 +108,7 @@ public partial class IngameClient : MonoBehaviour
 
 
     public SocketRequestFormat req(string method, params object[] _params) {
-        return new SocketRequestFormat(method, ++lastRequestId, timeSync.PosixTime, _params);
+        return new SocketRequestFormat(method, ++lastRequestId, _params);
     }
 
     public delegate void Response<T>(IngameRequest req, T result = null) where T : class;
@@ -159,7 +122,7 @@ public partial class IngameClient : MonoBehaviour
         byte[] bytes = TcpSocket.inst.SerializeToByte(request);
         socketRequest.Send(bytes);
 
-        if (request.method.Equals("movePlayer") == false) {
+        if (Logger.IsMutePacket(request.method) == false) {
             Logger.Debug(string.Format("<color=#86E57F>[Send]</color> method = {0} rid = {1}", request.method, request.id));
         }        
         this.responseList.Add(new ResponseEntry<T>() { ingameRequest = ingameRequest, responseCallback = response });
@@ -188,11 +151,10 @@ public partial class IngameClient : MonoBehaviour
     }
 
 
-    void OnResponse(SocketRequestFormat res) {
+    void OnResponse(SocketResponsePormat res) {
         IngameRequest req = this.requests.Find(r => r.RequestId == res.id);
         if (req != null) {
             this.requests.Remove(req);
-            timeSync.Update(res.time, (long)req.Elasped.TotalMilliseconds);
             req.Response = res;
 
             if (req .Equals("ping")) {
@@ -211,37 +173,18 @@ public partial class IngameClient : MonoBehaviour
             response.ExcuteCallback();
         }
     }
+    
 
-
-    Queue<long> RequestIdQueue;
-    public int GetQueueCount()
-    {
-        return RequestIdQueue.Count;
+    void EnqueueRequestId(long requestId) {
+        RequestIdQueue.Enqueue(requestId);
     }
 
-    public long GetIdNumber()
-    {
-        if (RequestIdQueue.Count > 0)
-        {
-            return RequestIdQueue.Peek();
-        }
-        return -1;
-    }
-
-    void EnqueueRequestId(long _Id)
-    {
-        RequestIdQueue.Enqueue(_Id);
-    }
-
-    bool DequeueRequestId(long _Id, string _Msg = "")
-    {
-        if (RequestIdQueue.Count == 0)
-        {
+    bool DequeueRequestId(long requestId) {
+        if (RequestIdQueue.Count == 0) {
             return false;
         }
 
-        if (RequestIdQueue.Peek() == _Id)
-        {
+        if (RequestIdQueue.Peek() == requestId) {
             RequestIdQueue.Dequeue();
             return true;
         }

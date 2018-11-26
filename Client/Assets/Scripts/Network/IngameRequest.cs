@@ -2,31 +2,28 @@
 using System.Collections;
 using Newtonsoft.Json;
 
-public class IngameRequest : IEnumerator
-{
+public class IngameRequest : IEnumerator {
     public long RequestId { get; private set; }
     public IngameRequestStates State { get; private set; }
     public Type ResultType { get; private set; }
     public string RequestMethod { get; protected set; }
-    public SocketRequestFormat Response
-    {
+
+    public SocketResponsePormat Response {
         get { return response; }
-        internal set
-        {
-            if (!State.IsFinal())
-            {
+        internal set {
+            if (!State.IsFinal()) {
                 response = value;
                 if (response == null)
                     Exception = new Exception("Null response");
                 else if (response.code == 200)
                     State = IngameRequestStates.Done;
-               // else
-                    //Exception = new IngameException(response);
+                else
+                    Exception = new Exception(string.Format("response is not success / code = {0}", response.code.ToString()));
             }
         }
     }
-    public Exception Exception
-    {
+
+    public Exception Exception {
         get { return exception; }
         set
         {
@@ -54,13 +51,8 @@ public class IngameRequest : IEnumerator
         }
     }
 
-    public TimeSpan Elasped
-    {
-        get { return DateTime.UtcNow - RequestTime; }
-    }
-
     DateTime requestTime = DateTime.UtcNow;
-    SocketRequestFormat response = null;
+    SocketResponsePormat response = null;
     Exception exception = null;
 
     public IngameRequest(SocketRequestFormat req, Type responseType)
@@ -82,8 +74,7 @@ public class IngameRequest : IEnumerator
         }
     }
 
-    public object Current
-    {
+    public object Current {
         get { return null; }
     }
 

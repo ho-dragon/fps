@@ -45,7 +45,9 @@ public class SocketResponse : MonoBehaviour {
         ingameClient.OnMessage(buffer);
     }
 
-    public void RecevieNotification(SocketRequestFormat result) {        
+
+    private const string movePacket = "movePlayer";
+    public void RecevieNotification(SocketResponsePormat result) {        
         switch(result.method){
             case "damagedPlayer":
                 DamagedPlayer(TcpSocket.inst.Deserializaer<DamageModel>(result.bytes));
@@ -53,7 +55,7 @@ public class SocketResponse : MonoBehaviour {
             case "joinPlayer":
                 JoinPlayer(TcpSocket.inst.Deserializaer<EnterRoomModel>(result.bytes));
                 break;
-            case "movePlayer":
+            case movePacket:
                 MovePlayer(TcpSocket.inst.Deserializaer<PlayerMoveModel>(result.bytes));
                 break;
         }

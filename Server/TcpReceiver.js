@@ -7,6 +7,12 @@ const debug = require('debug')('TcpRecevier');
 
 module.exports.receiveFromClient = receiveFromClient;
 
+
+const methodMovePlayer = "movePlayer";
+const methodInit = "init";
+const methodEnterRoom = "enterRoom";
+const methodAttackPlayer = "attackPlayer";
+
 function receiveFromClient(socket, msg) {
     let buffMsg = new Buffer(msg);
     //msg = buffMsg.slice(4, buffMsg.length);// remove header buffer// 불피요 : 기존 2.0.0에서 Bson 4.2.0 업그레이드 이후 Bson에서 알아서 앞에 버퍼 부분을 인식하고 디시리얼라이즈해줌
@@ -28,16 +34,16 @@ function receiveFromClient(socket, msg) {
     }    
 
 	switch(result.method) {
-		case 'init':
+		case methodInit :
 			init(socket, result);
 			break;
-		case 'enterRoom':
+		case methodEnterRoom :
 			enterRoom(socket, result);
 			break;
-		case 'movePlayer' :
+		case methodMovePlayer:
 			movePlayer(socket, result);
 			break;
-		case 'attackPlayer' :
+		case methodAttackPlayer :
 			attackPlayer(socket, result);
 			break;
 	}
@@ -80,7 +86,7 @@ function enterRoom(socket, receivedData) {
 	let response = new ResponseFormat(200, receivedData.id, "success", bytes);
 	server.send(socket, response);
 
-	let notiResult = new NotificationFormat('joinPlayer',200, "success", bytes);
+	let notiResult = new NotificationFormat('joinPlayer', 200, "success", bytes);
 	server.broadcastExcludedMe(notiResult, socket);
 }
 
