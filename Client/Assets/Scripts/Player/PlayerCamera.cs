@@ -35,8 +35,7 @@ public class PlayerCamera : MonoBehaviourInstance<PlayerCamera> {
 
     //void LateUpdate() {
     void Update() {
-        if (axes == RotationAxes.MouseXAndY) {
-            // Read the mouse input axis
+        if (axes == RotationAxes.MouseXAndY) { // Read the mouse input axis
             rotationX += Input.GetAxis("Mouse X") * sensitivityX;
             rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
             rotationX = ClampAngle(rotationX, minimumX, maximumX);

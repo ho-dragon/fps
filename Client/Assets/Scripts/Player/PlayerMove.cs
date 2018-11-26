@@ -5,40 +5,42 @@ using UnityEngine.Assertions;
 public class PlayerMove : MonoBehaviour {
     public Transform head;
     private int playerNumber = 0;
-    private bool isPlayable = false;
+    private bool isLocalPlayer = false;
     private System.Action<int, Vector3> moveCallback;
     private Transform cameraTransform;
     private Transform playerTrans;
     private bool isStartMove = false;
-    private Vector3 targetPos;
+    private Vector3 toPosition;
     private float speed = 10f;
     private float tilt = 1f;
     public Rigidbody rigidbody;
-    
+    public bool IsLocalPlayer { set { this.isLocalPlayer = value; } }
+
     void Awake() {
         Assert.IsNotNull(this.rigidbody);
     }
+
     public void Init(Transform playerTrans, int number, System.Action<int, Vector3> moveCallback) {
         this.playerTrans = playerTrans;
         this.playerNumber = number;
         this.moveCallback = moveCallback;
     }
-    public bool IsPlayable { set { this.isPlayable = value; } }
-    public Transform CameraTransform {set { this.cameraTransform = value; } }
-    public void SetMovePosition(Vector3 targetPos) {
+
+    public void SetCamera(Transform camearaTrans) {
+        this.cameraTransform = camearaTrans;
+    }
+
+    public void MoveTo(Vector3 toPosition) {
         this.isStartMove = true;        
-        this.targetPos = targetPos;
-        //Logger.DebugHighlight("[PlayerManager.SetMovePosition] playerNumb = " + playerNumber);
+        this.toPosition = toPosition;
     }
 
    void FixedUpdate() {
-
-        if (isPlayable) {
+        if (isLocalPlayer) {
             MoveInput();
         } else {
             if (isStartMove) {
-                this.playerTrans.position = Vector3.Lerp(this.playerTrans.position, this.targetPos, Time.deltaTime * speed);
-                //Logger.DebugHighlight("[PlayerManager.SetMovePosition] moving playerNum = {0} / pos = {1} ", playerNumber, this.playerTrans.position);
+                this.playerTrans.position = Vector3.Lerp(this.playerTrans.position, this.toPosition, Time.deltaTime * speed);
             }
         }
     }

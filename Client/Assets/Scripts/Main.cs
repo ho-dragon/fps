@@ -64,7 +64,6 @@ public class Main : MonoBehaviourInstance<Main>
                 return;
             }
 
-
             if (result.player == null) {
                 Logger.Debug("[Main.EnterRoom] player is null");
             }
@@ -75,13 +74,12 @@ public class Main : MonoBehaviourInstance<Main>
                 foreach (PlayerModel i in result.otherPlayers) {
                     PlayerManager.inst.JoinedPlayer(i, false);
                 }
-            }  else {
+            } else {
                 Logger.Debug("[Main] otherPlayers is null");
             }
             
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-
             isOnGUI = false;
         });
     }
