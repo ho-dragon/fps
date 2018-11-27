@@ -8,6 +8,13 @@ using Newtonsoft.Json.Bson;
 using System.IO;
 
 public class SocketResponse : MonoBehaviour {
+
+    private class DefineResponseMethod {
+        public const string movePlayer = "movePlayer";
+        public const string demagedPlayer = "damagedPlayer";
+        public const string joinPlayer = "joinPlayer";
+    }
+
     private DataResolver resolver;
     public IngameClient ingameClient;
 
@@ -45,17 +52,15 @@ public class SocketResponse : MonoBehaviour {
         ingameClient.OnMessage(buffer);
     }
 
-
-    private const string movePacket = "movePlayer";
     public void RecevieNotification(SocketResponsePormat result) {        
         switch(result.method){
-            case "damagedPlayer":
+            case DefineResponseMethod.demagedPlayer:
                 DamagedPlayer(TcpSocket.inst.Deserializaer<DamageModel>(result.bytes));
                 break;
-            case "joinPlayer":
+            case DefineResponseMethod.joinPlayer:
                 JoinPlayer(TcpSocket.inst.Deserializaer<EnterRoomModel>(result.bytes));
                 break;
-            case movePacket:
+            case DefineResponseMethod.movePlayer:
                 MovePlayer(TcpSocket.inst.Deserializaer<PlayerMoveModel>(result.bytes));
                 break;
         }
