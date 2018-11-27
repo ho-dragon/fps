@@ -1,17 +1,9 @@
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
-using System.Text;
-using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
-using System.IO;
 
 public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     private Socket socket;
-    public SocketResponse receiver;
+    public PacketNotification receiver;
     public PacketManager packetManager;
     private NetworkStream ns;
     private string ip = "";
@@ -22,6 +14,10 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
     private byte[] Receivebyte = new byte[2000];
     private string ReceiveString;
     private bool isConnected = false;
+
+    public PacketRequest Request {
+         get { return this.packetManager.PacketRequest; }
+    }
 
     public bool IsConnected {
         get { return this.isConnected; }
@@ -37,15 +33,14 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 
 		this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendTimeout, 10000);
-		this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 10000);
-        this.packetManager.socket = this.socket;
-
+		this.socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 10000);     
         IPAddress ipAddr = System.Net.IPAddress.Parse(ip);
         IPEndPoint ipEndPoint = new System.Net.IPEndPoint(ipAddr, port);
          try {
 			this.socket.Connect(ipEndPoint);
             this.ns = new NetworkStream(this.socket);
             this.isConnected = true;
+            this.packetManager.socket = this.socket;
             callback(this.isConnected);
         } catch (SocketException e) {
             Logger.Debug("Socket connect error! : " + e.ToString() );
@@ -63,32 +58,13 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         byte[] buffer = new byte[1024];
         if (this.ns.CanRead) {
             this.ns.Read(buffer, 0, buffer.Length);
-            this.receiver.GetRecevieBuffer(buffer);
+            this.packetManager.ReceiveBuffer(buffer);
         } else {
             Logger.Debug("Error: Can't read from this socket");
             ns.Close();
             this.socket.Close();
             return;
         }
-    }
-
-    public byte[] SerializeToByte(object data) {
-        MemoryStream ms = new MemoryStream();
-        JsonSerializer serializer = new JsonSerializer();
-        BsonWriter writer = new BsonWriter(ms);
-        serializer.Serialize(writer, data);
-        ms.Seek(0, SeekOrigin.Begin);
-        return ms.ToArray();
-    }
-
-    public T Deserialize<T>(byte[] data) {
-        MemoryStream ms = new MemoryStream(data);
-        ms.Seek(0, SeekOrigin.Begin);
-        byte[] byteBSON = ms.ToArray();
-        JsonSerializer deserializaer = new JsonSerializer();
-        BsonReader reader = new BsonReader(ms);
-        T result = deserializaer.Deserialize<T>(reader);
-        return result;
     }
 
     public void Send(byte[] data) {

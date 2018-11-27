@@ -58,7 +58,7 @@ public class Main : MonoBehaviourInstance<Main>
 
     
     public void EnterRoom(string userName) {
-        TcpSocket.inst.client.EnterRoom(userName, (req, result) => {
+        TcpSocket.inst.Request.EnterRoom(userName, (req, result) => {
             if (result == null) {
                 Logger.Error("[Main.EnterRoom] result is null");
                 return;

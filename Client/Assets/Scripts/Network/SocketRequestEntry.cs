@@ -2,20 +2,20 @@
 using System.Collections;
 using Newtonsoft.Json;
 
-public class SocketRequest : IEnumerator {
+public class SocketRequestEntry : IEnumerator {
     public long RequestId { get; private set; }
-    public IngameRequestStates State { get; private set; }
+    public SocketRequestState State { get; private set; }
     public Type ResultType { get; private set; }
     public string RequestMethod { get; protected set; }
     DateTime requestTime = DateTime.UtcNow;
     ResponseFormat response = null;
     Exception exception = null;
 
-    public SocketRequest(RequestFormat req, Type responseType) {
+    public SocketRequestEntry(RequestFormat req, Type responseType) {
         RequestId = req.id;
         ResultType = responseType;
         RequestMethod = req.method;
-        State = IngameRequestStates.Unsent;
+        State = SocketRequestState.Unsent;
     }
 
     public object Current {
@@ -33,7 +33,7 @@ public class SocketRequest : IEnumerator {
     public T Result<T>() {
         try {
             Logger.Debug("[ingameRequest.Result<T>] Response.bytes.length = " + Response.bytes.Length);
-            T result = TcpSocket.inst.Deserialize<T>(Response.bytes);
+            T result = BsonSerializer.Deserialize<T>(Response.bytes);
             return result;
         } catch (System.Exception e) {
             Logger.Error("[ingameRequest.Result<T>] deserialize failed / msg = " + e.Message);
@@ -49,7 +49,7 @@ public class SocketRequest : IEnumerator {
                 if (response == null)
                     Exception = new Exception("Null response");
                 else if (response.code == 200)
-                    State = IngameRequestStates.Done;
+                    State = SocketRequestState.Done;
                 else
                     Exception = new Exception(string.Format("response is not success / code = {0}", response.code.ToString()));
             }
@@ -64,9 +64,9 @@ public class SocketRequest : IEnumerator {
             {
                 exception = value;
                 if (exception is TimeoutException)
-                    State = IngameRequestStates.TimedOut;
+                    State = SocketRequestState.TimedOut;
                 else
-                    State = IngameRequestStates.Error;
+                    State = SocketRequestState.Error;
             }
         }
     }
@@ -74,9 +74,9 @@ public class SocketRequest : IEnumerator {
     public DateTime RequestTime {
         get { return requestTime; }
         internal set {
-            if (State == IngameRequestStates.Unsent) {
+            if (State == SocketRequestState.Unsent) {
                 requestTime = value;
-                State = IngameRequestStates.Sent;
+                State = SocketRequestState.Sent;
             }
         }
     }

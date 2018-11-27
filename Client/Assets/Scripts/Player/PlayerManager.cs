@@ -54,7 +54,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
              , player.currentHP
              , player.maxHP
              , (number, movePos) => {
-                 TcpSocket.inst.client.MovePlayer(number, movePos);
+                 TcpSocket.inst.Request.MovePlayer(number, movePos);
              });        
     }
 
@@ -69,9 +69,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
 
     public void DamagedPlayer(DamageModel result) {
         Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------result / damagedPlayerNumb = " + result.damagedPlayer);
-
         if (this.localPlayer.Number == result.damagedPlayer) {
-            Logger.Debug("내가 맞았다");
             Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------SetLocalHP / damagedPlayerNumb = " + result.damagedPlayer);
             this.localPlayer.SetHealth(result.currentHP, result.maxHP);
             return;

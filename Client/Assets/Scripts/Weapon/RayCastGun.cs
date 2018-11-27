@@ -20,11 +20,10 @@ public class RayCastGun : Weapon {
             if (hit.transform.tag.Equals(playerTag)) {
                 Player hitPlayer = hit.transform.GetComponent<Player>();
                 if(this.ownerPlayerNumber == hitPlayer.Number) {
-                    Logger.DebugHighlight("[내몸통맞았다..............]");
+                    Logger.DebugHighlight("[RayCastGun.Shoot] shoot my body");
                     return;
                 }
-
-                TcpSocket.inst.client.Attack(this.ownerPlayerNumber, hitPlayer.Number, 0, (req, result) => {
+                TcpSocket.inst.Request.Attack(this.ownerPlayerNumber, hitPlayer.Number, 0, (req, result) => {
                     PlayerManager.inst.DamagedPlayer(result);
                 });
             }
@@ -37,7 +36,7 @@ public class RayCastGun : Weapon {
 	private Vector3 GetScreenForwardPoint(float distance) {
 		RaycastHit hit;
 		Vector3 screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f);
-		Ray ray = this.playerCam.camera.ScreenPointToRay(screenCenter);
+		Ray ray = this.playerCam.GetCamera().ScreenPointToRay(screenCenter);
 		if (Physics.Raycast(ray, out hit, distance)) {
 			Debug.DrawLine(ray.origin, hit.point, Color.red, 2f);
 			Logger.Debug("[RayCastGun.GetScreenForwardPoint] Yes! hit detected : Tag = " + hit.transform.tag.ToString());
