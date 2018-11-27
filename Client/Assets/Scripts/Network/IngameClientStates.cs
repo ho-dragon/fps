@@ -1,4 +1,4 @@
-﻿public enum IngameClientStates
+﻿public enum SocketState
 {
     Unconnected,
     Connecting,
@@ -10,13 +10,13 @@
 
 public static class IngameClientStatesExtensions
 {
-    public static bool IsConnecting(this IngameClientStates state)
+    public static bool IsConnecting(this SocketState state)
     {
-        return state == IngameClientStates.Connecting;
+        return state == SocketState.Connecting;
     }
 
-    public static bool IsClosed(this IngameClientStates state)
+    public static bool IsClosed(this SocketState state)
     {
-        return state == IngameClientStates.Closed;
+        return state == SocketState.Closed;
     }
 }

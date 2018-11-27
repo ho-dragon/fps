@@ -2,13 +2,46 @@
 using System.Collections;
 using Newtonsoft.Json;
 
-public class IngameRequest : IEnumerator {
+public class SocketRequest : IEnumerator {
     public long RequestId { get; private set; }
     public IngameRequestStates State { get; private set; }
     public Type ResultType { get; private set; }
     public string RequestMethod { get; protected set; }
+    DateTime requestTime = DateTime.UtcNow;
+    ResponseFormat response = null;
+    Exception exception = null;
 
-    public SocketResponsePormat Response {
+    public SocketRequest(RequestFormat req, Type responseType) {
+        RequestId = req.id;
+        ResultType = responseType;
+        RequestMethod = req.method;
+        State = IngameRequestStates.Unsent;
+    }
+
+    public object Current {
+        get { return null; }
+    }
+
+    public bool MoveNext() {
+        return !State.IsFinal();
+    }
+
+    public void Reset() {
+        throw new NotImplementedException();
+    }
+       
+    public T Result<T>() {
+        try {
+            Logger.Debug("[ingameRequest.Result<T>] Response.bytes.length = " + Response.bytes.Length);
+            T result = TcpSocket.inst.Deserialize<T>(Response.bytes);
+            return result;
+        } catch (System.Exception e) {
+            Logger.Error("[ingameRequest.Result<T>] deserialize failed / msg = " + e.Message);
+            return default(T);
+        }
+    }
+
+    public ResponseFormat Response {
         get { return response; }
         internal set {
             if (!State.IsFinal()) {
@@ -38,53 +71,13 @@ public class IngameRequest : IEnumerator {
         }
     }
 
-    public DateTime RequestTime
-    {
+    public DateTime RequestTime {
         get { return requestTime; }
-        internal set
-        {
-            if (State == IngameRequestStates.Unsent)
-            {
+        internal set {
+            if (State == IngameRequestStates.Unsent) {
                 requestTime = value;
                 State = IngameRequestStates.Sent;
             }
         }
-    }
-
-    DateTime requestTime = DateTime.UtcNow;
-    SocketResponsePormat response = null;
-    Exception exception = null;
-
-    public IngameRequest(SocketRequestFormat req, Type responseType)
-    {
-        RequestId = req.id;
-        ResultType = responseType;
-        RequestMethod = req.method;
-        State = IngameRequestStates.Unsent;
-    }
-
-    public T Result<T>() {
-        try {
-            Logger.Debug("[ingameRequest.Result<T>] Response.bytes.length = " + Response.bytes.Length);
-            T result = TcpSocket.inst.Deserializaer<T>(Response.bytes);
-            return result;
-        } catch (System.Exception e) {
-            Logger.Error("[ingameRequest.Result<T>] deserialize failed / msg = " + e.Message);
-            return default(T);
-        }
-    }
-
-    public object Current {
-        get { return null; }
-    }
-
-    public bool MoveNext()
-    {
-        return !State.IsFinal();
-    }
-
-    public void Reset()
-    {
-        throw new NotImplementedException();
     }
 }

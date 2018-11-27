@@ -7,8 +7,7 @@ using System.Text;
 using System;
 using Newtonsoft.Json;
 
-public class SocketRequestFormat
-{
+public class RequestFormat {
     public string method;
     public int code = 0;
     public string msg;
@@ -21,7 +20,7 @@ public class SocketRequestFormat
     [JsonIgnoreAttribute]
     public bool IsNotification { get { return !string.IsNullOrEmpty(method); } }
 
-    public SocketRequestFormat(string method, long id, params object[] args) {
+    public RequestFormat(string method, long id, params object[] args) {
         this.method = method;
         this.id = (int)id;
 
@@ -41,7 +40,7 @@ public class SocketRequestFormat
     }
 }
 
-public class SocketResponsePormat {
+public class ResponseFormat {
     public string method;
     public int code = 0;
     public string msg;

@@ -8,18 +8,15 @@ using Newtonsoft.Json.Bson;
 using System.IO;
 
 public class SocketResponse : MonoBehaviour {
-
-    private class DefineResponseMethod {
-        public const string movePlayer = "movePlayer";
-        public const string demagedPlayer = "damagedPlayer";
-        public const string joinPlayer = "joinPlayer";
-    }
-
-    private DataResolver resolver;
-    public IngameClient ingameClient;
+    private const string notiMovePlayer = "movePlayer";
+    private const string notiDemagedPlayer = "damagedPlayer";
+    private const string notiJoinPlayer = "joinPlayer";
+    
+    private TcpBufferHandelr resolver;
+    public PacketManager socektDataHandler;
 
     void Awake() {
-        this.resolver = new DataResolver();
+        this.resolver = new TcpBufferHandelr();
     }
 
     public void GetRecevieBuffer(byte[] buffer) {
@@ -27,7 +24,7 @@ public class SocketResponse : MonoBehaviour {
         //for (int i = 0; i < buffer.Length; i++) {
         //    Logger.Debug("buffer[{" + i + "}] = " + buffer[i]);
         //}
-        this.resolver.on_receive(buffer, 0, buffer.Length, CallbackRecevieBuffer);
+        this.resolver.OnRecevie(buffer, 0, buffer.Length, CallbackRecevieBuffer);
     }
 
     public void CallbackRecevieBuffer(byte[] data) {
@@ -41,27 +38,28 @@ public class SocketResponse : MonoBehaviour {
         byte[] body = new byte[dataSize];
         Array.Copy(data, 4, body, 0, dataSize);
         //Logger.Debug("[SocketResponse.callback] data size = " + dataSize + " / data = " + Encoding.UTF8.GetString(body));
-        Receiver(Encoding.UTF8.GetString(body), body);
+        Deserialize(body);
     }
 
     private int get_body_size(byte[] data) {
         return BitConverter.ToInt32(data, 0);
     }
 
-    public void Receiver(string stringData, byte[] buffer) {
-        ingameClient.OnMessage(buffer);
+    public void Deserialize(byte[] data) {
+        ResponseFormat response = TcpSocket.inst.Deserialize<ResponseFormat>(data);
+        socektDataHandler.OnMessage(response);
     }
 
-    public void RecevieNotification(SocketResponsePormat result) {        
+    public void RecevieNotification(ResponseFormat result) {        
         switch(result.method){
-            case DefineResponseMethod.demagedPlayer:
-                DamagedPlayer(TcpSocket.inst.Deserializaer<DamageModel>(result.bytes));
+            case notiDemagedPlayer:
+                DamagedPlayer(TcpSocket.inst.Deserialize<DamageModel>(result.bytes));
                 break;
-            case DefineResponseMethod.joinPlayer:
-                JoinPlayer(TcpSocket.inst.Deserializaer<EnterRoomModel>(result.bytes));
+            case notiJoinPlayer:
+                JoinPlayer(TcpSocket.inst.Deserialize<EnterRoomModel>(result.bytes));
                 break;
-            case DefineResponseMethod.movePlayer:
-                MovePlayer(TcpSocket.inst.Deserializaer<PlayerMoveModel>(result.bytes));
+            case notiMovePlayer:
+                MovePlayer(TcpSocket.inst.Deserialize<PlayerMoveModel>(result.bytes));
                 break;
         }
     }
