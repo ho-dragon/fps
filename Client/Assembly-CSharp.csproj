@@ -61,21 +61,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\BulletEffect.cs" />
     <Compile Include="Assets\Scripts\EffectManager.cs" />
+    <Compile Include="Assets\Scripts\JsonNet\BsonSerializer.cs" />
+    <Compile Include="Assets\Scripts\Logger.cs" />
     <Compile Include="Assets\Scripts\Main.cs" />
     <Compile Include="Assets\Scripts\Model\DamageModel.cs" />
     <Compile Include="Assets\Scripts\Model\EnterRoomModel.cs" />
     <Compile Include="Assets\Scripts\Model\PlayerMoveModel.cs" />
-    <Compile Include="Assets\Scripts\Network\IngameClient.cs" />
-    <Compile Include="Assets\Scripts\Network\IngameClient.Request.cs" />
-    <Compile Include="Assets\Scripts\Network\IngameClientStates.cs" />
-    <Compile Include="Assets\Scripts\Network\IngameRequest.cs" />
-    <Compile Include="Assets\Scripts\Network\IngameRequestStates.cs" />
-    <Compile Include="Assets\Scripts\Network\IngameTimeSync.cs" />
-    <Compile Include="Assets\Scripts\Network\TcpSocket\DataResolver.cs" />
-    <Compile Include="Assets\Scripts\Network\TcpSocket\SocketRequest.cs" />
-    <Compile Include="Assets\Scripts\Network\TcpSocket\SocketRequestFormat.cs" />
+    <Compile Include="Assets\Scripts\Network\PacketManager.cs" />
+    <Compile Include="Assets\Scripts\Network\PacketRequest.cs" />
+    <Compile Include="Assets\Scripts\Network\ResponseEntry.cs" />
+    <Compile Include="Assets\Scripts\Network\SocketRequestEntry.cs" />
+    <Compile Include="Assets\Scripts\Network\SocketRequestState.cs" />
+    <Compile Include="Assets\Scripts\Network\SocketState.cs" />
+    <Compile Include="Assets\Scripts\Network\TcpSocket\RequestFormat.cs" />
     <Compile Include="Assets\Scripts\Network\TcpSocket\SocketResponse.cs" />
+    <Compile Include="Assets\Scripts\Network\TcpSocket\TcpBufferHandelr.cs" />
     <Compile Include="Assets\Scripts\Network\TcpSocket\TcpSocket.cs" />
     <Compile Include="Assets\Scripts\Player\Player.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerActionController.cs" />
@@ -83,11 +85,9 @@
     <Compile Include="Assets\Scripts\Player\PlayerManager.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerMove.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerShoot.cs" />
-    <Compile Include="Assets\Scripts\Player\PlayerStatus.cs" />
     <Compile Include="Assets\Scripts\UI\CameraFacingBillboard.cs" />
     <Compile Include="Assets\Scripts\UI\HpGage.cs" />
     <Compile Include="Assets\Scripts\UI\PlayerHUD.cs" />
-    <Compile Include="Assets\Scripts\UI\PlayersUI.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
     <Compile Include="Assets\Scripts\Util\MathUtility.cs" />
     <Compile Include="Assets\Scripts\Util\MonoBehaviourInstance.cs" />
