@@ -2,8 +2,7 @@
 using UnityEngine.Assertions;
 using System.Collections;
 
-public class PlayerCamera : MonoBehaviourInstance<PlayerCamera> {
-    public GameObject target;
+public class PlayerCamera : MonoBehaviour {
     public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
     public RotationAxes axes = RotationAxes.MouseXAndY;
     public float sensitivityX = 15F;
@@ -16,26 +15,30 @@ public class PlayerCamera : MonoBehaviourInstance<PlayerCamera> {
     private float rotationY = 0F;
     private float lockPos = 0F;
     private Quaternion originalRotation;
+    private Transform playerPivot;
+    private Transform cameraPivot;
+    private bool isAttachedPlayer = false;
 
     void Awake() {
 		Assert.IsNotNull(this.GetComponent<Camera>());
         this.originalRotation = this.transform.localRotation;
     }
 
+    public void AttatchCameraToPlayer(Transform playerPivot, Transform cameraPivot) {
+        this.playerPivot = playerPivot;
+        this.cameraPivot = cameraPivot;
+        this.isAttachedPlayer = false;
+    }
+
     public Camera GetCamera() {
         return this.GetComponent<Camera>();
     }
 
-    public void Look(Transform targetRotation) {
-        this.transform.LookAt(targetRotation);
-    }
-
-    public void MoveChildTrans(Transform parent) {
-       this.transform.parent = parent;
-       this.transform.localPosition = Vector3.zero;
-    }
-
     void Update() {
+        if (this.isAttachedPlayer == false) {
+            return;
+        }
+        
         if (axes == RotationAxes.MouseXAndY) {
             this.rotationX += Input.GetAxis("Mouse X") * sensitivityX;
             this.rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
@@ -43,21 +46,24 @@ public class PlayerCamera : MonoBehaviourInstance<PlayerCamera> {
             this.rotationY = ClampAngle(rotationY, minimumY, maximumY);
             Quaternion xQuaternion = Quaternion.AngleAxis(rotationX, Vector3.up);
             Quaternion yQuaternion = Quaternion.AngleAxis(rotationY, -Vector3.right);
-            this.transform.localRotation = originalRotation * xQuaternion * yQuaternion;
-        }
-        else if (axes == RotationAxes.MouseX) {
+            SetRotation(originalRotation * xQuaternion * yQuaternion);
+        } else if (axes == RotationAxes.MouseX) {
             this.rotationX += Input.GetAxis("Mouse X") * sensitivityX;
             this.rotationX = ClampAngle(rotationX, minimumX, maximumX);
             Quaternion xQuaternion = Quaternion.AngleAxis(rotationX, Vector3.up);
-            this.transform.localRotation = originalRotation * xQuaternion;
-        }
-        else {
+            SetRotation(originalRotation * xQuaternion);
+        } else {
             this.rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
             this.rotationY = ClampAngle(rotationY, minimumY, maximumY);
             Quaternion yQuaternion = Quaternion.AngleAxis(-rotationY, Vector3.right);
-            this.transform.localRotation = originalRotation * yQuaternion;
+            SetRotation(originalRotation * yQuaternion);
         }
-        this.transform.localRotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, lockPos);
+        SetRotation(Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, lockPos));
+    }
+
+    private void SetRotation(Quaternion quaternion) {
+        this.playerPivot.localRotation = quaternion;
+        this.cameraPivot.localRotation = quaternion;
     }
 
     public static float ClampAngle(float angle, float min, float max) {

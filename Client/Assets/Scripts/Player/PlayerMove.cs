@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine.Assertions;
 
 public class PlayerMove : MonoBehaviour {
-    public Transform head;
     private int playerNumber = 0;
     private bool isLocalPlayer = false;
     private System.Action<int, Vector3> moveCallback;

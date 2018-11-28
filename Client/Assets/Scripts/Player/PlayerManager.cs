@@ -36,7 +36,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
 
         if (isLocalPlayer) {
             this.localPlayer = newPlayer;
-            this.localPlayer.SetCamera(PlayerCamera.inst);
+            this.localPlayer.AttachCamera();
             this.localPlayer.IsLocalPlayer = true;
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.name, player.number);
         } else {

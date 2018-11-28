@@ -4,15 +4,13 @@ using UnityEngine.Assertions;
 
 public class Player : MonoBehaviour {
     public TextMesh textMesh;
-    public Transform eyes;
-    public Transform camDerection;
+    public Transform cameraPivot;
     public Transform muzzleTransform;
     public PlayerActionController actionController;
     public PlayerAnimationController animationController;
     public Weapon weapon;//테스트용으로 직접 붙여놓음
     public HpGage hpBar;
     private bool isLocalPlayer = false;
-    private PlayerCamera playerCameara;
     private int teamCode = 0;
     private int number = 0;
     private string name = "";
@@ -32,7 +30,6 @@ public class Player : MonoBehaviour {
 
     void Awake() {
         Assert.IsNotNull(this.actionController);
-        Assert.IsNotNull(this.camDerection);
         Assert.IsNotNull(this.textMesh);
         Assert.IsNotNull(this.muzzleTransform);
         Assert.IsNotNull(this.hpBar);
@@ -93,18 +90,13 @@ public class Player : MonoBehaviour {
         this.hpBar.SetHP(currentHP, maxHP);
     }
 
-    public void SetCamera(PlayerCamera playerCameara) {
-        if (this.playerCameara == null) {
+    public void AttachCamera() {
             Logger.Debug("[Player.AddCamera]");
-            this.playerCameara = playerCameara;
-            this.playerCameara.target = this.gameObject;
-            this.playerCameara.MoveChildTrans(this.eyes);
-            this.playerCameara.Look(this.camDerection);
-            this.actionController.SetCamera(playerCameara.transform);
+            CameraController.inst.AttatchCameraToPlayer(this.transform);
+            this.actionController.SetCamera(CameraController.inst.playerCamera.transform);
 			if (this.weapon != null){
-				this.weapon.SetCamera(playerCameara);
+				this.weapon.SetCamera(CameraController.inst.playerCamera);
 			}
-        }
     }
 }
 
