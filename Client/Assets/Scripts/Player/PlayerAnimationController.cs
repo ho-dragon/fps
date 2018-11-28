@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Assertions;
 
-public class PlayerAnimationController : MonoBehaviour {
+public class PlayerAnimationController : MonoBehaviour{
 
     #region OnGUI
     public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0) {
@@ -21,16 +20,11 @@ public class PlayerAnimationController : MonoBehaviour {
 
     #endregion
 
-    private Animator animator;
+    public Animator animator;
     const int countOfDamageAnimations = 3;
     int lastDamageAnimation = -1;
-
     void Awake() {
-        this.animator = GetComponent<Animator>();
-    }
-
-    public Animator GetAnimator {
-        get { return this.animator; }
+        Assert.IsNotNull(this.animator);
     }
 
     public void Stay() {
@@ -80,7 +74,7 @@ public class PlayerAnimationController : MonoBehaviour {
 
     public void Aiming() {
         animator.SetBool("Squat", false);
-        animator.SetFloat("Speed", 0f);
+        //animator.SetFloat("Speed", 0f);
         animator.SetBool("Aiming", true);
     }
 

@@ -3,15 +3,13 @@ using UnityEngine.Assertions;
 
 public class CameraController : MonoBehaviourInstance<CameraController> {
     public Transform pivot;
-    public Transform position;
     public PlayerCamera playerCamera;
     private Transform playerCameraPivot;
-    public bool isAttatchedPlayer = false;
+    private bool isAttatchedPlayer = false;
 
     void Awake() {
         Assert.IsNotNull(this.playerCamera);
         Assert.IsNotNull(this.pivot);
-        Assert.IsNotNull(this.position);
     }
 
     public void AttatchCameraToPlayer(Transform playerCameraPivot) {
@@ -20,11 +18,11 @@ public class CameraController : MonoBehaviourInstance<CameraController> {
         this.isAttatchedPlayer = true;        
     }
 
-    void Update() {
-        if (this.isAttatchedPlayer == false) {
-            return;
-        }
-        this.pivot = this.playerCameraPivot;
+    public void ZoomIn() {
+        this.playerCamera.ZoomIn();
     }
 
+    public void ZoomOut() {
+        this.playerCamera.ZoomOut();
+    }
 }

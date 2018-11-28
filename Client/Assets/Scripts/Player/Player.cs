@@ -39,14 +39,53 @@ public class Player : MonoBehaviour {
     public void Init(int teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3> moveCallback) {
         Logger.Debug("[Player] Init number = " + number + " / name = " + name);
         this.teamCode = teamCode;
-        this.number = number;
-        this.name = name;
-        this.textMesh.text = name;
-		this.actionController.Init(this.transform, number, moveCallback);
+        this.number = number;             
+        SetName(name);
         SetHealth(currentHP, maxHP);
         SetWeapon(this.weapon, number);
-
+        this.actionController.Init(this.animationController, this.transform, number, moveCallback);
     }
+    
+    private void SetName(string name) {
+        this.name = name;
+        if (this.isLocalPlayer) {
+            UIManager.inst.SetName(name);
+            this.textMesh.gameObject.SetActive(false);            
+        } else {
+            this.textMesh.gameObject.SetActive(true);
+            this.textMesh.text = name;
+        }
+    }
+
+    public void SetWeapon(Weapon weapon, int ownerPlayerNumber) {
+        this.weapon = weapon;        
+        this.weapon.Init(ownerPlayerNumber);
+        this.actionController.SetWeapon(weapon); 
+    }
+
+    public bool IsSameTeam(int teamCode) {
+        return this.teamCode == teamCode;
+    }
+
+    public void SetHealth(float currentHP, float maxHP) {
+        if (this.isLocalPlayer) {
+            this.hpBar.gameObject.SetActive(false);
+            UIManager.inst.SetHP(currentHP, maxHP);
+        } else {
+            this.hpBar.gameObject.SetActive(true);
+            this.hpBar.SetHP(currentHP, maxHP);
+        }        
+    }
+
+    public void AttachCamera() {
+            Logger.Debug("[Player.AddCamera]");
+            CameraController.inst.AttatchCameraToPlayer(this.transform);
+            this.actionController.SetCamera(CameraController.inst.playerCamera.transform);
+			if (this.weapon != null){
+				this.weapon.SetCamera(CameraController.inst.playerCamera);
+			}
+    }
+
 
     private void InitWeapon(string weaponName) {
         foreach (WeaponModel hand in weaponModels) {
@@ -67,36 +106,10 @@ public class Player : MonoBehaviour {
                     newLeftGun.transform.localPosition = Vector3.zero;
                     newLeftGun.transform.localRotation = Quaternion.Euler(90, 0, 0);
                 }
-                this.animationController.GetAnimator.runtimeAnimatorController = hand.controller;
+                this.animationController.animator.runtimeAnimatorController = hand.controller;
                 return;
             }
         }
-    }
-
-    public void SetWeapon(Weapon weapon, int ownerPlayerNumber) {
-        this.weapon = weapon;        
-        this.weapon.Init(ownerPlayerNumber);
-        this.actionController.SetWeapon(weapon); 
-    }
-
-    public bool IsSameTeam(int teamCode) {
-        return this.teamCode == teamCode;
-    }
-
-    public void SetHealth(float currentHP, float maxHP) {
-        if (this.isLocalPlayer) {
-            UIManager.inst.PlayerHP(currentHP, maxHP);
-        }
-        this.hpBar.SetHP(currentHP, maxHP);
-    }
-
-    public void AttachCamera() {
-            Logger.Debug("[Player.AddCamera]");
-            CameraController.inst.AttatchCameraToPlayer(this.transform);
-            this.actionController.SetCamera(CameraController.inst.playerCamera.transform);
-			if (this.weapon != null){
-				this.weapon.SetCamera(CameraController.inst.playerCamera);
-			}
     }
 }
 
