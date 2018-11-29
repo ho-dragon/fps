@@ -10,7 +10,6 @@ public class BulletEffect : MonoBehaviour {
         if (this.gameObject.activeSelf == false) {
             this.gameObject.SetActive(true);
         }
-        Logger.DebugHighlight("[BulletEffect.Show] duration = " + duration);
         this.lineRenderer.SetPositions(new Vector3[] { start, end });
         this.lineRenderer.enabled = true;
         this.lineRenderer.material.color = colorOrigin;

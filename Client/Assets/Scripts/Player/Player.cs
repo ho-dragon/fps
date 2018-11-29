@@ -36,14 +36,16 @@ public class Player : MonoBehaviour {
         InitWeapon("Rifle");//최초 라이플을 들고있도록
     }
     
-    public void Init(int teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3, float> moveCallback) {
+    public void Init(bool isLocalPlayer, int teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3, float> moveCallback) {
         Logger.Debug("[Player] Init number = " + number + " / name = " + name);
+        this.isLocalPlayer = isLocalPlayer;
         this.teamCode = teamCode;
         this.number = number;             
         SetName(name);
         SetHealth(currentHP, maxHP);
         SetWeapon(this.weapon, number);
         this.actionController.Init(this.animationController, this.transform, number, moveCallback);
+        this.actionController.SetLocalPlayer(isLocalPlayer);
     }
     
     private void SetName(string name) {

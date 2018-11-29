@@ -27,6 +27,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
 
         if (player.lastPosition != null) {
             clone.transform.position = new Vector3(player.lastPosition[0], player.lastPosition[1], player.lastPosition[2]);
+            clone.transform.localRotation = Quaternion.Euler(clone.transform.localRotation.eulerAngles.x, player.lastYaw, clone.transform.localRotation.eulerAngles.z);
         } else {
             clone.transform.position = new Vector3(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(10, 20), UnityEngine.Random.Range(0, 10));
         }        
@@ -37,7 +38,6 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         if (isLocalPlayer) {
             this.localPlayer = newPlayer;
             this.localPlayer.AttachCamera();
-            this.localPlayer.IsLocalPlayer = true;
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.name, player.number);
         } else {
             if (this.remotePlayers.Exists(x => x.Number == player.number)) {
@@ -48,14 +48,15 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.name, player.number);
         }
 
-        newPlayer.Init(player.teamCode
+        newPlayer.Init(isLocalPlayer,
+               player.teamCode
              , player.number
              , player.name
              , player.currentHP
              , player.maxHP
              , (number, movePos, roationY) => {
                  TcpSocket.inst.Request.MovePlayer(number, movePos, roationY);
-             });        
+             });
     }
 
     public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {

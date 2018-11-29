@@ -3,20 +3,19 @@ using UnityEngine.Assertions;
 
 public class PlayerAnimationController : MonoBehaviour {
     #region OnGUI
-    public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0) {
-        return new Rect(_width * raw, _height * column, _width, _height);
-    }
+    //public Rect getrectpos(int raw, int column, float _width = 0, float _height = 0) {
+    //    return new Rect(_width * raw, _height * column, _width, _height);
+    //}
 
-    void OnGUI() {
-        if (GUI.Button(GetRectPos(5, 1, 200, 50), "Run")) {
-            Run();
-        }
+    //void ongui() {
+    //    if (GUI.Button(getrectpos(5, 1, 200, 50), "run")) {
+    //        Run();
+    //    }
 
-        if (GUI.Button(GetRectPos(5, 2, 200, 50), "Aiming")) {
-            Aiming();
-        }
-    }
-
+    //    if (GUI.Button(getrectpos(5, 2, 200, 50), "aiming")) {
+    //        Aiming();
+    //    }
+    //}
     #endregion
 
     public Animator animator;
@@ -126,7 +125,7 @@ public class PlayerAnimationController : MonoBehaviour {
 
     private void Aiming() {
         animator.SetBool("Squat", false);
-        //animator.SetFloat("Speed", 0f);
+        animator.SetFloat("Speed", 0f);
         animator.SetBool("Aiming", true);
     }
 

@@ -11,7 +11,7 @@ module.exports.attackPlayer = attackPlayer;
 
 function addPlayer(playerName) {
 	var playerNum = room.players.length;
-	var player = new model.player(playerName, playerNum, getTeamCode(playerNum), 100, 100, null);
+	var player = new model.player(playerName, playerNum, getTeamCode(playerNum), 100, 100, null, 0);
 	room.players.push(player);
 	debug("added player :: name = " + player.name + " / number = " + player.number);
 	return player;
@@ -34,10 +34,11 @@ function getOtherPlayers(playerNum) {
 	return otherPlayers;
 }
 
-function updateLastPosition(playerNum, lastPosition) {
+function updateLastPosition(playerNum, lastPosition, lastYaw) {
 	for (let key in room.players) {
 		if (room.players[key].number == playerNum) {
 			room.players[key].lastPosition = lastPosition;
+			room.players[key].lastYaw = lastYaw;
 		}
 	}
 }

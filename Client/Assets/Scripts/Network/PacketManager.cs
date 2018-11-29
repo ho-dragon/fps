@@ -73,6 +73,7 @@ public partial class PacketManager: MonoBehaviour {
         } else  {
             if (Logger.IsMutePacket(response.method) == false) {
                 Logger.Debug("[OnMessage] IsNotification = false");
+                Logger.Debug(string.Format("<color=#FFFFFF>[Response]</color> method = {0} rid = {1}", response.method, response.id));
             }
             DequeueRequestId(response.id);
             OnResponse(response);

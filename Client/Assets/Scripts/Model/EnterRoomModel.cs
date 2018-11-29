@@ -13,4 +13,5 @@ public class PlayerModel {
     public float currentHP;
     public float maxHP;
     public float[] lastPosition;
+    public float lastYaw;
 }

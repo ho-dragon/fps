@@ -19,13 +19,13 @@ module.exports.broadcastExcludedMe = broadcastExcludedMe;
 var server = net.createServer(function(socket) {
 debug(' CreateServer');
 
-  let networker = new TcpBufferHandler(socket, (data) => {
+  let bufferHandler = new TcpBufferHandler(socket, (data) => {
   	debug(' received:', data.toString());
   	debug(' received from socket / bytesRead = ' + socket.bytesRead + " / data length = " + data.length);
     receive(socket, data);
   });
 
-  networker.init();
+  bufferHandler.init();
   sockets.push(socket);
   
   debug('Client connection: ');

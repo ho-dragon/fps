@@ -51,6 +51,7 @@ public class Main : MonoBehaviourInstance<Main>
     #endregion
 
     private void Start() {
+        Application.targetFrameRate = 60;
         Logger.Debug("[Main] Start!");
         Logger.isMuted = isDebugMuted;
         Logger.SetLogLevel(this.logLevel);
@@ -67,7 +68,9 @@ public class Main : MonoBehaviourInstance<Main>
             if (result.player == null) {
                 Logger.Debug("[Main.EnterRoom] player is null");
             }
-            
+
+
+            Logger.Debug("[Main.EnterRoom] SUCCESS enter room");
             PlayerManager.inst.JoinedPlayer(result.player, true);
 
             if (result.otherPlayers != null) {

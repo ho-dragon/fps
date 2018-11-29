@@ -1,46 +1,48 @@
 'use strict';//hoisting을 막기위해 
 
 const debug = require('debug')('TcpBufferHandler');
+module.exports = TcpBufferHandler;
+const HEADER = "HEADER";
+const BODY = "BODY";
 
 function TcpBufferHandler(socket, handler) {
-  debug(' _onData =');
+  debug('new TcpBufferHandler');
 
   this.socket = socket;
-  this._packet = {};
+  this.packet = {};
   
-  this._process = false;
-  this._state = 'HEADER';
-  this._payloadLength = 0;
-  this._bufferedBytes = 0;
+  this.process = false;
+  this.state = HEADER;
+  this.bodySzie = 0;
+  this.bufferedBytes = 0;
   this.queue = [];
-
   this.handler = handler;
 }
 
 TcpBufferHandler.prototype.init = function () {
 debug('init');	
   this.socket.on('data', (data) => {
-    this._bufferedBytes += data.length;
+    this.bufferedBytes += data.length;
     this.queue.push(data);
 
-    this._process = true;
-    this._onData();
+    this.process = true;
+    this.onData();
   });
 
   this.socket.on('served', this.handler);
 };
 
-NetwoTcpBufferHandlerrker.prototype._hasEnough = function (size) {
-  if (this._bufferedBytes >= size) {
+TcpBufferHandler.prototype.hasEnough = function (size) {
+  if (this.bufferedBytes >= size) {
     return true;
   }
-  this._process = false;
+  this.process = false;
   return false;
 }
 
-TcpBufferHandler.prototype._readBytes = function (size) {
+TcpBufferHandler.prototype.readBytes = function (size) {
   let result;
-  this._bufferedBytes -= size;
+  this.bufferedBytes -= size;
 
   if (size === this.queue[0].length) {
     return this.queue.shift();
@@ -74,33 +76,31 @@ TcpBufferHandler.prototype._readBytes = function (size) {
   return result;
 }
 
-TcpBufferHandler.prototype._getHeader = function () {
-  //if (this._hasEnough(2)) {
-  if (this._hasEnough(4)) {
-    //this._payloadLength = this._readBytes(2).readUInt16BE(0, true);
-    this._payloadLength = this._readBytes(4).readUInt32LE(0, true);
-    debug(' _getHeader...|| this._payloadLength =', this._payloadLength);
-    this._state = 'PAYLOAD';
+TcpBufferHandler.prototype.getHeader = function () {
+  if (this.hasEnough(4)) {
+    this.bodySzie = this.readBytes(4).readUInt32LE(0, true);
+    debug(' getBody...|| this.bodySzie =', this.bodySzie);
+    this.state = BODY;
   }
 }
 
 TcpBufferHandler.prototype.getBody = function () {
-  if (this._hasEnough(this._payloadLength)) {
-    let received = this._readBytes(this._payloadLength);
+  if (this.hasEnough(this.bodySzie)) {
+    let received = this.readBytes(this.bodySzie);
     this.socket.emit('served', received);
-    this._state = 'BODY';
+    this.state = HEADER;
   }
 }
 
-TcpBufferHandler.prototype._onData = function (data) {
-  debug(' _onData...|| this._process =', this._process);
+TcpBufferHandler.prototype.onData = function (data) {
+  debug('onData...|| this.process =', this.process);
 
-  while (this._process) {
-    switch (this._state) {
-      case 'HEADER':
-        this._getHeader();
+  while (this.process) {
+    switch (this.state) {
+      case HEADER:
+        this.getHeader();
         break;
-      case 'BODY':
+      case BODY:
         this.getBody();
         break;
     }
@@ -109,23 +109,22 @@ TcpBufferHandler.prototype._onData = function (data) {
 
 TcpBufferHandler.prototype.send = function (message) {
   let buffer = Buffer.from(message);
-  this._header(buffer.length);
-  this._packet.message = buffer;
+  this.header(buffer.length);
+  this.packet.message = buffer;
   this._send();
 }
 
-TcpBufferHandler.prototype._header = function (messageLength) {
-  this._packet.header = { length: messageLength };
+TcpBufferHandler.prototype.header = function (messageLength) {
+  this.packet.header = { length: messageLength };
 };
 
 TcpBufferHandler.prototype._send = function () {
   //let contentLength = Buffer.allocUnsafe(2);
   //contentLength.writeUInt16BE(this._packet.header.length);
   let contentLength = Buffer.allocUnsafe(4);
-  contentLength.writeUInt32LE(this._packet.header.length);
+  contentLength.writeUInt32LE(this.packet.header.length);
   this.socket.write(contentLength);
-  this.socket.write(this._packet.message);
-  this._packet = {};
+  this.socket.write(this.packet.message);
+  this.packet = {};
 };
 
-module.exports = Networker;
