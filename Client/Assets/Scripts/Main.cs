@@ -51,6 +51,7 @@ public class Main : MonoBehaviourInstance<Main>
     #endregion
 
     private void Start() {
+        Application.targetFrameRate = 60;
         Logger.Debug("[Main] Start!");
         Logger.isMuted = isDebugMuted;
         Logger.SetLogLevel(this.logLevel);
@@ -58,30 +59,30 @@ public class Main : MonoBehaviourInstance<Main>
 
     
     public void EnterRoom(string userName) {
-        TcpSocket.inst.client.EnterRoom(userName, (req, result) => {
+        TcpSocket.inst.Request.EnterRoom(userName, (req, result) => {
             if (result == null) {
                 Logger.Error("[Main.EnterRoom] result is null");
                 return;
             }
 
-
             if (result.player == null) {
                 Logger.Debug("[Main.EnterRoom] player is null");
             }
-            
+
+
+            Logger.Debug("[Main.EnterRoom] SUCCESS enter room");
             PlayerManager.inst.JoinedPlayer(result.player, true);
 
             if (result.otherPlayers != null) {
                 foreach (PlayerModel i in result.otherPlayers) {
                     PlayerManager.inst.JoinedPlayer(i, false);
                 }
-            }  else {
+            } else {
                 Logger.Debug("[Main] otherPlayers is null");
             }
             
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-
             isOnGUI = false;
         });
     }

@@ -24,23 +24,20 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
 
         GameObject clone = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity) as GameObject;
-        if (clone == null) {
-            Logger.Error("[PlayerManager.JoinedPlayer] clone is null");
-            return;
-        }
 
         if (player.lastPosition != null) {
             clone.transform.position = new Vector3(player.lastPosition[0], player.lastPosition[1], player.lastPosition[2]);
+            clone.transform.localRotation = Quaternion.Euler(clone.transform.localRotation.eulerAngles.x, player.lastYaw, clone.transform.localRotation.eulerAngles.z);
         } else {
             clone.transform.position = new Vector3(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(10, 20), UnityEngine.Random.Range(0, 10));
         }        
+
         Player newPlayer = clone.GetComponent<Player>();
         //newPlayer.hpBar.facing.SetCamara(PlayerCamera.inst.camera);//HP카메라 보는 부분 일단 주석
 
         if (isLocalPlayer) {
             this.localPlayer = newPlayer;
-            this.localPlayer.EnableCamera(PlayerCamera.inst);
-            this.localPlayer.IsPlayable = true;
+            this.localPlayer.AttachCamera();
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.name, player.number);
         } else {
             if (this.remotePlayers.Exists(x => x.Number == player.number)) {
@@ -51,35 +48,43 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.name, player.number);
         }
 
-        newPlayer.Init(player.teamCode
+        newPlayer.Init(isLocalPlayer,
+               player.teamCode
              , player.number
              , player.name
              , player.currentHP
              , player.maxHP
-             , (number, movePos) => {
-                 TcpSocket.inst.client.MovePlayer(number, movePos);
-             });        
+             , (number, movePos, roationY) => {
+                 TcpSocket.inst.Request.MovePlayer(number, movePos, roationY);
+             });
     }
 
-    public void MovePlayer(int playerNumb, Vector3 movePosition) {
+    public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if (player != null) {
-            if (player.IsPlayable == false) {                
-                player.ActionController.move.SetMovePosition(movePosition);
+            if (player.IsLocalPlayer == false) {                
+                player.ActionController.OnMove(movePosition, yaw);
             }
         }
     }
 
-    public void DamagedPlayer(DamageModel result) {
+    public void OnACtion(int playerNumb, PLAYER_ACTION_TYPE actionType) {
+        Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
+        if (player != null) {
+            if (player.IsLocalPlayer == false) {
+                player.ActionController.OnAction(actionType);
+            }
+        }
+    }
+
+    public void OnDamaged(DamageModel result) {
         Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------result / damagedPlayerNumb = " + result.damagedPlayer);
-
         if (this.localPlayer.Number == result.damagedPlayer) {
-            Logger.Debug("내가 맞았다");
-
             Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------SetLocalHP / damagedPlayerNumb = " + result.damagedPlayer);
             this.localPlayer.SetHealth(result.currentHP, result.maxHP);
             return;
         }
+
         Player player = this.remotePlayers.Find(x => x.Number == result.damagedPlayer);
         if (player == null) {
             Logger.Error("[PlayerManager.SetDamage] player is null");

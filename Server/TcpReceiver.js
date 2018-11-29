@@ -1,11 +1,19 @@
 
 var server = require('./TcpServer.js');
+var packetModel = require('./PacketModel.js');
 var room = require('./Room.js');
 var BSON = require('bson');
 var color = require("colors");
 const debug = require('debug')('TcpRecevier');
 
 module.exports.receiveFromClient = receiveFromClient;
+
+
+const methodMovePlayer = "movePlayer";
+const methodInit = "init";
+const methodEnterRoom = "enterRoom";
+const methodAttackPlayer = "attackPlayer";
+const methodactionPlayer = "actionPlayer";
 
 function receiveFromClient(socket, msg) {
     let buffMsg = new Buffer(msg);
@@ -28,17 +36,20 @@ function receiveFromClient(socket, msg) {
     }    
 
 	switch(result.method) {
-		case 'init':
+		case methodInit:
 			init(socket, result);
 			break;
-		case 'enterRoom':
+		case methodEnterRoom:
 			enterRoom(socket, result);
 			break;
-		case 'movePlayer' :
+		case methodMovePlayer:
 			movePlayer(socket, result);
 			break;
-		case 'attackPlayer' :
+		case methodAttackPlayer:
 			attackPlayer(socket, result);
+			break;
+		case methodactionPlayer:
+			actionPlayer(socket, result);
 			break;
 	}
 }
@@ -51,7 +62,7 @@ function get_type(thing) {
 }
  
 function init(socket, receivedData) {
-	let snedData = new ResponseFormat(200, receivedData.id, "success", null);
+	let snedData = new packetModel.responseFormat(200, receivedData.id, "success", null);
 	server.send(socket, snedData);
 }
 
@@ -64,7 +75,7 @@ function enterRoom(socket, receivedData) {
 		return;
 	}
 
-	let model = new EnterRoomModel(player, room.getOtherPlayers(player.number));
+	let model = new packetModel.enterRoom(player, room.getOtherPlayers(player.number));
 
 	if (model.player == null) {
 		debug("[enterRoom] model.player is null")
@@ -77,28 +88,40 @@ function enterRoom(socket, receivedData) {
 
    debug("[enterRoom] bytes length = " + bytes.length);
 
-	let response = new ResponseFormat(200, receivedData.id, "success", bytes);
+	let response = new packetModel.responseFormat(200, receivedData.id, "success", bytes);
 	server.send(socket, response);
 
-	let notiResult = new NotificationFormat('joinPlayer',200, "success", bytes);
+	let notiResult = new packetModel.notificationFormat('joinPlayer', 200, "success", bytes);
 	server.broadcastExcludedMe(notiResult, socket);
 }
 
 function movePlayer(socket, receivedData) {
 	let playerNum = receivedData.param["playerNum"];
-	let posX = receivedData.param["playerPosX"];
-	let posY = receivedData.param["playerPosY"];
-	let posZ = receivedData.param["playerPosZ"];
-	let model = new PlayerMoveModel(playerNum
+	let posX = receivedData.param["x"];
+	let posY = receivedData.param["y"];
+	let posZ = receivedData.param["z"];
+	let yaw = receivedData.param["yaw"];
+	let model = new packetModel.playerMove(playerNum
 		, posX
 		, posY
-		, posZ);
+		, posZ
+		, yaw);
 
 	let bytes = BSON.serialize(model);
-	let notiResult = new NotificationFormat('movePlayer', 200, "success", bytes);
-	room.updateLastPosition(playerNum, [posX, posY, posZ]);
+	let notiResult = new packetModel.notificationFormat('movePlayer', 200, "success", bytes);
+	room.updateLastPosition(playerNum, [posX, posY, posZ], yaw);
 	server.broadcastExcludedMe(notiResult, socket);
+}
 
+
+function actionPlayer(socket, receivedData) {
+	let playerNum = receivedData.param["playerNum"];
+	let actionType = receivedData.param["actionType"];
+	let model = new packetModel.playerAction(playerNum, actionType);
+	let bytes = BSON.serialize(model);
+	let notiResult = new packetModel.notificationFormat('actionPlayer', 200, "success", bytes);
+	debug("[actionPlayer] bytes length = " + bytes.length);
+	server.broadcastExcludedMe(notiResult, socket);	
 }
 
 function attackPlayer(socket, receivedData) {
@@ -109,48 +132,13 @@ function attackPlayer(socket, receivedData) {
 	let player = room.attackPlayer(attackPlayer, damagedPlayer, attackPosition);
 	debug("[attackPlayer] damaged player name = " + player.number);
 
-	let model = new DamageModel(attackPlayer, damagedPlayer, 10, player.currentHP, player.maxHP);
+	let model = new packetModel.playerDamage(attackPlayer, damagedPlayer, 10, player.currentHP, player.maxHP);
 	let bytes = BSON.serialize(model);
 
-	let response = new ResponseFormat(200, receivedData.id, "success", bytes);
+	let response = new packetModel.responseFormat(200, receivedData.id, "success", bytes);
 	server.send(socket, response);
 
-	let notiResult = new NotificationFormat('damagedPlayer', 200, "success", bytes);
+	let notiResult = new packetModel.notificationFormat('damagedPlayer', 200, "success", bytes);
 	server.broadcastExcludedMe(notiResult, socket);
 }
 
-function PlayerMoveModel(playerNum, playerPosX, playerPosY, playerPosZ) {
-	this.playerNum = playerNum;
-	this.playerPosX = playerPosX;
-	this.playerPosY = playerPosY;
-	this.playerPosZ = playerPosZ;
-}
-
-function DamageModel(attackPlayer, damagedPlayer, damage, currentHP, maxHP) {
-	this.attackPlayer = attackPlayer;
-	this.damagedPlayer = damagedPlayer;
-	this.damage = damage;
-	this.currentHP = currentHP;
-	this.maxHP = maxHP;
-}
-
-function EnterRoomModel(player, otherPlayers) {
-	this.player = player;
-	this.otherPlayers = otherPlayers;
-}
-
-function ResponseFormat(code, id, msg, bytes) {
-	this.method = "";
-	this.code = code;
-	this.id = id;
-	this.msg = msg;
-	this.bytes = bytes;
-}
-
-function NotificationFormat(method, code, msg, bytes) {
-	this.method = method;
-	this.code = code;
-	this.id = 0;
-	this.msg = msg;
-	this.bytes = bytes;
-}

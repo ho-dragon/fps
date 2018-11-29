@@ -48,6 +48,12 @@ public static class Logger {
 		Log(string.Format(fmt, param));
 	}
 
+    public static bool IsMutePacket(string packetMsg) {//빈번한 패킷은 로그에서 제외
+        if (packetMsg.Equals("movePlayer")) {
+            return true;
+        }
+        return false;
+    }
 
 	public static void Log(string msg) {
 		if (logLevel > (int)LogLevel.verbose || isMuted) {

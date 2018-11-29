@@ -3,6 +3,7 @@ using System.Collections;
 
 public class RayCastGun : Weapon {
     private float distance = 1000f;
+
     public override void Shoot() {
 		Logger.Debug("[RayCastGun] called Shoot");
 		if(this.playerCam == null) {
@@ -18,13 +19,12 @@ public class RayCastGun : Weapon {
 			Logger.Debug("[RayCastGun.Shoot] Yes! hit detected : Tag = " + hit.transform.tag.ToString());
             if (hit.transform.tag.Equals(playerTag)) {
                 Player hitPlayer = hit.transform.GetComponent<Player>();
-                if(this.playerNum == hitPlayer.Number) {
-                    Logger.DebugHighlight("[내몸통맞았다..............]");
+                if(this.ownerPlayerNumber == hitPlayer.Number) {
+                    Logger.DebugHighlight("[RayCastGun.Shoot] shoot my body");
                     return;
                 }
-
-                TcpSocket.inst.client.Attack(this.playerNum, hitPlayer.Number, 0, (req, result) => {
-                    PlayerManager.inst.DamagedPlayer(result);
+                TcpSocket.inst.Request.Attack(this.ownerPlayerNumber, hitPlayer.Number, 0, (req, result) => {
+                    PlayerManager.inst.OnDamaged(result);
                 });
             }
             EffectManager.inst.OnBulletTail(this.muzzleTransform.position, hit.point, 2f);
@@ -36,7 +36,7 @@ public class RayCastGun : Weapon {
 	private Vector3 GetScreenForwardPoint(float distance) {
 		RaycastHit hit;
 		Vector3 screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f);
-		Ray ray = this.playerCam.camera.ScreenPointToRay(screenCenter);
+		Ray ray = this.playerCam.GetCamera().ScreenPointToRay(screenCenter);
 		if (Physics.Raycast(ray, out hit, distance)) {
 			Debug.DrawLine(ray.origin, hit.point, Color.red, 2f);
 			Logger.Debug("[RayCastGun.GetScreenForwardPoint] Yes! hit detected : Tag = " + hit.transform.tag.ToString());

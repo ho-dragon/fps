@@ -3,34 +3,32 @@ using System.Collections;
 using UnityEngine.Assertions;
 
 public class Weapon : MonoBehaviour {
-    public int playerNum;
+    public int ownerPlayerNumber;
     public Transform muzzleTransform;
     public string playerTag = "Player";
     public string groundTag = "Ground";
-	public PlayerCamera playerCam;
-	public bool isPlayable = false;
-	public bool IsPlayable { set { this.isPlayable = value; } }
-    public void Init(int playerNum, Transform muzzleTransform) {
+	protected PlayerCamera playerCam;
+
+    private void Awake() {
+        Assert.IsNotNull(this.muzzleTransform);
+    }
+
+    public void Init(int ownerPlayerNumber) {
         Logger.Debug("[Weapon] Init");
-		this.muzzleTransform = muzzleTransform;
-        this.playerNum = playerNum;
+        this.ownerPlayerNumber = ownerPlayerNumber;
     }
 
 	public void SetCamera(PlayerCamera camera) {
 		this.playerCam = camera;
 	}
-
+   
     public virtual void Shoot() {
         Logger.Debug("[Weapon] shoot");
     }
 
     void Update() {
         if (this.playerCam != null) {
-            this.transform.forward = - this.playerCam.transform.forward;
-        }
-
-        if (Input.GetMouseButtonDown(0)) {
-            Shoot();
+            this.transform.forward = -this.playerCam.transform.forward;
         }
     }
 }
