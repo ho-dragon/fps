@@ -3,9 +3,8 @@ using System.Collections;
 using UnityEngine.Assertions;
 
 public class PlayerMove : MonoBehaviour {
-    private int playerNumber = 0;
-    private bool isLocalPlayer = false;
-    private System.Action<int, Vector3> moveCallback;
+    private int playerNumber = 0;    
+    private System.Action<int, Vector3, float> moveCallback;
     private Transform cameraTransform;
     private Transform playerTrans;
     private bool isStartMove = false;
@@ -14,26 +13,31 @@ public class PlayerMove : MonoBehaviour {
     private float runSpeed = 6f;
     private float tilt = 1f;
     public Rigidbody rigidbody;
-    public bool IsLocalPlayer { set { this.isLocalPlayer = value; } }
+    private bool isLocalPlayer = false;
     public PlayerAnimationController animationController;
     void Awake() {
         Assert.IsNotNull(this.rigidbody);
     }
 
-    public void Init(PlayerAnimationController animationController, Transform playerTrans, int number, System.Action<int, Vector3> moveCallback) {
+    public void Init(PlayerAnimationController animationController, Transform playerTrans, int number, System.Action<int, Vector3, float> moveCallback) {
         this.animationController = animationController;
         this.playerTrans = playerTrans;
         this.playerNumber = number;
         this.moveCallback = moveCallback;
     }
 
+    public void SetLocalPlayer(bool isLocalPlayer) {
+        this.isLocalPlayer = isLocalPlayer;
+    }
+
     public void SetCamera(Transform camearaTrans) {
         this.cameraTransform = camearaTrans;
     }
 
-    public void MoveTo(Vector3 toPosition) {
+    public void OnMoveTo(Vector3 toPosition, float yaw) {
         this.isStartMove = true;
         this.toPosition = toPosition;
+        this.playerTrans.localRotation = Quaternion.Euler(this.playerTrans.localRotation.eulerAngles.x, yaw, this.playerTrans.localRotation.eulerAngles.z);
     }
 
     void FixedUpdate() {
@@ -51,7 +55,7 @@ public class PlayerMove : MonoBehaviour {
         float moveVertical = Input.GetAxis("Vertical");
 
         if (System.Math.Abs(moveHorizontal) > 0f == false && System.Math.Abs(moveVertical) > 0f == false) {
-            this.animationController.Stay();
+            this.animationController.OnAcion(PLAYER_ACTION_TYPE.Idle);
             return;
         }        
         Vector3 movement = new Vector3(moveHorizontal, 0f, moveVertical);
@@ -61,10 +65,10 @@ public class PlayerMove : MonoBehaviour {
         }
         bool isRun = Input.GetKey(KeyCode.LeftShift);
         if (isRun) {
-            this.animationController.Run();
+            this.animationController.OnAcion(PLAYER_ACTION_TYPE.Run);
             movement = movement * runSpeed;
         } else {
-            this.animationController.Walk();
+            this.animationController.OnAcion(PLAYER_ACTION_TYPE.Walk);
             movement = movement * walkSpeed;
         }
         
@@ -72,7 +76,7 @@ public class PlayerMove : MonoBehaviour {
         this.rigidbody.rotation = Quaternion.Euler(0.0f, 0.0f, this.rigidbody.velocity.x * -tilt);
 
         if (moveCallback != null) {
-            moveCallback(this.playerNumber, this.playerTrans.position);
+            moveCallback(this.playerNumber, this.playerTrans.position, this.transform.localRotation.y);
         }
     }
 }

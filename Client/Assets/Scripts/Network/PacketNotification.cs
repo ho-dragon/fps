@@ -11,7 +11,8 @@ public class PacketNotification {
     private const string notiMovePlayer = "movePlayer";
     private const string notiDemagedPlayer = "damagedPlayer";
     private const string notiJoinPlayer = "joinPlayer";
-    
+    private const string notiActionPlayer = "actionPlayer";
+
     public void RecevieNotification(ResponseFormat result) {        
         switch(result.method){
             case notiDemagedPlayer:
@@ -23,12 +24,16 @@ public class PacketNotification {
             case notiMovePlayer:
                 MovePlayer(BsonSerializer.Deserialize<PlayerMoveModel>(result.bytes));
                 break;
+            case notiActionPlayer:
+                ActionPlayer(BsonSerializer.Deserialize<PLayerActionModel>(result.bytes));
+                break;
+
         }
     }
 
     public void DamagedPlayer(DamageModel result) {
         Logger.DebugHighlight("[RecevieNtotication.DamagedPlayer]");
-        PlayerManager.inst.DamagedPlayer(result);
+        PlayerManager.inst.OnDamaged(result);
     }
 
     public void JoinPlayer(EnterRoomModel result) {
@@ -38,8 +43,14 @@ public class PacketNotification {
 
     private void MovePlayer(PlayerMoveModel result) {
         //Logger.DebugHighlight("[RecevieNtotication.MovePlayer]  = " + result.playerNum + " / movePosition X : {0} Y : {1} : Z : {2}" , result.playerPosX, result.playerPosY, result.playerPosZ);
-        PlayerManager.inst.MovePlayer(result.playerNum, new Vector3(result.playerPosX
+        PlayerManager.inst.OnMove(result.playerNum, new Vector3(result.playerPosX
                                                                     , result.playerPosY
-                                                                    , result.playerPosZ));
+                                                                    , result.playerPosZ)
+                                                                    , result.playerYaw);
+    }
+
+    private void ActionPlayer(PLayerActionModel result) {
+        Logger.DebugHighlight("[PacketNotification.ActionPlayer] actioType = " + result.actionType);
+        PlayerManager.inst.OnACtion(result.playerNum, result.actionType);
     }
 }

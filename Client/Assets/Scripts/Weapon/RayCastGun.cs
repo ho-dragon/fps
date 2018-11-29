@@ -24,7 +24,7 @@ public class RayCastGun : Weapon {
                     return;
                 }
                 TcpSocket.inst.Request.Attack(this.ownerPlayerNumber, hitPlayer.Number, 0, (req, result) => {
-                    PlayerManager.inst.DamagedPlayer(result);
+                    PlayerManager.inst.OnDamaged(result);
                 });
             }
             EffectManager.inst.OnBulletTail(this.muzzleTransform.position, hit.point, 2f);

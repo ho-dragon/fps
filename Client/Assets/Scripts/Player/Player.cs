@@ -36,7 +36,7 @@ public class Player : MonoBehaviour {
         InitWeapon("Rifle");//최초 라이플을 들고있도록
     }
     
-    public void Init(int teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3> moveCallback) {
+    public void Init(int teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3, float> moveCallback) {
         Logger.Debug("[Player] Init number = " + number + " / name = " + name);
         this.teamCode = teamCode;
         this.number = number;             

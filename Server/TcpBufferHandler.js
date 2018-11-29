@@ -1,8 +1,8 @@
 'use strict';//hoisting을 막기위해 
 
-const debug = require('debug')('Networker');
+const debug = require('debug')('TcpBufferHandler');
 
-function Networker(socket, handler) {
+function TcpBufferHandler(socket, handler) {
   debug(' _onData =');
 
   this.socket = socket;
@@ -17,8 +17,8 @@ function Networker(socket, handler) {
   this.handler = handler;
 }
 
-Networker.prototype.init = function () {
-debug(' init');	
+TcpBufferHandler.prototype.init = function () {
+debug('init');	
   this.socket.on('data', (data) => {
     this._bufferedBytes += data.length;
     this.queue.push(data);
@@ -30,7 +30,7 @@ debug(' init');
   this.socket.on('served', this.handler);
 };
 
-Networker.prototype._hasEnough = function (size) {
+NetwoTcpBufferHandlerrker.prototype._hasEnough = function (size) {
   if (this._bufferedBytes >= size) {
     return true;
   }
@@ -38,7 +38,7 @@ Networker.prototype._hasEnough = function (size) {
   return false;
 }
 
-Networker.prototype._readBytes = function (size) {
+TcpBufferHandler.prototype._readBytes = function (size) {
   let result;
   this._bufferedBytes -= size;
 
@@ -74,7 +74,7 @@ Networker.prototype._readBytes = function (size) {
   return result;
 }
 
-Networker.prototype._getHeader = function () {
+TcpBufferHandler.prototype._getHeader = function () {
   //if (this._hasEnough(2)) {
   if (this._hasEnough(4)) {
     //this._payloadLength = this._readBytes(2).readUInt16BE(0, true);
@@ -84,15 +84,15 @@ Networker.prototype._getHeader = function () {
   }
 }
 
-Networker.prototype._getPayload = function () {
+TcpBufferHandler.prototype.getBody = function () {
   if (this._hasEnough(this._payloadLength)) {
     let received = this._readBytes(this._payloadLength);
     this.socket.emit('served', received);
-    this._state = 'HEADER';
+    this._state = 'BODY';
   }
 }
 
-Networker.prototype._onData = function (data) {
+TcpBufferHandler.prototype._onData = function (data) {
   debug(' _onData...|| this._process =', this._process);
 
   while (this._process) {
@@ -100,25 +100,25 @@ Networker.prototype._onData = function (data) {
       case 'HEADER':
         this._getHeader();
         break;
-      case 'PAYLOAD':
-        this._getPayload();
+      case 'BODY':
+        this.getBody();
         break;
     }
   }
 }
 
-Networker.prototype.send = function (message) {
+TcpBufferHandler.prototype.send = function (message) {
   let buffer = Buffer.from(message);
   this._header(buffer.length);
   this._packet.message = buffer;
   this._send();
 }
 
-Networker.prototype._header = function (messageLength) {
+TcpBufferHandler.prototype._header = function (messageLength) {
   this._packet.header = { length: messageLength };
 };
 
-Networker.prototype._send = function () {
+TcpBufferHandler.prototype._send = function () {
   //let contentLength = Buffer.allocUnsafe(2);
   //contentLength.writeUInt16BE(this._packet.header.length);
   let contentLength = Buffer.allocUnsafe(4);

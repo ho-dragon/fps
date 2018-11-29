@@ -18,10 +18,16 @@ public class PacketRequest {
                                       , "attackPosition", attackPosition), callback);
     }
 
-    public void MovePlayer(int playerNum, Vector3 playerPos) {
+    public void MovePlayer(int playerNum, Vector3 playerPos, float rotationY) {
         this.packetManager.Send<PlayerMoveModel>(this.packetManager.CreateRequestFormat("movePlayer", "playerNum", playerNum
-                                              , "playerPosX", playerPos.x
-                                              , "playerPosY", playerPos.y
-                                              , "playerPosZ", playerPos.z), null);
+                                              , "x", playerPos.x
+                                              , "y", playerPos.y
+                                              , "z", playerPos.z
+                                              , "yaw", rotationY), null);
     }
+
+    public void ActionPlayer(int playerNum, PLAYER_ACTION_TYPE actionType) {
+        this.packetManager.Send<PLayerActionModel>(this.packetManager.CreateRequestFormat("actionPlayer", "playerNum", playerNum, "actionType", actionType), null);
+    }
+                                            
 }

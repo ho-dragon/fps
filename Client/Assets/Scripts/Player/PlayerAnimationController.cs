@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 
-public class PlayerAnimationController : MonoBehaviour{
-
+public class PlayerAnimationController : MonoBehaviour {
     #region OnGUI
     public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0) {
         return new Rect(_width * raw, _height * column, _width, _height);
@@ -22,63 +21,116 @@ public class PlayerAnimationController : MonoBehaviour{
 
     public Animator animator;
     const int countOfDamageAnimations = 3;
-    int lastDamageAnimation = -1;
+    public int lastDamageAnimation = -1;
+    private bool isLocalPlayer = false;
+    private int playerNum = 0;
+    private PLAYER_ACTION_TYPE lastAction = PLAYER_ACTION_TYPE.Idle;
     void Awake() {
         Assert.IsNotNull(this.animator);
     }
 
-    public void Stay() {
+    public void Init(int playerNum){
+        this.playerNum = playerNum;
+    }
+
+    public void SetLocalPlayer(bool isLocalPlayer) {
+        this.isLocalPlayer = isLocalPlayer;
+    }
+
+    public void OnAcion(PLAYER_ACTION_TYPE actionType) {
+        if (this.lastAction != actionType) {
+            this.lastAction = actionType;
+            if (this.isLocalPlayer) {
+                TcpSocket.inst.Request.ActionPlayer(this.playerNum, actionType);
+            }            
+        }
+        switch (actionType) {
+            case PLAYER_ACTION_TYPE.Aiming:
+                Aiming();
+                break;            
+            case PLAYER_ACTION_TYPE.Attack:
+                Attack();
+                break;
+            case PLAYER_ACTION_TYPE.Damage:
+                Damage();
+                break;
+            case PLAYER_ACTION_TYPE.Death:
+                Death();
+                break;
+            case PLAYER_ACTION_TYPE.Idle:
+                Stay();
+                break;
+            case PLAYER_ACTION_TYPE.Jump:
+                Jump();
+                break;
+            case PLAYER_ACTION_TYPE.Run:
+                Run();
+                break;
+            case PLAYER_ACTION_TYPE.Sitting:
+                Sitting();
+                break;
+            case PLAYER_ACTION_TYPE.Walk:
+                Walk();
+                break;
+        }
+    }
+
+    private void Stay() {
         animator.SetBool("Aiming", false);
         animator.SetFloat("Speed", 0f);
     }
 
-    public void Walk() {
+    private void Walk() {
         animator.SetBool("Aiming", false);
         animator.SetFloat("Speed", 0.5f);
     }
 
-    public void Run() {
+    private void Run() {
         animator.SetBool("Aiming", false);
         animator.SetFloat("Speed", 1f);
     }
 
-    public void Attack() {
+    private void Attack() {
         Aiming();
         animator.SetTrigger("Attack");
     }
 
-    public void Death() {
+    private void Death() {
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Death"))
             animator.Play("Idle", 0);
         else
             animator.SetTrigger("Death");
     }
 
-    public void Damage() {
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Death")) return;
+    private void Damage() {
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Death")) {
+            return;
+        }
         int id = Random.Range(0, countOfDamageAnimations);
-        if (countOfDamageAnimations > 1)
-            while (id == lastDamageAnimation)
+        if (countOfDamageAnimations > 1) {
+            while (id == this.lastDamageAnimation) {
                 id = Random.Range(0, countOfDamageAnimations);
-        lastDamageAnimation = id;
+            }              
+        }            
+        this.lastDamageAnimation = id;
         animator.SetInteger("DamageID", id);
         animator.SetTrigger("Damage");
     }
 
-    public void Jump() {
+    private void Jump() {
         animator.SetBool("Squat", false);
         animator.SetFloat("Speed", 0f);
         animator.SetBool("Aiming", false);
         animator.SetTrigger("Jump");
     }
 
-    public void Aiming() {
+    private void Aiming() {
         animator.SetBool("Squat", false);
         //animator.SetFloat("Speed", 0f);
         animator.SetBool("Aiming", true);
     }
 
-    public void Sitting() {
+    private void Sitting() {
         animator.SetBool("Squat", !animator.GetBool("Squat"));
         animator.SetBool("Aiming", false);
     }

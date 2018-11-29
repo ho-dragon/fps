@@ -6,14 +6,16 @@ public class PlayerActionController : MonoBehaviour {
     public PlayerMove move;
     public PlayerShoot shoot;
     private PlayerAnimationController animationController;
+    private bool isLocalPayer = false;
     void Awake() {
         Assert.IsNotNull(this.move);
         Assert.IsNotNull(this.shoot);
     }
 
-    public void Init(PlayerAnimationController animationController, Transform playerTras, int PlayerNmber, System.Action<int, Vector3> moveCallback) {
+    public void Init(PlayerAnimationController animationController, Transform playerTras, int playerNmber, System.Action<int, Vector3, float> moveCallback) {
         this.animationController = animationController;
-        this.move.Init(animationController, playerTras, PlayerNmber, moveCallback);
+        this.move.Init(animationController, playerTras, playerNmber, moveCallback);
+        this.animationController.Init(playerNmber);
     }
 
     public void SetCamera(Transform playerCamera) {
@@ -21,11 +23,17 @@ public class PlayerActionController : MonoBehaviour {
     }
 
     public void SetLocalPlayer(bool isLocalPlayer) {
-        this.move.IsLocalPlayer = isLocalPlayer;
+        this.isLocalPayer = isLocalPlayer;
+        this.move.SetLocalPlayer(isLocalPlayer);
+        this.animationController.SetLocalPlayer(isLocalPlayer);
     }
 
-    public void MoveTo(Vector3 toPosition) {
-        this.move.MoveTo(toPosition);
+    public void OnMove(Vector3 toPosition, float yaw) {
+        this.move.OnMoveTo(toPosition, yaw);
+    }
+
+    public void OnAction(PLAYER_ACTION_TYPE actionType) {
+        this.animationController.OnAcion(actionType);
     }
 
     public void SetWeapon(Weapon weapon) {
@@ -33,24 +41,28 @@ public class PlayerActionController : MonoBehaviour {
     }
 
     void Update() {
+        if(this.isLocalPayer == false) {
+            return;
+        }
+
         if (this.shoot.IsShootable == false) {
             return;
         }
 
         if (Input.GetMouseButtonDown(0)) {
             this.shoot.Shoot();
-            this.animationController.Attack();
+            this.animationController.OnAcion(PLAYER_ACTION_TYPE.Attack);
         }
 
         if (Input.GetMouseButton(1)) {
-            this.animationController.Aiming();
+            this.animationController.OnAcion(PLAYER_ACTION_TYPE.Aiming);
             CameraController.inst.ZoomIn();
         } else {
             CameraController.inst.ZoomOut();
         }
 
         if (Input.GetKeyDown(KeyCode.Space)) {
-            this.animationController.Jump();
+            this.animationController.OnAcion(PLAYER_ACTION_TYPE.Jump);
         }
     }
 }

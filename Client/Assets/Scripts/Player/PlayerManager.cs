@@ -53,21 +53,30 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
              , player.name
              , player.currentHP
              , player.maxHP
-             , (number, movePos) => {
-                 TcpSocket.inst.Request.MovePlayer(number, movePos);
+             , (number, movePos, roationY) => {
+                 TcpSocket.inst.Request.MovePlayer(number, movePos, roationY);
              });        
     }
 
-    public void MovePlayer(int playerNumb, Vector3 movePosition) {
+    public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if (player != null) {
             if (player.IsLocalPlayer == false) {                
-                player.ActionController.MoveTo(movePosition);
+                player.ActionController.OnMove(movePosition, yaw);
             }
         }
     }
 
-    public void DamagedPlayer(DamageModel result) {
+    public void OnACtion(int playerNumb, PLAYER_ACTION_TYPE actionType) {
+        Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
+        if (player != null) {
+            if (player.IsLocalPlayer == false) {
+                player.ActionController.OnAction(actionType);
+            }
+        }
+    }
+
+    public void OnDamaged(DamageModel result) {
         Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------result / damagedPlayerNumb = " + result.damagedPlayer);
         if (this.localPlayer.Number == result.damagedPlayer) {
             Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------SetLocalHP / damagedPlayerNumb = " + result.damagedPlayer);
