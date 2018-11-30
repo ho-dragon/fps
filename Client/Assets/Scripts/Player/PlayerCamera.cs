@@ -5,8 +5,8 @@ using System.Collections;
 public class PlayerCamera : MonoBehaviour {
     public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
     public RotationAxes axes = RotationAxes.MouseXAndY;
-    public float sensitivityX = 15F;
-    public float sensitivityY = 15F;
+    private float sensitivityX = 2f;
+    private float sensitivityY = 2f;
     public float minimumX = -360F;
     public float maximumX = 360F;
     public float minimumY = -60F;
@@ -17,7 +17,7 @@ public class PlayerCamera : MonoBehaviour {
     private Quaternion originalRotation;
     private Transform playerPivot;
     private Transform cameraPivot;
-    private bool isAttachedPlayer = false;
+    private bool isLocalPlayer = false;
 
     void Awake() {
 		Assert.IsNotNull(this.GetComponent<Camera>());
@@ -27,7 +27,7 @@ public class PlayerCamera : MonoBehaviour {
     public void AttatchCameraToPlayer(Transform playerPivot, Transform cameraPivot) {
         this.playerPivot = playerPivot;
         this.cameraPivot = cameraPivot;
-        this.isAttachedPlayer = true;
+        this.isLocalPlayer = true;
     }
 
     public Camera GetCamera() {
@@ -45,7 +45,7 @@ public class PlayerCamera : MonoBehaviour {
     }
 
     void Update() {
-        if (this.isAttachedPlayer == false) {
+        if (this.isLocalPlayer == false) {
             return;
         }
 

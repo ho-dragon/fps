@@ -29,7 +29,8 @@ public class RayCastGun : Weapon {
             }
             EffectManager.inst.OnBulletTail(this.muzzleTransform.position, hit.point, 2f);
         } else {
-			Logger.Debug("[RayCastGun.Shoot] No! hit not detected");
+            EffectManager.inst.OnBulletTail(this.muzzleTransform.position, normalizedDirection * distance, 2f);
+            Logger.Debug("[RayCastGun.Shoot] No! hit not detected");
 		}
     }
 
