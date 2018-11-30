@@ -25,10 +25,4 @@ public class Weapon : MonoBehaviour {
     public virtual void Shoot() {
         Logger.Debug("[Weapon] shoot");
     }
-
-    void Update() {
-        if (this.playerCam != null) {
-            this.transform.forward = -this.playerCam.transform.forward;
-        }
-    }
 }

@@ -8,7 +8,7 @@ public class Player : MonoBehaviour {
     public Transform muzzleTransform;
     public PlayerActionController actionController;
     public PlayerAnimationController animationController;
-    public Weapon weapon;//테스트용으로 직접 붙여놓음
+    public Weapon weapon;
     public HpGage hpBar;
     private bool isLocalPlayer = false;
     private int teamCode = 0;
@@ -43,7 +43,6 @@ public class Player : MonoBehaviour {
         this.number = number;             
         SetName(name);
         SetHealth(currentHP, maxHP);
-        SetWeapon(this.weapon, number);
         this.actionController.Init(this.animationController, this.transform, number, moveCallback);
         this.actionController.SetLocalPlayer(isLocalPlayer);
     }
@@ -101,12 +100,14 @@ public class Player : MonoBehaviour {
                     newRightGun.transform.parent = rightGunBone;
                     newRightGun.transform.localPosition = Vector3.zero;
                     newRightGun.transform.localRotation = Quaternion.Euler(90, 0, 0);
+                    SetWeapon(newRightGun.GetComponent<Weapon>(), this.number);
                 }
                 if (hand.leftGun != null) {
                     GameObject newLeftGun = (GameObject)Instantiate(hand.leftGun);
                     newLeftGun.transform.parent = leftGunBone;
                     newLeftGun.transform.localPosition = Vector3.zero;
                     newLeftGun.transform.localRotation = Quaternion.Euler(90, 0, 0);
+                    SetWeapon(newLeftGun.GetComponent<Weapon>(), this.number);
                 }
                 this.animationController.animator.runtimeAnimatorController = hand.controller;
                 return;
