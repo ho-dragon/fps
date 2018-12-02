@@ -5,8 +5,6 @@ using UnityEngine.Assertions;
 public class Weapon : MonoBehaviour {
     public int ownerPlayerNumber;
     public Transform muzzleTransform;
-    public string playerTag = "Player";
-    public string groundTag = "Ground";
 	protected PlayerCamera playerCam;
 
     private void Awake() {

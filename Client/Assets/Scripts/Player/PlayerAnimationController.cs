@@ -74,6 +74,10 @@ public class PlayerAnimationController : MonoBehaviour {
         }
     }
 
+    public bool IsAiming() {
+        return animator.GetBool("Aiming");
+    }
+
     private void Stay() {
         animator.SetBool("Aiming", false);
         animator.SetFloat("Speed", 0f);

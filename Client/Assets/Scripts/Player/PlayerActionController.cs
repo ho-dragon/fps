@@ -7,6 +7,7 @@ public class PlayerActionController : MonoBehaviour {
     public PlayerShoot shoot;
     private PlayerAnimationController animationController;
     private bool isLocalPayer = false;
+    private bool isZoomOut = false;
     void Awake() {
         Assert.IsNotNull(this.move);
         Assert.IsNotNull(this.shoot);
@@ -40,8 +41,6 @@ public class PlayerActionController : MonoBehaviour {
         this.shoot.Init(weapon);
     }
 
-
-    private bool isZoomOut = false;
     void Update() {
         if(this.isLocalPayer == false) {
             return;
@@ -51,9 +50,16 @@ public class PlayerActionController : MonoBehaviour {
             return;
         }
 
+
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            this.animationController.OnAcion(PLAYER_ACTION_TYPE.Jump);
+        }
+
         if (Input.GetMouseButtonDown(0)) {
-            this.shoot.Shoot();
-            this.animationController.OnAcion(PLAYER_ACTION_TYPE.Attack);
+            if (this.animationController.IsAiming()) {
+                this.shoot.Shoot();
+                this.animationController.OnAcion(PLAYER_ACTION_TYPE.Attack);
+            }
         }
 
         if (Input.GetMouseButton(1)) {
@@ -66,10 +72,6 @@ public class PlayerActionController : MonoBehaviour {
                 CameraController.inst.ZoomOut();
                 this.isZoomOut = true;
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            this.animationController.OnAcion(PLAYER_ACTION_TYPE.Jump);
         }
 
         if (Input.GetKeyDown(KeyCode.C)) {

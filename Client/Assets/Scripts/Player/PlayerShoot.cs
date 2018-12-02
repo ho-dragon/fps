@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class PlayerShoot : MonoBehaviour {
+    public AudioSource audioSource;
     private Weapon weapon;
     private bool isShootable = false;
     public bool IsShootable {

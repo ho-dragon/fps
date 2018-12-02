@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\BulletEffect.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\EffectManager.cs" />
+    <Compile Include="Assets\Scripts\GameLayers.cs" />
     <Compile Include="Assets\Scripts\JsonNet\BsonSerializer.cs" />
     <Compile Include="Assets\Scripts\Logger.cs" />
     <Compile Include="Assets\Scripts\Main.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Assets\Scripts\Player\PlayerManager.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerMove.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerShoot.cs" />
+    <Compile Include="Assets\Scripts\SoundManager.cs" />
     <Compile Include="Assets\Scripts\UI\HpGage.cs" />
     <Compile Include="Assets\Scripts\UI\PlayerHeaderUI.cs" />
     <Compile Include="Assets\Scripts\UI\PlayerHUD.cs" />

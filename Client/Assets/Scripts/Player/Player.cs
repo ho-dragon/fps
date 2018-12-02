@@ -8,7 +8,6 @@ public class Player : MonoBehaviour {
     public PlayerAnimationController animationController;
     public PlayerHeaderUI ui;
     public Weapon weapon;
-   
     private bool isLocalPlayer = false;
     private int teamCode = 0;
     private int number = 0;

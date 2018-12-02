@@ -19,6 +19,8 @@ public class PlayerCamera : MonoBehaviour {
     private Transform cameraPivot;
     private bool isAttachedPlayer = false;
     private bool isDoingZoomIn = false;
+    private bool isDoneZoomIn = false;
+    private bool isDoneZoomOut = false;
 
     void Awake() {
 		Assert.IsNotNull(this.GetComponent<Camera>());
@@ -35,6 +37,7 @@ public class PlayerCamera : MonoBehaviour {
         return this.GetComponent<Camera>();
     }
 
+
     public void ZoomIn() {
         this.isDoingZoomIn = true;
     }
@@ -49,9 +52,23 @@ public class PlayerCamera : MonoBehaviour {
         }
 
         if (this.isDoingZoomIn) {
-           this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(40, 60, Time.deltaTime * 0.01f);
+            if (this.isDoneZoomIn == false) {
+                this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(40, 60, Time.deltaTime * 0.01f);
+                Logger.DebugHighlight("[zoomIn]");
+                if (this.GetComponent<Camera>().fieldOfView <= 40f) {
+                    this.isDoneZoomIn = true;
+                    UIManager.inst.EnableGunCross(true);
+                }
+            }           
         } else {
-            this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(60, 40, Time.deltaTime * 0.01f);
+            if(this.isDoneZoomOut == false) {
+                this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(60, 40, Time.deltaTime * 0.01f);
+                Logger.DebugHighlight("[zoomOut]");
+                if (this.GetComponent<Camera>().fieldOfView >= 60f) {
+                    this.isDoneZoomOut = true;
+                    UIManager.inst.EnableGunCross(false);
+                }
+            }            
         }
 
         this.cameraPivot.position = this.playerPivot.position;

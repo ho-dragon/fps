@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class BulletEffect : MonoBehaviour {
     public LineRenderer lineRenderer;
-    private readonly Color colorOrigin = Color.white;
+    private IEnumerator coFadeOut;
+    private readonly Color colorOrigin = Color.gray;
 
     public void Show(Vector3 start, Vector3 end, float duration) {        
         if (this.gameObject.activeSelf == false) {
@@ -12,20 +13,30 @@ public class BulletEffect : MonoBehaviour {
         }
         this.lineRenderer.SetPositions(new Vector3[] { start, end });
         this.lineRenderer.enabled = true;
-        this.lineRenderer.material.color = colorOrigin;
-        StartCoroutine(FadeOut(duration));
+        this.lineRenderer.startColor = colorOrigin;
+        this.lineRenderer.endColor = colorOrigin;
+
+        if(this.coFadeOut != null) {
+            StopCoroutine(this.coFadeOut);
+        }
+
+        this.coFadeOut = FadeOut(duration);
+        StartCoroutine(this.coFadeOut);
     }
 
     IEnumerator FadeOut(float duration) {
-        yield return new WaitForSeconds(duration);
-        float alpha = lineRenderer.material.color.a;
+        float remainDuraion = duration;
+        float alpha = 1f;
         while(alpha > 0) {
             yield return null;
+            remainDuraion -= Time.deltaTime;
             alpha -= 0.05f;
             if(alpha < 0) {
                 alpha = 0f;
             }
-            lineRenderer.material.color = new Color(this.colorOrigin.r, this.colorOrigin.g, this.colorOrigin.b, alpha);
+            Color temp = new Color(this.colorOrigin.r, this.colorOrigin.g, this.colorOrigin.b, alpha);
+            this.lineRenderer.startColor = temp;
+            this.lineRenderer.endColor = temp; 
         }
         this.lineRenderer.enabled = false;
     }
