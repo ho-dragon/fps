@@ -5,19 +5,20 @@ using System.Collections;
 public class PlayerCamera : MonoBehaviour {
     public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
     public RotationAxes axes = RotationAxes.MouseXAndY;
-    public float sensitivityX = 15F;
-    public float sensitivityY = 15F;
-    public float minimumX = -360F;
-    public float maximumX = 360F;
-    public float minimumY = -60F;
-    public float maximumY = 60F;
-    private float rotationX = 0F;
-    private float rotationY = 0F;
-    private float lockPos = 0F;
+    private float sensitivityX = 2f;
+    private float sensitivityY = 2f;
+    public float minimumX = -360f;
+    public float maximumX = 360f;
+    public float minimumY = -60f;
+    public float maximumY = 60f;
+    private float rotationX = 0f;
+    private float rotationY = 0f;
+    private float lockPos = 0f;
     private Quaternion originalRotation;
     private Transform playerPivot;
     private Transform cameraPivot;
     private bool isAttachedPlayer = false;
+    private bool isDoingZoomIn = false;
 
     void Awake() {
 		Assert.IsNotNull(this.GetComponent<Camera>());
@@ -34,8 +35,6 @@ public class PlayerCamera : MonoBehaviour {
         return this.GetComponent<Camera>();
     }
 
-
-    private bool isDoingZoomIn = false;
     public void ZoomIn() {
         this.isDoingZoomIn = true;
     }
@@ -89,8 +88,8 @@ public class PlayerCamera : MonoBehaviour {
             angle += 360F;
         }
          
-        if (angle > 360F) {
-            angle -= 360F;
+        if (angle > 360f) {
+            angle -= 360f;
         }        
         return Mathf.Clamp (angle, min, max);
     }

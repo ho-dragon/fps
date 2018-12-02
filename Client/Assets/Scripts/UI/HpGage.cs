@@ -6,7 +6,6 @@ using System.Collections;
 public class HpGage : MonoBehaviour {
     public Image image;
     public Text text;
-    public CameraFacingBillboard facing;
 
     void Awake() {
         Assert.IsNotNull(this.image);

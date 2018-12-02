@@ -1,19 +1,18 @@
 using UnityEngine;
-using System.Collections;
+using UnityEngine.UI;
 using UnityEngine.Assertions;
 
 public class Player : MonoBehaviour {
-    public TextMesh textMesh;
     public Transform cameraPivot;
-    public Transform muzzleTransform;
     public PlayerActionController actionController;
     public PlayerAnimationController animationController;
+    public PlayerHeaderUI ui;
     public Weapon weapon;
-    public HpGage hpBar;
+   
     private bool isLocalPlayer = false;
     private int teamCode = 0;
     private int number = 0;
-    private string name = "";
+    private string nickName = "";
     public Transform rightGunBone;
     public Transform leftGunBone;
     public WeaponModel[] weaponModels;
@@ -30,32 +29,24 @@ public class Player : MonoBehaviour {
 
     void Awake() {
         Assert.IsNotNull(this.actionController);
-        Assert.IsNotNull(this.textMesh);
-        Assert.IsNotNull(this.muzzleTransform);
-        Assert.IsNotNull(this.hpBar);
+        Assert.IsNotNull(this.ui);
         InitWeapon("Rifle");//최초 라이플을 들고있도록
     }
-    
+
     public void Init(bool isLocalPlayer, int teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3, float> moveCallback) {
         Logger.Debug("[Player] Init number = " + number + " / name = " + name);
         this.isLocalPlayer = isLocalPlayer;
         this.teamCode = teamCode;
-        this.number = number;             
-        SetName(name);
+        this.number = number;
+        this.nickName = name;
+        if (this.isLocalPlayer) {
+            UIManager.inst.SetName(nickName);
+        } else {
+            this.ui.SetNickName(nickName);
+        }
         SetHealth(currentHP, maxHP);
         this.actionController.Init(this.animationController, this.transform, number, moveCallback);
         this.actionController.SetLocalPlayer(isLocalPlayer);
-    }
-    
-    private void SetName(string name) {
-        this.name = name;
-        if (this.isLocalPlayer) {
-            UIManager.inst.SetName(name);
-            this.textMesh.gameObject.SetActive(false);            
-        } else {
-            this.textMesh.gameObject.SetActive(true);
-            this.textMesh.text = name;
-        }
     }
 
     public void SetWeapon(Weapon weapon, int ownerPlayerNumber) {
@@ -70,23 +61,19 @@ public class Player : MonoBehaviour {
 
     public void SetHealth(float currentHP, float maxHP) {
         if (this.isLocalPlayer) {
-            this.hpBar.gameObject.SetActive(false);
             UIManager.inst.SetHP(currentHP, maxHP);
         } else {
-            this.hpBar.gameObject.SetActive(true);
-            this.hpBar.SetHP(currentHP, maxHP);
+            this.ui.SetHealth(currentHP, maxHP);
         }        
     }
 
     public void AttachCamera() {
-            Logger.Debug("[Player.AddCamera]");
-            CameraController.inst.AttatchCameraToPlayer(this.transform);
-            this.actionController.SetCamera(CameraController.inst.playerCamera.transform);
-			if (this.weapon != null){
-				this.weapon.SetCamera(CameraController.inst.playerCamera);
-			}
+        CameraController.inst.AttatchCameraToPlayer(this.transform);
+        this.actionController.SetCamera(CameraController.inst.playerCamera.transform);
+		if (this.weapon != null){
+			this.weapon.SetCamera(CameraController.inst.playerCamera);
+		}
     }
-
 
     private void InitWeapon(string weaponName) {
         foreach (WeaponModel hand in weaponModels) {

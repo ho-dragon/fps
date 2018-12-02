@@ -23,7 +23,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
         get { return this.isConnected; }
     }
 
-    public void Connect(string ip, int port, System.Action<bool> callback) {
+    public void Connect(string ip, int port, System.Action<bool, string> callback) {
         this.ip = ip;
         this.port = port;
         if (this.isConnected) {
@@ -41,11 +41,10 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
             this.ns = new NetworkStream(this.socket);
             this.isConnected = true;
             this.packetManager.socket = this.socket;
-            callback(this.isConnected);
+            callback(this.isConnected, "Connect success.");
         } catch (SocketException e) {
-            Logger.Debug("Socket connect error! : " + e.ToString() );
             this.isConnected = false;
-            callback(this.isConnected);
+            callback(this.isConnected, "Connect failed. error msg = " + e.ToString());
             return;
         }
     }

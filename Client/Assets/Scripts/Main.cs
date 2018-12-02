@@ -12,7 +12,8 @@ public class Main : MonoBehaviourInstance<Main>
     public bool isDebugMuted = false;
     private bool isOnGUI = true;
     private bool isConnected = false;
-
+    private bool isTryConnected = false;
+    private string connectMsg = "";
     public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0) {
         return new Rect(_width * raw, _height * column, _width, _height);
     }
@@ -23,19 +24,32 @@ public class Main : MonoBehaviourInstance<Main>
         }
 
         if (this.isConnected == false) {
-            ip = GUI.TextField(GetRectPos(0, 1, 200, 50), ip, 25);
-            port = GUI.TextField(GetRectPos(0, 2, 200, 50), port, 25);
-            userName = GUI.TextField(GetRectPos(0, 3, 200, 50), userName, 25);
+            GUI.Label(GetRectPos(1, 1, 100, 50), "IPAddress");
+            ip = GUI.TextField(GetRectPos(1, 1, 200, 50), ip, 25);
+            GUI.Label(GetRectPos(1, 2, 100, 50), "Port");
+            port = GUI.TextField(GetRectPos(1, 2, 200, 50), port, 25);
+            GUI.Label(GetRectPos(1, 3, 100, 50), "NickName");
+            userName = GUI.TextField(GetRectPos(1, 3, 200, 50), userName, 25);
 
-            if (GUI.Button(GetRectPos(0, 4, 200, 50), "Connect Socket")) {
-                TcpSocket.inst.Connect(this.ip, System.Convert.ToInt32(this.port), (isConnected) => {
+            if (GUI.Button(GetRectPos(1, 4, 200, 50), "Connect Socket")) {
+                TcpSocket.inst.Connect(this.ip, System.Convert.ToInt32(this.port), (isConnected, msg) => {
+                    this.isTryConnected = true;
+                    Logger.Error("Connect result = {0}, msg ={1}", isConnected, msg);
                     this.isConnected = isConnected;
+                    this.connectMsg = msg;
                 });
+            }            
+        }
+
+        if (this.isTryConnected) {
+            if (this.isConnected == false) {
+                GUI.Label(GetRectPos(0, 5, 500, 50), this.connectMsg);
             }
-        }        
+        }
 
         if (this.isConnected) {
-            if (GUI.Button(GetRectPos(0, 5, 200, 50), "EnterRoom")) {
+            GUI.Label(GetRectPos(0, 1, 500, 50), this.connectMsg + " Click EnterRoom.");
+            if (GUI.Button(GetRectPos(0, 2, 200, 50), "EnterRoom")) {
                 EnterRoom(userName);
             }
         }

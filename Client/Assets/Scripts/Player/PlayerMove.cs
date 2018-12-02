@@ -52,9 +52,16 @@ public class PlayerMove : MonoBehaviour {
             }
         }
     }
+
     private void MoveInput() {
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
+
+        if (IsChangeRotationY(this.playerTrans.rotation.eulerAngles.y)) {
+            if (moveCallback != null) {
+                moveCallback(this.playerNumber, this.playerTrans.position, this.playerTrans.rotation.eulerAngles.y);
+            }
+        }
 
         if (System.Math.Abs(moveHorizontal) > 0f == false && System.Math.Abs(moveVertical) > 0f == false) {
             PlayAnimation(PLAYER_ACTION_TYPE.Idle);
@@ -76,9 +83,22 @@ public class PlayerMove : MonoBehaviour {
 
         this.playerRigidbody.MovePosition(this.playerRigidbody.position + movement * Time.deltaTime);
         this.playerRigidbody.rotation = Quaternion.Euler(0.0f, 0.0f, this.playerRigidbody.velocity.x * -tilt);
+        this.lastRotationY = this.playerTrans.rotation.eulerAngles.y;
 
         if (moveCallback != null) {
-            moveCallback(this.playerNumber, this.playerTrans.position, this.transform.localRotation.y);
+            moveCallback(this.playerNumber, this.playerTrans.position, this.playerTrans.rotation.eulerAngles.y);
+        }
+    }
+
+
+    private float lastRotationY = 0f;
+    private const float MinimumRotationY = 3f;
+    private bool IsChangeRotationY(float currentRotationY) {
+        if (Mathf.Abs(this.lastRotationY - currentRotationY) > MinimumRotationY) {
+            this.lastRotationY = currentRotationY;
+            return true;
+        } else {
+            return false;
         }
     }
 
