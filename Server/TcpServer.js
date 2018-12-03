@@ -17,7 +17,10 @@ module.exports.broadcastAll = broadcastAll;
 module.exports.broadcastExcludedMe = broadcastExcludedMe;
 
 var server = net.createServer(function(socket) {
-debug(' CreateServer');
+    server.maxConnections = 1000;
+    server.getConnections(function(err, count) {
+       console.log("Connections: " + count +" /  maxConnections = " + server.maxConnections);
+    });
 
   let bufferHandler = new TcpBufferHandler(socket, (data) => {
   	debug(' received:', data.toString());
@@ -104,15 +107,13 @@ function broadcastExcludedMe(message, sender) {
 
 
 function makeSendBuffer(msg) {
-    var buffMsg = new Buffer(msg);
+    var buffMsg = Buffer.from(msg);
     var msgLen = buffMsg.length ;
-    var bufPacketLenInfo = new Buffer(4);
-    bufPacketLenInfo.fill();
+    var bufPacketLenInfo = Buffer.allocUnsafe(4);
     var headerLen= bufPacketLenInfo.length;
     bufPacketLenInfo.writeUInt32LE(msgLen, 0); 
     
-    var bufTotal = new Buffer(  headerLen + msgLen ); //packet length info + msg
-    bufTotal.fill();
+    var bufTotal = Buffer.allocUnsafe(headerLen + msgLen); //packet length info + msg
     bufPacketLenInfo.copy(bufTotal, 0, 0, headerLen);
     buffMsg.copy(bufTotal, headerLen, 0, msgLen );
     //debug(color.yellow('[send] header length = '+headerLen+' / msg length = '+ msgLen+ '/ total length = '+(headerLen + msgLen) +' /  msg = ' + buffMsg.toString())); 
