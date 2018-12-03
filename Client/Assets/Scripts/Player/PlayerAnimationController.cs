@@ -23,7 +23,7 @@ public class PlayerAnimationController : MonoBehaviour {
     public int lastDamageAnimation = -1;
     private bool isLocalPlayer = false;
     private int playerNum = 0;
-    private PLAYER_ACTION_TYPE lastAction = PLAYER_ACTION_TYPE.Idle;
+    private PLAYER_ACTION_TYPE currentAction = PLAYER_ACTION_TYPE.Idle;
     void Awake() {
         Assert.IsNotNull(this.animator);
     }
@@ -36,9 +36,13 @@ public class PlayerAnimationController : MonoBehaviour {
         this.isLocalPlayer = isLocalPlayer;
     }
 
+    public PLAYER_ACTION_TYPE GetCurrentAction() {
+        return this.currentAction;
+    }
+
     public void OnAcion(PLAYER_ACTION_TYPE actionType) {
-        if (this.lastAction != actionType) {
-            this.lastAction = actionType;
+        if (this.currentAction != actionType) {
+            this.currentAction = actionType;
             if (this.isLocalPlayer) {
                 TcpSocket.inst.Request.ActionPlayer(this.playerNum, actionType);
             }            

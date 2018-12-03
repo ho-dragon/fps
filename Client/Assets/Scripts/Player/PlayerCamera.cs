@@ -21,7 +21,8 @@ public class PlayerCamera : MonoBehaviour {
     private bool isDoingZoomIn = false;
     private bool isDoneZoomIn = false;
     private bool isDoneZoomOut = false;
-
+    private float zoomTime = 2f;
+         
     void Awake() {
 		Assert.IsNotNull(this.GetComponent<Camera>());
         this.originalRotation = this.transform.localRotation;
@@ -40,39 +41,52 @@ public class PlayerCamera : MonoBehaviour {
 
     public void ZoomIn() {
         this.isDoingZoomIn = true;
+        this.isDoneZoomOut = false;
     }
 
     public void ZoomOut() {
         this.isDoingZoomIn = false;
+        this.isDoneZoomIn = false;
+    }
+
+
+    private bool isShaking = false;
+    private float durationRecoil = 0f;
+    private float currentDurationRecoil = 0f;
+    private float degreeRecoil = 0f;
+    private float originRotationX = 0f;
+    public void GunRecoil(float degree, float duration) {
+        this.currentDurationRecoil = 0f;
+        this.durationRecoil = duration;
+        this.degreeRecoil = 0.1f;
+        this.isShaking = true;
+    }
+
+    
+    private void UpdateRecoil(float duration) {
+        this.currentDurationRecoil += Time.deltaTime;
+        this.rotationX += this.degreeRecoil;
+        this.rotationX = ClampAngle(rotationX, minimumX, maximumX);
+        Quaternion xQuaternion = Quaternion.AngleAxis(rotationX, Vector3.up);
+        SetRotation(originalRotation * xQuaternion);
+        if (this.currentDurationRecoil > this.durationRecoil) {
+            this.isShaking = false;
+        }
     }
 
     void Update() {
+        //if(isShaking) {
+        //    UpdateRecoil(this.durationRecoil);
+        //   return;
+        //}
+
         if (this.isAttachedPlayer == false) {
             return;
         }
 
-        if (this.isDoingZoomIn) {
-            if (this.isDoneZoomIn == false) {
-                this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(40, 60, Time.deltaTime * 0.01f);
-                Logger.DebugHighlight("[zoomIn]");
-                if (this.GetComponent<Camera>().fieldOfView <= 40f) {
-                    this.isDoneZoomIn = true;
-                    UIManager.inst.EnableGunCross(true);
-                }
-            }           
-        } else {
-            if(this.isDoneZoomOut == false) {
-                this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(60, 40, Time.deltaTime * 0.01f);
-                Logger.DebugHighlight("[zoomOut]");
-                if (this.GetComponent<Camera>().fieldOfView >= 60f) {
-                    this.isDoneZoomOut = true;
-                    UIManager.inst.EnableGunCross(false);
-                }
-            }            
-        }
+        ZooInOut();
 
         this.cameraPivot.position = this.playerPivot.position;
-
         if (axes == RotationAxes.MouseXAndY) {
             this.rotationX += Input.GetAxis("Mouse X") * sensitivityX;
             this.rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
@@ -93,6 +107,32 @@ public class PlayerCamera : MonoBehaviour {
             SetRotation(originalRotation * yQuaternion);
         }
         SetRotation(Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, lockPos));
+    }
+
+    private float duratuonTime = 0f;
+    private float accelerationTime = 0f;
+    private void ZooInOut() {
+        if (this.isDoingZoomIn) {
+            if (this.isDoneZoomIn == false) {
+                this.accelerationTime = Mathf.Lerp(0.1f, 0.5f, duratuonTime);
+                duratuonTime += Time.deltaTime + this.accelerationTime / zoomTime;
+                this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(60, 40, duratuonTime);
+                if (this.GetComponent<Camera>().fieldOfView <= 40) {
+                    this.isDoneZoomIn = true;
+                    UIManager.inst.SetActiveGunCross(true);
+                }
+            }
+        } else {
+            if (this.isDoneZoomOut == false) {
+                UIManager.inst.SetActiveGunCross(false);
+                this.accelerationTime = Mathf.Lerp(0.5f, 0.1f, duratuonTime);
+                duratuonTime -= Time.deltaTime + this.accelerationTime / zoomTime;
+                this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(60, 40, duratuonTime);
+                if (this.GetComponent<Camera>().fieldOfView >= 60f) {
+                    this.isDoneZoomOut = true;
+                }
+            }
+        }
     }
 
     private void SetRotation(Quaternion quaternion) {

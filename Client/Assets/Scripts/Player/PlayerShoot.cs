@@ -2,11 +2,10 @@
 using System.Collections;
 
 public class PlayerShoot : MonoBehaviour {
-    public AudioSource audioSource;
     private Weapon weapon;
     private bool isShootable = false;
     public bool IsShootable {
-        get { return this.isShootable; }
+        get { return this.isShootable && this.weapon.IsShootable(); }
     }
 
     public void Init(Weapon weapon) {

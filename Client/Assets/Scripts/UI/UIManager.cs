@@ -18,8 +18,8 @@ public class UIManager : MonoBehaviourInstance<UIManager> {
         this.hud.SetName(name);
     }
 
-    public void EnableGunCross(bool isEnable) {
-        this.hud.EnableGunCross(isEnable);
+    public void SetActiveGunCross(bool isOn) {
+        this.hud.SetActiveGunCross(isOn);
     }
 
     public void HitEffect() {

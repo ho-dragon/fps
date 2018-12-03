@@ -11,6 +11,7 @@ public class PlayerMove : MonoBehaviour {
     private Transform playerTrans;
     private bool isStartMove = false;
     private Vector3 toPosition;
+    private float aimingSpeed = 1f;
     private float walkSpeed = 3f;
     private float runSpeed = 6f;
     private float tilt = 1f;
@@ -72,14 +73,19 @@ public class PlayerMove : MonoBehaviour {
             movement = this.cameraTransform.TransformDirection(movement);
             movement.y = 0;
         }
-        bool isRun = Input.GetKey(KeyCode.LeftShift);
-        if (isRun) {
-            PlayAnimation(PLAYER_ACTION_TYPE.Run);
-            movement = movement * runSpeed;
+
+        if (this.animationController.IsAiming()) {
+            movement = movement * GetAccelerationSpped(this.currentSpeed, this.aimingSpeed, 1f);
         } else {
-            PlayAnimation(PLAYER_ACTION_TYPE.Walk);
-            movement = movement * walkSpeed;
-        }
+            bool isRun = Input.GetKey(KeyCode.LeftShift);
+            if (isRun) {
+                PlayAnimation(PLAYER_ACTION_TYPE.Run);
+                movement = movement * GetAccelerationSpped(this.currentSpeed, this.runSpeed, 1f);
+            } else {
+                PlayAnimation(PLAYER_ACTION_TYPE.Walk);
+                movement = movement * GetAccelerationSpped(this.currentSpeed, this.walkSpeed, 1f);
+            }
+        }        
 
         this.playerRigidbody.MovePosition(this.playerRigidbody.position + movement * Time.deltaTime);
         this.playerRigidbody.rotation = Quaternion.Euler(0.0f, 0.0f, this.playerRigidbody.velocity.x * -tilt);
@@ -90,6 +96,11 @@ public class PlayerMove : MonoBehaviour {
         }
     }
 
+    private float currentSpeed = 0f;
+    private float GetAccelerationSpped(float currentSpeed, float targetSpeed, float accelerationTime) {
+        this.currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, accelerationTime * Time.deltaTime);
+        return this.currentSpeed;
+    }
 
     private float lastRotationY = 0f;
     private const float MinimumRotationY = 3f;

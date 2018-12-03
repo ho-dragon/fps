@@ -42,21 +42,17 @@ public class PlayerActionController : MonoBehaviour {
     }
 
     void Update() {
-        if(this.isLocalPayer == false) {
+        if (this.isLocalPayer == false) {
             return;
         }
-
-        if (this.shoot.IsShootable == false) {
-            return;
-        }
-
 
         if (Input.GetKeyDown(KeyCode.Space)) {
             this.animationController.OnAcion(PLAYER_ACTION_TYPE.Jump);
         }
 
         if (Input.GetMouseButtonDown(0)) {
-            if (this.animationController.IsAiming()) {
+            if (this.animationController.IsAiming() && this.shoot.IsShootable) {
+                CameraController.inst.GunRecoil(2f, 0.2f);
                 this.shoot.Shoot();
                 this.animationController.OnAcion(PLAYER_ACTION_TYPE.Attack);
             }

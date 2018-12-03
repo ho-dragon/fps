@@ -25,4 +25,8 @@ public class CameraController : MonoBehaviourInstance<CameraController> {
     public void ZoomOut() {
         this.playerCamera.ZoomOut();
     }
+
+    public void GunRecoil(float degree, float duration) {
+        this.playerCamera.GunRecoil(degree , duration);
+    }
 }

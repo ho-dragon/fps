@@ -24,8 +24,8 @@ public class PlayerHUD : MonoBehaviour {
         this.hp.SetHP(currentHP, maxHP);
     }
 
-    public void EnableGunCross(bool isEnable) {
-        this.gunCross.SetActive(isEnable);        
+    public void SetActiveGunCross(bool isOn) {
+        this.gunCross.SetActive(isOn);        
     }
     
     public void HitEffect() {
@@ -47,6 +47,7 @@ public class PlayerHUD : MonoBehaviour {
             if (alpha < 0) {
                 alpha = 0f;
             }
+            group.alpha = alpha;
         }
     }
 }
