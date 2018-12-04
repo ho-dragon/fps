@@ -1,9 +1,10 @@
 'use strict';//hoisting을 막기위해 
 
 const debug = require('debug')('TcpBufferHandler');
-module.exports = TcpBufferHandler;
 const HEADER = "HEADER";
 const BODY = "BODY";
+
+module.exports = TcpBufferHandler;
 
 function TcpBufferHandler(socket, handler) {
   debug('new TcpBufferHandler');
@@ -79,7 +80,7 @@ TcpBufferHandler.prototype.readBytes = function (size) {
 TcpBufferHandler.prototype.getHeader = function () {
   if (this.hasEnough(4)) {
     this.bodySzie = this.readBytes(4).readUInt32LE(0, true);
-    debug(' getBody...|| this.bodySzie =', this.bodySzie);
+    debug('[getHeader] this.bodySzie =', this.bodySzie);
     this.state = BODY;
   }
 }
@@ -93,8 +94,7 @@ TcpBufferHandler.prototype.getBody = function () {
 }
 
 TcpBufferHandler.prototype.onData = function (data) {
-  debug('onData...|| this.process =', this.process);
-
+  debug('[onData] this.process =', this.process);
   while (this.process) {
     switch (this.state) {
       case HEADER:

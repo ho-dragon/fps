@@ -1,5 +1,5 @@
 const debug = require('debug')('Room');
-var model = require('./PacketModel.js');
+const model = require('./PacketModel');
 var room = {
 	players : []
 }
@@ -8,20 +8,61 @@ module.exports.addPlayer = addPlayer;
 module.exports.getOtherPlayers = getOtherPlayers;
 module.exports.updateLastPosition = updateLastPosition;
 module.exports.attackPlayer = attackPlayer;
+module.exports.AssingTemaNumber = AssingTemaNumber;
 
 function addPlayer(playerName) {
+	if (isExistPlayer()) {
+		return getPlayer(playerName);
+	}
+
 	var playerNum = room.players.length;
-	var player = new model.player(playerName, playerNum, getTeamCode(playerNum), 100, 100, null, 0);
+	var player = new model.player(playerName, playerNum, -1, 100, 100, null, 0, false, 0);
 	room.players.push(player);
 	debug("added player :: name = " + player.name + " / number = " + player.number);
 	return player;
 }
 
-function getTeamCode(playerNum) {
-	if(playerNum % 2 == 0) {
-		return 1;
+function isExistPlayer(playerName) {
+	if (room == null) {
+		return false;
 	}
-	return 2;
+
+	for (let key in room.players) {
+		if (room.players[key].name == playerName) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function getPlayer(playerName) {
+	for (let key in room.players) {
+		if (room.players[key].name == playerName) {
+			return room.players[key];
+		}
+	}
+	return null;
+}
+
+function getPlayer(playerNum) {
+	for (let key in room.players) {
+		if (room.players[key].number == playerNum) {
+			return room.players[key];
+		}
+	}
+	return null;
+}
+
+function AssignTemaNumber() {
+	let isTeamOne = false;
+	for (let key in room.players) {
+		isTeamOne = !isTeamOne;
+		if (isTeamOne) {
+			room.players[key].teamCode = 1;	
+		} else {
+			room.players[key].teamCode = 2;	
+		}		
+	}
 }
 
 function getOtherPlayers(playerNum) {
@@ -43,12 +84,14 @@ function updateLastPosition(playerNum, lastPosition, lastYaw) {
 	}
 }
 
-function attackPlayer(attackPlayer, damagedPlayer, attackPosition) {
+function attackPlayer(damagedPlayer, attackPosition) {
 	for(var key in room.players) {
 		if (room.players[key].number == damagedPlayer) {
 			room.players[key].currentHP -= 10;
 			if (room.players[key].currentHP < 0) {
 				room.players[key].currentHP = 0;
+				room.players[key].isDead = true;
+				room.players[key].deadCount++;
 			}
 			return room.players[key];
 		}

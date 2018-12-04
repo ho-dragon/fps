@@ -16,12 +16,15 @@ function playerMove(playerNum, playerPosX, playerPosY, playerPosZ, playerYaw) {
 	this.playerYaw = playerYaw;
 }
 
-function playerDamage(attackPlayer, damagedPlayer, damage, currentHP, maxHP) {
+function playerDamage(attackPlayer, damagedPlayer, damage, currentHP, maxHP, isDead, scoreTeam1, scoreTeam2) {
 	this.attackPlayer = attackPlayer;
 	this.damagedPlayer = damagedPlayer;
 	this.damage = damage;
 	this.currentHP = currentHP;
 	this.maxHP = maxHP;
+	this.isDead = isDead;
+	this.scoreTeam1 = scoreTeam1;
+	this.scoreTeam2 = scoreTeam2;
 }
 
 function enterRoom(player, otherPlayers) {
@@ -46,7 +49,7 @@ function notificationFormat(method, code, msg, bytes) {
 }
 
 
-function player(name, number, teamCode, currentHP, maxHP, lastPosition, lastYaw) {
+function player(name, number, teamCode, currentHP, maxHP, lastPosition, lastYaw, isDead, deadCount) {
 	this.name = name;
 	this.number = number;
 	this.teamCode = teamCode;
@@ -54,9 +57,31 @@ function player(name, number, teamCode, currentHP, maxHP, lastPosition, lastYaw)
 	this.maxHP = maxHP;
 	this.lastPosition = lastPosition;
 	this.lastYaw = lastYaw;
+	this.isDead = isDead;
+	this.deadCount = deadCount;
 }
 
 function playerAction(playerNum, actionType) {
 	this.playerNum = playerNum;
 	this.actionType = actionType;
+}
+
+function GameInfo(isStarted, score) {
+	this.score = score;
+	this.isStarted = isStarted;
+}
+
+
+function StartGame(remainTime, playerTeamNumber, GameInfo) {
+
+
+}
+
+function GameTime(remainTime) {//초당 보내는 게임 시작
+	this.remainTime = remainTime;
+}
+
+
+function GameResult(scoreTeam1, scoreTeam2) {
+
 }

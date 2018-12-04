@@ -1,15 +1,16 @@
 /***************************************************************************************
 * refernece link :  https://mylko72.gitbooks.io/node-js/content/chapter8/chapter8_3.html
 ****************************************************************************************/
-var connectPort = 8107;
-var timeOutDuration = 5000;
-var net = require('net');
-var util = require('util');
-var color = require("colors");
+const connectPort = 8107;
+const timeOutDuration = 5000;
+const net = require('net');
+const util = require('util');
+const color = require("colors");
 const debug = require('debug')('TcpServer');
-var receiver = require('./TcpReceiver.js');
-const TcpBufferHandler = require('./TcpBufferHandler.js');
-var BSON = require('bson');
+const receiver = require('./TcpReceiver');
+const BSON = require('bson');
+
+var TcpBufferHandler = require('./TcpBufferHandler');
 var sockets = [];
 
 module.exports.send = send;
@@ -35,17 +36,7 @@ var server = net.createServer(function(socket) {
   debug('   local = %s:%s', socket.localAddress, socket.localPort);
   debug('   remote = %s:%s', socket.remoteAddress, socket.remotePort);
   socket.setTimeout(timeOutDuration);
-  //socket.setEncoding('utf8');
-/*
-  socket.on('data', function(data) {
-    //debug('Received test data from socket on port %d: %s', socket.remotePort, data.toString());
-    debug('received from socket / bytesRead = : ' + socket.bytesRead);
-    debug('received from socket / data length = : ' + data.length);
-    
-    receive(socket, data);
-    debug('  Bytes sent: ' + socket.bytesWritten);
-  });
-*/
+
   socket.on('end', function() {
     debug('Client disconnected');
     server.getConnections(function(err, count){

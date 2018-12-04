@@ -23,10 +23,12 @@
      { console.log("key : " + key +", value : " + result.param[key]); }
 
 
-   console.log( "type = string " + get_type(result.param));
+   console.log( "type = string " + getType(result.param));
 }
 
-function get_type(thing){
-    if(thing===null)return "[object Null]"; // special case
+function getType(thing){
+    if (thing===null) { 
+      return "[object Null]";
+    } // special case
     return Object.prototype.toString.call(thing);
 }
