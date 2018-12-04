@@ -35,6 +35,16 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         Player newPlayer = clone.GetComponent<Player>();
         //newPlayer.hpBar.facing.SetCamara(PlayerCamera.inst.camera);//HP카메라 보는 부분 일단 주석
 
+        newPlayer.Init(isLocalPlayer,
+               player.teamCode
+             , player.number
+             , player.name
+             , player.currentHP
+             , player.maxHP
+             , (number, movePos, roationY) => {
+                 TcpSocket.inst.Request.MovePlayer(number, movePos, roationY);
+             });
+
         if (isLocalPlayer) {
             this.localPlayer = newPlayer;
             this.localPlayer.AttachCamera();
@@ -48,15 +58,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.name, player.number);
         }
 
-        newPlayer.Init(isLocalPlayer,
-               player.teamCode
-             , player.number
-             , player.name
-             , player.currentHP
-             , player.maxHP
-             , (number, movePos, roationY) => {
-                 TcpSocket.inst.Request.MovePlayer(number, movePos, roationY);
-             });
+        
     }
 
     public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {
