@@ -23,7 +23,7 @@ public class PlayerAnimationController : MonoBehaviour {
     public int lastDamageAnimation = -1;
     private bool isLocalPlayer = false;
     private int playerNum = 0;
-    private PLAYER_ACTION_TYPE currentAction = PLAYER_ACTION_TYPE.Idle;
+    private PlayerActionType currentAction = PlayerActionType.Idle;
     void Awake() {
         Assert.IsNotNull(this.animator);
     }
@@ -36,11 +36,11 @@ public class PlayerAnimationController : MonoBehaviour {
         this.isLocalPlayer = isLocalPlayer;
     }
 
-    public PLAYER_ACTION_TYPE GetCurrentAction() {
+    public PlayerActionType GetCurrentAction() {
         return this.currentAction;
     }
 
-    public void OnAcion(PLAYER_ACTION_TYPE actionType) {
+    public void OnAcion(PlayerActionType actionType) {
         if (this.currentAction != actionType) {
             this.currentAction = actionType;
             if (this.isLocalPlayer) {
@@ -48,31 +48,31 @@ public class PlayerAnimationController : MonoBehaviour {
             }            
         }
         switch (actionType) {
-            case PLAYER_ACTION_TYPE.Aiming:
+            case PlayerActionType.Aiming:
                 Aiming();
                 break;            
-            case PLAYER_ACTION_TYPE.Attack:
+            case PlayerActionType.Attack:
                 Attack();
                 break;
-            case PLAYER_ACTION_TYPE.Damage:
+            case PlayerActionType.Damage:
                 Damage();
                 break;
-            case PLAYER_ACTION_TYPE.Death:
+            case PlayerActionType.Death:
                 Death();
                 break;
-            case PLAYER_ACTION_TYPE.Idle:
+            case PlayerActionType.Idle:
                 Stay();
                 break;
-            case PLAYER_ACTION_TYPE.Jump:
+            case PlayerActionType.Jump:
                 Jump();
                 break;
-            case PLAYER_ACTION_TYPE.Run:
+            case PlayerActionType.Run:
                 Run();
                 break;
-            case PLAYER_ACTION_TYPE.Sitting:
+            case PlayerActionType.Sitting:
                 Sitting();
                 break;
-            case PLAYER_ACTION_TYPE.Walk:
+            case PlayerActionType.Walk:
                 Walk();
                 break;
         }

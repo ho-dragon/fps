@@ -37,15 +37,15 @@ const waitingTimer = setInterval(() => {
 				debug("[waitingTimer] isWaitingPlayer is false");
 				return;
 			}
-			this currentWaitingTime++;
-			debug("[waitingTimer] currentWaitingTime = " + this currentWaitingTime);
+			this.currentWaitingTime++;
+			debug("[waitingTimer] currentWaitingTime = " + this.currentWaitingTime);
 			if (isRemainWaitingTime() <= 0) {//시간초과
 				if (this.minPlayerCount <= playerCount) {//최소 시작 인원 달성
 					StartGame();
 	   	 			return;
 				} else {
-					this currentWaitingTime -= 15; //5초 더 추가
-					if (this currentWaitingTime < 0) {
+					this.currentWaitingTime -= 15; //5초 더 추가
+					if (this.currentWaitingTime < 0) {
 						this.currentPlayTime = 0;
 					}
 				}
@@ -135,8 +135,7 @@ function isRemainWaitingTime() {
 }
 
 function broadcastStartGame() {
-	let gameContext = packetModel.GameContext(this.isGameStarted, this.scoreRed, this.scoreBlue);
-	let model = new packetModel.StartGame(this.currentPlayTime, this.maxPlayTime,  room.getTeamNumbers(), gameContext)
+	let model = new packetModel.gameContext(this.currentPlayTime, this.maxPlayTime,  room.getTeamNumbers(), this.scoreRed, this.scoreBlue)
 	let bytes = BSON.serialize(model);
 	let noti = new packetModel.notificationFormat('startGame', successCode, "success", bytes);
 	server.broadcastAll(noti);
@@ -150,14 +149,14 @@ function broadcastWaitingStatus() {
 }
 
 function broadcastEndGame() {
-	let model = new packetModel.GameResult(this.scoreRed, this.scoreBlue);
+	let model = new packetModel.updateScore(this.scoreRed, this.scoreBlue);
 	let bytes = BSON.serialize(model);
 	let noti = new packetModel.notificationFormat('endGame', successCode, "success", bytes);
 	server.broadcastAll(noti);
 }
 
 function broadcastUpdateGameTime() {
-	let model = new packetModel.GameTime(this.currentPlayTime);
+	let model = new packetModel.gameTime(this.currentPlayTime);
 	let bytes = BSON.serialize(model);
 	let noti = new packetModel.notificationFormat('updateGameTime', successCode, "success", bytes);
 	server.broadcastAll(noti);

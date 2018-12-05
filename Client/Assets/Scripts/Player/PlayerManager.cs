@@ -70,7 +70,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
     }
 
-    public void OnACtion(int playerNumb, PLAYER_ACTION_TYPE actionType) {
+    public void OnACtion(int playerNumb, PlayerActionType actionType) {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if (player != null) {
             if (player.IsLocalPlayer == false) {

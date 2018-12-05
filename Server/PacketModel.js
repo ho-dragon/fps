@@ -66,28 +66,18 @@ function playerAction(playerNum, actionType) {
 	this.actionType = actionType;
 }
 
-function GameContext(isStarted, scoreRed, scoreBlue) {
+function gameContext(remainTimeToEnd, maxPlayTime, playerTeamNumbers, scoreRed, scoreBlue) {
+	this.remainTimeToEnd = remainTimeToEnd;
+	this.playerTeamNumbers = playerTeamNumbers;
 	this.scoreRed = scoreRed;
 	this.scoreBlue = scoreBlue;
-	this.isStarted = isStarted;
 }
 
-function StartGame(remainTimeToEndGame, maxPlayTime, playerTeamNumbers, gameContext) {
-	this.remainTimeToEndGame = remainTime;
-	this.playerTeamNumbers = playerTeamNumbers;
-	this.gameContext = gameContext;
-}
-
-function RunningGame(remainTimeToEndGame, gameContext) {
-	this.remainTimeToEndGame = remainTimeToEndGame;
-	this.gameContext = gameContext;
-}
-
-function GameTime(currentPlayTime) {
+function gameTime(currentPlayTime) {
 	this.currentPlayTime = currentPlayTime;
 }
 
-function GameResult(scoreRed, scoreBlue) {
+function updateScore(scoreRed, scoreBlue) {
 	this.scoreRed = scoreRed;
 	this.scoreBlue = scoreBlue;
 }

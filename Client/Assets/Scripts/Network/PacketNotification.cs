@@ -8,24 +8,40 @@ using Newtonsoft.Json.Bson;
 using System.IO;
 
 public class PacketNotification {
-    private const string notiMovePlayer = "movePlayer";
-    private const string notiDemagedPlayer = "damagedPlayer";
-    private const string notiJoinPlayer = "joinPlayer";
-    private const string notiActionPlayer = "actionPlayer";
+    private const string _movePlayer = "movePlayer";
+    private const string _damagedPlayer = "damagedPlayer";
+    private const string _joinPlayer = "joinPlayer";
+    private const string _actionPlayer = "actionPlayer";
+    private const string _startGame = "startGame";
+    private const string _waitingPlayer = "waitingPlayer";
+    private const string _updateGameTime = "updateGameTime";
+    private const string _endGame = "_endGame";
 
     public void RecevieNotification(ResponseFormat result) {        
         switch(result.method){
-            case notiDemagedPlayer:
+            case _damagedPlayer:
                 DamagedPlayer(BsonSerializer.Deserialize<DamageModel>(result.bytes));
                 break;
-            case notiJoinPlayer:
+            case _joinPlayer:
                 JoinPlayer(BsonSerializer.Deserialize<EnterRoomModel>(result.bytes));
                 break;
-            case notiMovePlayer:
+            case _movePlayer:
                 MovePlayer(BsonSerializer.Deserialize<PlayerMoveModel>(result.bytes));
                 break;
-            case notiActionPlayer:
+            case _actionPlayer:
                 ActionPlayer(BsonSerializer.Deserialize<PLayerActionModel>(result.bytes));
+                break;
+            case _startGame:
+
+                break;
+            case _waitingPlayer:
+
+                break;
+            case _updateGameTime:
+
+                break;
+
+            case _endGame:
                 break;
 
         }

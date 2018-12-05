@@ -16,7 +16,7 @@ public class PlayerMove : MonoBehaviour {
     private float runSpeed = 6f;
     private float tilt = 1f;
     private bool isLocalPlayer = false;
-    private PLAYER_ACTION_TYPE currentActionType = PLAYER_ACTION_TYPE.Idle;
+    private PlayerActionType currentActionType = PlayerActionType.Idle;
 
     void Awake() {
         Assert.IsNotNull(this.playerRigidbody);
@@ -65,7 +65,7 @@ public class PlayerMove : MonoBehaviour {
         }
 
         if (System.Math.Abs(moveHorizontal) > 0f == false && System.Math.Abs(moveVertical) > 0f == false) {
-            PlayAnimation(PLAYER_ACTION_TYPE.Idle);
+            PlayAnimation(PlayerActionType.Idle);
             return;
         }        
         Vector3 movement = new Vector3(moveHorizontal, 0f, moveVertical);
@@ -79,10 +79,10 @@ public class PlayerMove : MonoBehaviour {
         } else {
             bool isRun = Input.GetKey(KeyCode.LeftShift);
             if (isRun) {
-                PlayAnimation(PLAYER_ACTION_TYPE.Run);
+                PlayAnimation(PlayerActionType.Run);
                 movement = movement * GetAccelerationSpped(this.currentSpeed, this.runSpeed, 1f);
             } else {
-                PlayAnimation(PLAYER_ACTION_TYPE.Walk);
+                PlayAnimation(PlayerActionType.Walk);
                 movement = movement * GetAccelerationSpped(this.currentSpeed, this.walkSpeed, 1f);
             }
         }        
@@ -113,7 +113,7 @@ public class PlayerMove : MonoBehaviour {
         }
     }
 
-    private void PlayAnimation(PLAYER_ACTION_TYPE actionType) {
+    private void PlayAnimation(PlayerActionType actionType) {
         if (this.currentActionType != actionType) {
             this.currentActionType = actionType;
             this.animationController.OnAcion(actionType);

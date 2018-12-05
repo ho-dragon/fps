@@ -26,7 +26,7 @@ public class PacketRequest {
                                               , "yaw", rotationY), null);
     }
 
-    public void ActionPlayer(int playerNum, PLAYER_ACTION_TYPE actionType) {
+    public void ActionPlayer(int playerNum, PlayerActionType actionType) {
         this.packetManager.Send<PLayerActionModel>(this.packetManager.CreateRequestFormat("actionPlayer", "playerNum", playerNum, "actionType", actionType), null);
     }
                                             

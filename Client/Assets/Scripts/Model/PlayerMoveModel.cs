@@ -11,10 +11,10 @@ public class PlayerMoveModel {
 
 public class PLayerActionModel {
     public int playerNum;
-    public PLAYER_ACTION_TYPE actionType;
+    public PlayerActionType actionType;
 }
 
-public enum PLAYER_ACTION_TYPE {
+public enum PlayerActionType {
     Idle = 0,
     Walk = 1,
     Run = 2,
