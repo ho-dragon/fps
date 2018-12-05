@@ -8,7 +8,8 @@ module.exports.addPlayer = addPlayer;
 module.exports.getOtherPlayers = getOtherPlayers;
 module.exports.updateLastPosition = updateLastPosition;
 module.exports.attackPlayer = attackPlayer;
-module.exports.AssingTemaNumber = AssingTemaNumber;
+module.exports.assingTemaNumber = assingTemaNumber;
+module.exports.getTeamNumbers = getTeamNumbers;
 
 function addPlayer(playerName) {
 	if (isExistPlayer()) {
@@ -52,16 +53,25 @@ function getPlayer(playerNum) {
 	return null;
 }
 
-function AssignTemaNumber() {
-	let isTeamOne = false;
+function assignTemaNumber() {
+	let isTeamRed = false;
 	for (let key in room.players) {
-		isTeamOne = !isTeamOne;
-		if (isTeamOne) {
+		isTeamRed = !isTeamRed;
+		if (isTeamRed) {
 			room.players[key].teamCode = 1;	
 		} else {
 			room.players[key].teamCode = 2;	
 		}		
 	}
+	return teamNumbers;
+}
+
+function getTeamNumbers() {
+	let teamNumbers = [];
+	for (let key in room.players) {
+		teamNumbers[room.players[key].number] = room.players[key].teamCode;
+	}
+	return teamNumbers;
 }
 
 function getOtherPlayers(playerNum) {

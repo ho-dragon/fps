@@ -72,7 +72,7 @@ function GameContext(isStarted, scoreRed, scoreBlue) {
 	this.isStarted = isStarted;
 }
 
-function StartGame(remainTimeToEndGame, playerTeamNumbers, gameContext) {
+function StartGame(remainTimeToEndGame, maxPlayTime, playerTeamNumbers, gameContext) {
 	this.remainTimeToEndGame = remainTime;
 	this.playerTeamNumbers = playerTeamNumbers;
 	this.gameContext = gameContext;
@@ -83,8 +83,8 @@ function RunningGame(remainTimeToEndGame, gameContext) {
 	this.gameContext = gameContext;
 }
 
-function GameTime(remainTimeToEndGame) {//초당 보내는 게임 시작
-	this.remainTimeToEndGame = remainTimeToEndGame;
+function GameTime(currentPlayTime) {
+	this.currentPlayTime = currentPlayTime;
 }
 
 function GameResult(scoreRed, scoreBlue) {

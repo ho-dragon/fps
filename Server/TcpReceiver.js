@@ -32,7 +32,7 @@ function receiveFromClient(socket, msg) {
     debug("** param = " + result.param);
 
     for (let key in result.param) {
-		debug(" key : " + key +", value : type = " + get_type(result.param[key]));
+		debug(" key : " + key +", value : type = " + getType(result.param[key]));
 		let x = result.param[key];
 		debug(x);
      }
@@ -57,7 +57,7 @@ function receiveFromClient(socket, msg) {
 	}
 }
 
-function get_type(thing) {
+function getType(thing) {
     if (thing===null) { 
     	return "[object Null]";
     }
@@ -144,10 +144,8 @@ function attackPlayer(socket, receivedData) {
 	debug("[attackPlayerNumber] damaged player name = " + player.name);
 	let model = new packetModel.playerDamage(attackPlayerNumber, damagedPlayerNumber, 10, player.currentHP, player.maxHP, player.isDead);
 	let bytes = BSON.serialize(model);
-
 	let response = new packetModel.responseFormat(successCode, receivedData.id, "success", bytes);
 	server.send(socket, response);
-
 	let notiResult = new packetModel.notificationFormat('damagedPlayer', successCode, "success", bytes);
 	server.broadcastExcludedMe(notiResult, socket);
 }

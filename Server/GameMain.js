@@ -71,7 +71,6 @@ const gameTimer = setInterval(() => {
 }, 1000);
 
 
-
 function checkGameStart(playerCount) {
 	this.currentPlayerCount = playerCount;
 	if (this.isWaitingPlayer == false) {
@@ -99,7 +98,7 @@ function startGame() {//Todo.GameStart
 	this.isWaitingPlayer = false;
  	this.isGameStarted = true;
  	this.isGameEnd = false;
- 	room.AssignTemaNumber();
+ 	room.assignTemaNumber();
  	gameTimer();
  	broadcastStartGame();
 }
@@ -136,29 +135,30 @@ function isRemainWaitingTime() {
 }
 
 function broadcastStartGame() {
-	let model = new packetModel.StartGame(isRemainPlayTime(), 
+	let gameContext = packetModel.GameContext(this.isGameStarted, this.scoreRed, this.scoreBlue);
+	let model = new packetModel.StartGame(this.currentPlayTime, this.maxPlayTime,  room.getTeamNumbers(), gameContext)
 	let bytes = BSON.serialize(model);
-	let notiResult = new packetModel.notificationFormat('startGame', successCode, "success", bytes);
-	server.broadcastAll(notiResult);
+	let noti = new packetModel.notificationFormat('startGame', successCode, "success", bytes);
+	server.broadcastAll(noti);
 }
 
 function broadcastWaitingStatus() {
 	let model = new packetModel.waitingStatus(this.currentPlayerCount, this.maxPlayerCount, isRemainWaitingTime());
 	let bytes = BSON.serialize(model);
-	let notiResult = new packetModel.notificationFormat('waitingPlayer', successCode, "success", bytes);
-	server.broadcastAll(notiResult);
+	let noti = new packetModel.notificationFormat('waitingPlayer', successCode, "success", bytes);
+	server.broadcastAll(noti);
 }
 
 function broadcastEndGame() {
-	let model = new packetModel.GameResult(attackPlayerNumber, damagedPlayerNumber, 10, player.currentHP, player.maxHP, player.isDead);
+	let model = new packetModel.GameResult(this.scoreRed, this.scoreBlue);
 	let bytes = BSON.serialize(model);
-	let notiResult = new packetModel.notificationFormat('endGame', successCode, "success", bytes);
-	server.broadcastAll(notiResult);
+	let noti = new packetModel.notificationFormat('endGame', successCode, "success", bytes);
+	server.broadcastAll(noti);
 }
 
 function broadcastUpdateGameTime() {
-	let model = new packetModel.GameTime(attackPlayerNumber, damagedPlayerNumber, 10, player.currentHP, player.maxHP, player.isDead);
+	let model = new packetModel.GameTime(this.currentPlayTime);
 	let bytes = BSON.serialize(model);
-	let notiResult = new packetModel.notificationFormat('updateGameTime', successCode, "success", bytes);
-	server.broadcastAll(notiResult);
+	let noti = new packetModel.notificationFormat('updateGameTime', successCode, "success", bytes);
+	server.broadcastAll(noti);
 }
