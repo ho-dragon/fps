@@ -11,65 +11,77 @@ const debug = require('debug')('GameMain');
 
 const maxPlayerCount = 20;
 const minPlayerCount = 2 
-const maxWaitingTime = 20f;
-const maxPlayTime = 300f;
-const countDownTime = 5f;
+const maxWaitingTime = 20;
+const maxPlayTime = 300;
+const maxScoreGoal = 10;
+const countDownTime = 5;
+const successCode = 200;
 
-var currentWaitingTime = 0f;
+var currentWaitingTime = 0;
 var currentPlayerCount = 0;
-var currentPlayTime = 0f;
+var currentPlayTime = 0;
 
 var isGameStarted = false;
 var isGameEnd = false;
 
 var scoreTeamRed = 0;
 var scoreTeamBlue = 0;
+var isWaitingPlayer = false;
 
 module.exports.checkGameStart = checkGameStart;
-
-var isWaiting = false;
+module.exports.isWaitingGame = isWaitingGame;
+module.exports.isRunningGame = isRunningGame;
 
 const waitingTimer = setInterval(() => {
-			if (this.isWaiting == false) {
+			if (this.isWaitingPlayer == false) {
+				debug("[waitingTimer] isWaitingPlayer is false");
 				return;
 			}
-
-			this.currentWaitingTime++;
-			debug("[waitingTimer] currentWaitingTime = " + this.currentWaitingTime);			
-			if (playerCount >= this.maxPlayerCount) {//바로 시작 
-				startGame();
-			} else {
+			this currentWaitingTime++;
+			debug("[waitingTimer] currentWaitingTime = " + this currentWaitingTime);
+			if (isRemainWaitingTime() <= 0) {//시간초과
 				if (this.minPlayerCount <= playerCount) {//최소 시작 인원 달성
-	   	 			if (this.currentWaitingTime >= this.maxWaitingTime) {
-	   	 				StartGame();
-	   	 			}
+					StartGame();
+	   	 			return;
+				} else {
+					this currentWaitingTime -= 15; //5초 더 추가
+					if (this currentWaitingTime < 0) {
+						this.currentPlayTime = 0;
+					}
 				}
-			}	
+			} else {
+				if (playerCount >= this.maxPlayerCount) {//바로 시작
+					startGame();
+					return;
+				}
+			}			
+			broadcastWaitingStatus();
 }, 1000)
 
 
 const gameTimer = setInterval(() => {
 	this.currentPlayTime++;
 	debug("[gameTimer] currentPlayTime = " + this.currentPlayTime);
-	if (this.currentPlayTime >= this.maxPlayTime) {
+	if (isRemainPlayTime() <= 0) {
 		clearInterval(this.gameTimer);
 		endGame();
+		return;
 	}
+	broadcastUpdateGameTime();
 }, 1000);
 
-
-function sendWaitingStatus() {//클라이언트에게 대기 정보 전송
-	
-
-}
 
 
 function checkGameStart(playerCount) {
 	this.currentPlayerCount = playerCount;
-	if (this.isWaiting == false) {
-		this.isWaiting = true;
+	if (this.isWaitingPlayer == false) {
+		this.isWaitingPlayer = true;
 		waitingTimer();
 	}
+}
+
+function isWaitingGame() {
+	return this.isWaitingPlayer;
 }
 
 function isRunningGame() {
@@ -78,22 +90,26 @@ function isRunningGame() {
 
 function startGame() {//Todo.GameStart
 	debug("[startGame]");
-	this.isWaiting = false;
-	clearInterval(this.waitingTimer);
-
 	if (this.isGameStarted) {
+		debug("[startGame] game is already started.");
 		return;
 	}
+
+	clearInterval(this.waitingTimer);
+	this.isWaitingPlayer = false;
  	this.isGameStarted = true;
  	this.isGameEnd = false;
  	room.AssignTemaNumber();
  	gameTimer();
+ 	broadcastStartGame();
 }
 
 function endGame() {//Todo. send GameReuslt
 	debug("[endGame]");
 	this.isGameStarted = false;
 	this.isGameEnd = true;
+	waitingTimer();
+	broadcastEndGame();
 }
 
 function addTeamScore(killerTeam) {
@@ -101,5 +117,48 @@ function addTeamScore(killerTeam) {
 		scoreTeamRed++;
 	} else {
 		scoreTeamBlue++;
-	}	
+	}
+	checkGameEnd(scoreRed, scoreBlue);
+}
+
+function checkGameEnd(scoreRed, scoreBlue) {
+	if (this.maxScoreGoal <= scoreRed || this.maxScoreGoal <= scoreBlue) {
+		endGame();
+	}
+}
+
+function isRemainPlayTime() {
+	return this.maxPlayTime - this.currentPlayTime;
+}
+
+function isRemainWaitingTime() {
+	return this.maxWaitingTime - this.currentPlayTime;
+}
+
+function broadcastStartGame() {
+	let model = new packetModel.StartGame(isRemainPlayTime(), 
+	let bytes = BSON.serialize(model);
+	let notiResult = new packetModel.notificationFormat('startGame', successCode, "success", bytes);
+	server.broadcastAll(notiResult);
+}
+
+function broadcastWaitingStatus() {
+	let model = new packetModel.waitingStatus(this.currentPlayerCount, this.maxPlayerCount, isRemainWaitingTime());
+	let bytes = BSON.serialize(model);
+	let notiResult = new packetModel.notificationFormat('waitingPlayer', successCode, "success", bytes);
+	server.broadcastAll(notiResult);
+}
+
+function broadcastEndGame() {
+	let model = new packetModel.GameResult(attackPlayerNumber, damagedPlayerNumber, 10, player.currentHP, player.maxHP, player.isDead);
+	let bytes = BSON.serialize(model);
+	let notiResult = new packetModel.notificationFormat('endGame', successCode, "success", bytes);
+	server.broadcastAll(notiResult);
+}
+
+function broadcastUpdateGameTime() {
+	let model = new packetModel.GameTime(attackPlayerNumber, damagedPlayerNumber, 10, player.currentHP, player.maxHP, player.isDead);
+	let bytes = BSON.serialize(model);
+	let notiResult = new packetModel.notificationFormat('updateGameTime', successCode, "success", bytes);
+	server.broadcastAll(notiResult);
 }

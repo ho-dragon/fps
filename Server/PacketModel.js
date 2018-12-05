@@ -66,22 +66,34 @@ function playerAction(playerNum, actionType) {
 	this.actionType = actionType;
 }
 
-function GameInfo(isStarted, score) {
-	this.score = score;
+function GameContext(isStarted, scoreRed, scoreBlue) {
+	this.scoreRed = scoreRed;
+	this.scoreBlue = scoreBlue;
 	this.isStarted = isStarted;
 }
 
-
-function StartGame(remainTime, playerTeamNumber, GameInfo) {
-
-
+function StartGame(remainTimeToEndGame, playerTeamNumbers, gameContext) {
+	this.remainTimeToEndGame = remainTime;
+	this.playerTeamNumbers = playerTeamNumbers;
+	this.gameContext = gameContext;
 }
 
-function GameTime(remainTime) {//초당 보내는 게임 시작
-	this.remainTime = remainTime;
+function RunningGame(remainTimeToEndGame, gameContext) {
+	this.remainTimeToEndGame = remainTimeToEndGame;
+	this.gameContext = gameContext;
 }
 
+function GameTime(remainTimeToEndGame) {//초당 보내는 게임 시작
+	this.remainTimeToEndGame = remainTimeToEndGame;
+}
 
-function GameResult(scoreTeam1, scoreTeam2) {
+function GameResult(scoreRed, scoreBlue) {
+	this.scoreRed = scoreRed;
+	this.scoreBlue = scoreBlue;
+}
 
+function waitingStatus(currentPlayerCount, maxPlayerCount, remianTimeToPlay) {
+	this.currentPlayerCount = currentPlayerCount;
+	this.maxPlayerCount = maxPlayerCount;
+	this.remianTimeToPlay = remianTimeToPlay;
 }

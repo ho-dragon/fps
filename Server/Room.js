@@ -14,7 +14,6 @@ function addPlayer(playerName) {
 	if (isExistPlayer()) {
 		return getPlayer(playerName);
 	}
-
 	var playerNum = room.players.length;
 	var player = new model.player(playerName, playerNum, -1, 100, 100, null, 0, false, 0);
 	room.players.push(player);
