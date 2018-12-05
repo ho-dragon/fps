@@ -19,6 +19,7 @@ module.exports.broadcastExcludedMe = broadcastExcludedMe;
 
 var server = net.createServer(function(socket) {
     server.maxConnections = 1000;
+    server.setMaxListeners(0);
     server.getConnections(function(err, count) {
        console.log("Connections: " + count +" /  maxConnections = " + server.maxConnections);
     });
