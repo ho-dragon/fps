@@ -28,7 +28,7 @@ public class RayCastGun : Weapon {
                 Player hitPlayer = hit.transform.GetComponent<Player>();
                 SoundManager.inst.PlayFx(SoundFxType.HitPlayer, hitPlayer.gameObject);
                 if (this.ownerPlayerNumber == hitPlayer.Number) {
-                    Logger.DebugHighlight("[RayCastGun.Shoot] shoot my body");
+                    Logger.DebugHighlight("[RayCastGun.Shoot] shoot my body this.ownerPlayerNumber  = {0} hitNumber = {1}", this.ownerPlayerNumber, hitPlayer.Number);
                     return;
                 }
                 UIManager.inst.HitEffect();

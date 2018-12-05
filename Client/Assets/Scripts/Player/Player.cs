@@ -29,7 +29,7 @@ public class Player : MonoBehaviour {
     void Awake() {
         Assert.IsNotNull(this.actionController);
         Assert.IsNotNull(this.ui);
-        InitWeapon("Rifle");//최초 라이플을 들고있도록
+        
     }
 
     public void Init(bool isLocalPlayer, int teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3, float> moveCallback) {
@@ -44,6 +44,7 @@ public class Player : MonoBehaviour {
             this.ui.SetNickName(nickName);
         }
         SetHealth(currentHP, maxHP);
+        InitWeapon(number, "Rifle");//최초 라이플을 들고있도록
         this.actionController.Init(this.animationController, this.transform, number, moveCallback);
         this.actionController.SetLocalPlayer(isLocalPlayer);
     }
@@ -74,7 +75,7 @@ public class Player : MonoBehaviour {
 		}
     }
 
-    private void InitWeapon(string weaponName) {
+    private void InitWeapon(int ownerNumber, string weaponName) {
         foreach (WeaponModel hand in weaponModels) {
             if (hand.name == weaponName) {
                 if (rightGunBone.childCount > 0)
@@ -86,14 +87,14 @@ public class Player : MonoBehaviour {
                     newRightGun.transform.parent = rightGunBone;
                     newRightGun.transform.localPosition = Vector3.zero;
                     newRightGun.transform.localRotation = Quaternion.Euler(90, 0, 0);
-                    SetWeapon(newRightGun.GetComponent<Weapon>(), this.number);
+                    SetWeapon(newRightGun.GetComponent<Weapon>(), ownerNumber);
                 }
                 if (hand.leftGun != null) {
                     GameObject newLeftGun = (GameObject)Instantiate(hand.leftGun);
                     newLeftGun.transform.parent = leftGunBone;
                     newLeftGun.transform.localPosition = Vector3.zero;
                     newLeftGun.transform.localRotation = Quaternion.Euler(90, 0, 0);
-                    SetWeapon(newLeftGun.GetComponent<Weapon>(), this.number);
+                    SetWeapon(newLeftGun.GetComponent<Weapon>(), ownerNumber);
                 }
                 this.animationController.animator.runtimeAnimatorController = hand.controller;
                 return;

@@ -8,48 +8,67 @@ const server = require('./TcpServer');
 const packetModel = require('./PacketModel');
 const room = require('./Room');
 const debug = require('debug')('GameMain');
-const startPlayerMinmum = 2;
-const waitingPlayerTime = 5f;
-const maxGameTime = 180f;
+
+const maxPlayerCount = 20;
+const minPlayerCount = 2 
+const maxWaitingTime = 20f;
+const maxPlayTime = 300f;
+const countDownTime = 5f;
+
 var currentWaitingTime = 0f;
 var currentPlayerCount = 0;
-var currentGameTime = 0f;
-var isChangedPlayerCount = false;
+var currentPlayTime = 0f;
+
 var isGameStarted = false;
 var isGameEnd = false;
 
-var scoreTeam1 = 0;
-var scoreTeam2 = 0;
+var scoreTeamRed = 0;
+var scoreTeamBlue = 0;
 
 module.exports.checkGameStart = checkGameStart;
-const waitingPlayerInterver = setInterval(() => {
-			this.currentWaitingTime++;
-			debug("[waitingPlayerInterver] currentWaitingTime = " + this.currentWaitingTime);
-			if (this.currentWaitingTime >= this.waitingPlayerTime) {
-				clearInterval(this.waitingPlayerInterver);
-				startGame();
+
+var isWaiting = false;
+
+const waitingTimer = setInterval(() => {
+			if (this.isWaiting == false) {
+				return;
 			}
-		}, 1000)
+
+			this.currentWaitingTime++;
+			debug("[waitingTimer] currentWaitingTime = " + this.currentWaitingTime);			
+			if (playerCount >= this.maxPlayerCount) {//바로 시작 
+				startGame();
+			} else {
+				if (this.minPlayerCount <= playerCount) {//최소 시작 인원 달성
+	   	 			if (this.currentWaitingTime >= this.maxWaitingTime) {
+	   	 				StartGame();
+	   	 			}
+				}
+			}	
+}, 1000)
 
 
 const gameTimer = setInterval(() => {
-	this.currentGameTime++;
-	debug("[gameTimer] currentGameTime = " + this.currentGameTime);
-	if (this.currentGameTime >= this.maxGameTime) {
+	this.currentPlayTime++;
+	debug("[gameTimer] currentPlayTime = " + this.currentPlayTime);
+	if (this.currentPlayTime >= this.maxPlayTime) {
 		clearInterval(this.gameTimer);
 		endGame();
 	}
 }, 1000);
 
-function checkGameStart(playerCount) {	
-	if (startPlayerMinmum <= playerCount) {
-		if (this.currentPlayerCount != playerCount) {
-	    	this.currentPlayerCount = playerCount;
-	   	 	this.currentWaitingTime = 0f;
-	    	this.isChangedPlayerCount = true;
-	    	clearInterval(this.waitingPlayerInterver);
-	    	waitingPlayerInterver();		   		
-		}
+
+function sendWaitingStatus() {//클라이언트에게 대기 정보 전송
+	
+
+}
+
+
+function checkGameStart(playerCount) {
+	this.currentPlayerCount = playerCount;
+	if (this.isWaiting == false) {
+		this.isWaiting = true;
+		waitingTimer();
 	}
 }
 
@@ -59,6 +78,9 @@ function isRunningGame() {
 
 function startGame() {//Todo.GameStart
 	debug("[startGame]");
+	this.isWaiting = false;
+	clearInterval(this.waitingTimer);
+
 	if (this.isGameStarted) {
 		return;
 	}
@@ -76,8 +98,8 @@ function endGame() {//Todo. send GameReuslt
 
 function addTeamScore(killerTeam) {
 	if (killerTeam == 1) {
-		scoreTeam1++;
+		scoreTeamRed++;
 	} else {
-		scoreTeam2++;
+		scoreTeamBlue++;
 	}	
 }

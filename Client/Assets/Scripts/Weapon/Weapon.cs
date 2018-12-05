@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.Assertions;
 
 public class Weapon : MonoBehaviour {
-    public int ownerPlayerNumber;
+    protected int ownerPlayerNumber;
     public Transform muzzleTransform;
 	protected PlayerCamera playerCam;
     protected float fireRate = 0f;
@@ -14,7 +14,7 @@ public class Weapon : MonoBehaviour {
     }
 
     public void Init(int ownerPlayerNumber) {
-        Logger.Debug("[Weapon] Init");
+        Logger.Debug("[Weapon] Init : ownerPlayerNumber = " + ownerPlayerNumber);
         this.ownerPlayerNumber = ownerPlayerNumber;
     }
 
