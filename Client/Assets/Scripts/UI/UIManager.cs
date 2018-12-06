@@ -25,4 +25,8 @@ public class UIManager : MonoBehaviourInstance<UIManager> {
     public void HitEffect() {
         this.hud.HitEffect();
     }
+
+    public void UpdateWaitingPlayers(int joinedPlayerCount, int maxPlayerCount,) {
+
+    }
 }

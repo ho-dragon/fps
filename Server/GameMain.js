@@ -18,8 +18,8 @@ const countDownTime = 5;
 const successCode = 200;
 
 var currentWaitingTime = 0;
-var currentPlayerCount = 0;
-var currentPlayTime = 0;
+var joinedPlayerCount = 0;
+var playTime = 0;
 
 var isGameStarted = false;
 var isGameEnd = false;
@@ -46,7 +46,7 @@ const waitingTimer = setInterval(() => {
 				} else {
 					this.currentWaitingTime -= 15; //5초 더 추가
 					if (this.currentWaitingTime < 0) {
-						this.currentPlayTime = 0;
+						this.playTime = 0;
 					}
 				}
 			} else {
@@ -60,9 +60,9 @@ const waitingTimer = setInterval(() => {
 
 
 const gameTimer = setInterval(() => {
-	this.currentPlayTime++;
-	debug("[gameTimer] currentPlayTime = " + this.currentPlayTime);
-	if (isRemainPlayTime() <= 0) {
+	this.playTime++;
+	debug("[gameTimer] playTime = " + this.playTime);
+	if (isRemainTimeToEnd() <= 0) {
 		clearInterval(this.gameTimer);
 		endGame();
 		return;
@@ -72,7 +72,7 @@ const gameTimer = setInterval(() => {
 
 
 function checkGameStart(playerCount) {
-	this.currentPlayerCount = playerCount;
+	this.joinedPlayerCount = playerCount;
 	if (this.isWaitingPlayer == false) {
 		this.isWaitingPlayer = true;
 		waitingTimer();
@@ -126,23 +126,23 @@ function checkGameEnd(scoreRed, scoreBlue) {
 	}
 }
 
-function isRemainPlayTime() {
-	return this.maxPlayTime - this.currentPlayTime;
+function isRemainTimeToEnd() {
+	return this.maxPlayTime - this.playTime;
 }
 
 function isRemainWaitingTime() {
-	return this.maxWaitingTime - this.currentPlayTime;
+	return this.maxWaitingTime - this.playTime;
 }
 
 function broadcastStartGame() {
-	let model = new packetModel.gameContext(this.currentPlayTime, this.maxPlayTime,  room.getTeamNumbers(), this.scoreRed, this.scoreBlue)
+	let model = new packetModel.gameContext(this.playTime, this.maxPlayTime,  room.getTeamNumbers(), this.scoreRed, this.scoreBlue)
 	let bytes = BSON.serialize(model);
 	let noti = new packetModel.notificationFormat('startGame', successCode, "success", bytes);
 	server.broadcastAll(noti);
 }
 
 function broadcastWaitingStatus() {
-	let model = new packetModel.waitingStatus(this.currentPlayerCount, this.maxPlayerCount, isRemainWaitingTime());
+	let model = new packetModel.waitingStatus(this.joinedPlayerCount, this.maxPlayerCount, isRemainWaitingTime());
 	let bytes = BSON.serialize(model);
 	let noti = new packetModel.notificationFormat('waitingPlayer', successCode, "success", bytes);
 	server.broadcastAll(noti);
@@ -156,7 +156,7 @@ function broadcastEndGame() {
 }
 
 function broadcastUpdateGameTime() {
-	let model = new packetModel.gameTime(this.currentPlayTime);
+	let model = new packetModel.gameTime(this.playTime);
 	let bytes = BSON.serialize(model);
 	let noti = new packetModel.notificationFormat('updateGameTime', successCode, "success", bytes);
 	server.broadcastAll(noti);

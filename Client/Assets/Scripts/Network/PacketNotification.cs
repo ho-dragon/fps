@@ -8,52 +8,52 @@ using Newtonsoft.Json.Bson;
 using System.IO;
 
 public class PacketNotification {
-    private const string _movePlayer = "movePlayer";
-    private const string _damagedPlayer = "damagedPlayer";
-    private const string _joinPlayer = "joinPlayer";
-    private const string _actionPlayer = "actionPlayer";
-    private const string _startGame = "startGame";
-    private const string _waitingPlayer = "waitingPlayer";
-    private const string _updateGameTime = "updateGameTime";
-    private const string _endGame = "_endGame";
+    private const string _MovePlayer = "movePlayer";
+    private const string _DamagedPlayer = "damagedPlayer";
+    private const string _JoinPlayer = "joinPlayer";
+    private const string _ActionPlayer = "actionPlayer";
+    private const string _StartGame = "startGame";
+    private const string _WaitingPlayer = "waitingPlayer";
+    private const string _UpdateGameTime = "updateGameTime";
+    private const string _EndGame = "_endGame";
 
     public void RecevieNotification(ResponseFormat result) {        
         switch(result.method){
-            case _damagedPlayer:
+            case _DamagedPlayer:
                 DamagedPlayer(BsonSerializer.Deserialize<DamageModel>(result.bytes));
                 break;
-            case _joinPlayer:
+            case _JoinPlayer:
                 JoinPlayer(BsonSerializer.Deserialize<EnterRoomModel>(result.bytes));
                 break;
-            case _movePlayer:
+            case _MovePlayer:
                 MovePlayer(BsonSerializer.Deserialize<PlayerMoveModel>(result.bytes));
                 break;
-            case _actionPlayer:
+            case _ActionPlayer:
                 ActionPlayer(BsonSerializer.Deserialize<PLayerActionModel>(result.bytes));
                 break;
-            case _startGame:
-
+            case _StartGame:
+                StartGame(BsonSerializer.Deserialize<GameContextModel>(result.bytes));
                 break;
-            case _waitingPlayer:
-
+            case _WaitingPlayer:
+                WaitingPlayer(BsonSerializer.Deserialize<WaitingStatusModel>(result.bytes));
                 break;
-            case _updateGameTime:
-
-                break;
-
-            case _endGame:
+            case _UpdateGameTime:
+                UpdateGameTime(BsonSerializer.Deserialize<GameTimeModel>(result.bytes));
+                break;                
+            case _EndGame:
+                EndGame(BsonSerializer.Deserialize<UpdateScoreModel>(result.bytes));
                 break;
 
         }
     }
 
     public void DamagedPlayer(DamageModel result) {
-        Logger.DebugHighlight("[RecevieNtotication.DamagedPlayer]");
+        Logger.DebugHighlight("[PacketNotification.DamagedPlayer]");
         PlayerManager.inst.OnDamaged(result);
     }
 
     public void JoinPlayer(EnterRoomModel result) {
-        Logger.DebugHighlight("[RecevieNtotication.JoinPlayer]");
+        Logger.DebugHighlight("[PacketNotification.JoinPlayer]");
         PlayerManager.inst.JoinedPlayer(result.player, false);
     }
 
@@ -68,5 +68,26 @@ public class PacketNotification {
     private void ActionPlayer(PLayerActionModel result) {
         Logger.DebugHighlight("[PacketNotification.ActionPlayer] actioType = " + result.actionType);
         PlayerManager.inst.OnACtion(result.playerNum, result.actionType);
+    }
+    
+    public void StartGame(GameContextModel result) {
+        Logger.DebugHighlight("[PacketNotification.StatGame]");
+        Main.inst.StartGame(result);
+    }
+
+    public void WaitingPlayer(WaitingStatusModel result) {
+        Logger.DebugHighlight("[PacketNotification.WaitingPlayer]");
+        //Todo.UI
+        //[플레이어를 기다리고 있습니다..10]
+        //우측 상단 10 / 20
+    }
+
+    public void UpdateGameTime(GameTimeModel result) {
+        Logger.DebugHighlight("[PackketNotification.UpdateGameTime");
+        Main.inst.context.UpdatePlayTime(result.playTime);
+    }
+
+    public void EndGame(UpdateScoreModel result) {
+        Logger.DebugHighlight("[PacketNotification.EndGame");
     }
 }

@@ -13,6 +13,13 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         this.remotePlayers = new List<Player>();
     }
 
+    public int GetPlayerCount() {
+        if(this.remotePlayers == null) {
+            return 1;
+        }           
+        return this.remotePlayers.Count + 1;
+    }
+
     public bool IsExsitPlayer(int playerNum) {
         return this.remotePlayers.Exists(x => x.Number == playerNum);
     }
@@ -36,7 +43,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         //newPlayer.hpBar.facing.SetCamara(PlayerCamera.inst.camera);//HP카메라 보는 부분 일단 주석
 
         newPlayer.Init(isLocalPlayer,
-               player.teamCode
+               (TeamCode)player.teamCode
              , player.number
              , player.name
              , player.currentHP
@@ -56,9 +63,20 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             }
             this.remotePlayers.Add(newPlayer);
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.name, player.number);
-        }
+        }        
+    }
 
-        
+    public void AssignTeam(Dictionary<int, int> playerTeamNumbers) {
+        this.localPlayer.AssignTeamCode((TeamCode)playerTeamNumbers[localPlayer.Number]);
+        if (this.remotePlayers != null) {
+            for(int i = 0; i < this.remotePlayers.Count; i++) {
+                if (playerTeamNumbers.ContainsKey(this.remotePlayers[i].Number)) {
+                    this.remotePlayers[i].AssignTeamCode((TeamCode)playerTeamNumbers[this.remotePlayers[i].Number]);
+                } else {
+                    Logger.Error("[PlayerManager.AssignTeam] key is not found.");
+                }               
+            }
+        }
     }
 
     public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {

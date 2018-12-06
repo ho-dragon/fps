@@ -66,15 +66,16 @@ function playerAction(playerNum, actionType) {
 	this.actionType = actionType;
 }
 
-function gameContext(remainTimeToEnd, maxPlayTime, playerTeamNumbers, scoreRed, scoreBlue) {
-	this.remainTimeToEnd = remainTimeToEnd;
+function gameContext(playTime, maxPlayTime, playerTeamNumbers, scoreRed, scoreBlue) {
+	this.playTime = playTime;
+	this.maxPlayTime = maxPlayTime;
 	this.playerTeamNumbers = playerTeamNumbers;
 	this.scoreRed = scoreRed;
 	this.scoreBlue = scoreBlue;
 }
 
-function gameTime(currentPlayTime) {
-	this.currentPlayTime = currentPlayTime;
+function gameTime(playTime) {
+	this.playTime = playTime;
 }
 
 function updateScore(scoreRed, scoreBlue) {
@@ -82,8 +83,8 @@ function updateScore(scoreRed, scoreBlue) {
 	this.scoreBlue = scoreBlue;
 }
 
-function waitingStatus(currentPlayerCount, maxPlayerCount, remianTimeToPlay) {
-	this.currentPlayerCount = currentPlayerCount;
+function waitingStatus(joinedPlayerCount, maxPlayerCount, remianTimeToPlay) {
+	this.joinedPlayerCount = joinedPlayerCount;
 	this.maxPlayerCount = maxPlayerCount;
 	this.remianTimeToPlay = remianTimeToPlay;
 }

@@ -2,18 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Main : MonoBehaviourInstance<Main>
-{
+public class Main : MonoBehaviourInstance<Main> {
     #region OnGUI
-    public string userName = "PlayerName";
-    public string ip = "127.0.0.1";
-    public string port = "8107";
-    public Logger.LogLevel logLevel = Logger.LogLevel.debug;
-    public bool isDebugMuted = false;
     private bool isOnGUI = true;
-    private bool isConnected = false;
     private bool isTryConnected = false;
     private string connectMsg = "";
+    private bool isConnected = false;
     public Rect GetRectPos(int raw, int column, float _width = 0, float _height = 0) {
         return new Rect(_width * raw, _height * column, _width, _height);
     }
@@ -53,16 +47,16 @@ public class Main : MonoBehaviourInstance<Main>
                 EnterRoom(userName);
             }
         }
-        //if (GUI.Button(GetRectPos(0, 6, 200, 50), "JoinRoom(dummy)")) {
-        //    int playerRandomNum = UnityEngine.Random.Range(0,1000);
-        //    while (PlayerManager.inst.IsExsitPlayer(playerRandomNum)) {
-        //        playerRandomNum = UnityEngine.Random.Range(0,1000);
-        //    }
-        //  // PlayerManager.inst.JoinedPlayer(playerRandomNum, "dummy"+ playerRandomNum.ToString());
-        //}
-
     }
     #endregion
+    public GameContext context;
+    private EventManager eventManager;
+    public string userName = "PlayerName";
+    public string ip = "127.0.0.1";
+    public string port = "8107";
+    public Logger.LogLevel logLevel = Logger.LogLevel.debug;
+    public bool isDebugMuted = false;
+
 
     private void Start() {
         Application.targetFrameRate = 60;
@@ -99,5 +93,19 @@ public class Main : MonoBehaviourInstance<Main>
             Cursor.lockState = CursorLockMode.Locked;
             isOnGUI = false;
         });
+    }
+
+    public void StartGame(GameContextModel result) {
+        
+        PlayerManager.inst.AssignTeam(result.playerTeamNumbers);
+
+        this.eventManager = new EventManager();        
+        this.context = new GameContext(this.eventManager, result.maxPlayTime, result.playTime, result.scoreRed, result.scoreBlue, PlayerManager.inst.GetPlayerCount());
+        //Todo.UI
+    }
+
+    public void EndGame() {//Todo.UI
+        this.eventManager = null;
+        this.context = null;
     }
 }

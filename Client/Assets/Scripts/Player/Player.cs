@@ -9,7 +9,7 @@ public class Player : MonoBehaviour {
     public PlayerHeaderUI ui;
     public Weapon weapon;
     private bool isLocalPlayer = false;
-    private int teamCode = 0;
+    private TeamCode teamCode;
     private int number = 0;
     private string nickName = "";
     public Transform rightGunBone;
@@ -32,7 +32,7 @@ public class Player : MonoBehaviour {
         
     }
 
-    public void Init(bool isLocalPlayer, int teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3, float> moveCallback) {
+    public void Init(bool isLocalPlayer, TeamCode teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3, float> moveCallback) {
         Logger.Debug("[Player] Init number = " + number + " / name = " + name);
         this.isLocalPlayer = isLocalPlayer;
         this.teamCode = teamCode;
@@ -55,7 +55,11 @@ public class Player : MonoBehaviour {
         this.actionController.SetWeapon(weapon); 
     }
 
-    public bool IsSameTeam(int teamCode) {
+    public void AssignTeamCode(TeamCode teamCode) {
+        this.teamCode = teamCode;
+    }
+
+    public bool IsSameTeam(TeamCode teamCode) {
         return this.teamCode == teamCode;
     }
 
