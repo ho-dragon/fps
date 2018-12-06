@@ -1,5 +1,5 @@
-const debug = require('debug')('Room');
-const model = require('./PacketModel');
+const debug = require('debug')('room');
+const models = require('./packetmodelss');
 var room = {
 	players : []
 }
@@ -16,7 +16,7 @@ function addPlayer(playerName) {
 		return getPlayer(playerName);
 	}
 	var playerNum = room.players.length;
-	var player = new model.player(playerName, playerNum, -1, 100, 100, null, 0, false, 0);
+	var player = new models.player(playerName, playerNum, -1, 100, 100, null, 0, false, 0);
 	room.players.push(player);
 	debug("added player :: name = " + player.name + " / number = " + player.number);
 	return player;

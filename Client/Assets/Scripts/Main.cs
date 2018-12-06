@@ -95,10 +95,8 @@ public class Main : MonoBehaviourInstance<Main> {
         });
     }
 
-    public void StartGame(GameContextModel result) {
-        
+    public void StartGame(GameContextModel result) {        
         PlayerManager.inst.AssignTeam(result.playerTeamNumbers);
-
         this.eventManager = new EventManager();        
         this.context = new GameContext(this.eventManager, result.maxPlayTime, result.playTime, result.scoreRed, result.scoreBlue, PlayerManager.inst.GetPlayerCount());
         //Todo.UI

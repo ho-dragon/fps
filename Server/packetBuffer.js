@@ -1,13 +1,13 @@
 'use strict';//hoisting을 막기위해 
 
-const debug = require('debug')('TcpBufferHandler');
+const debug = require('debug')('packetBuffer');
 const HEADER = "HEADER";
 const BODY = "BODY";
 
-module.exports = TcpBufferHandler;
+module.exports = packetBuffer;
 
-function TcpBufferHandler(socket, handler) {
-  debug('new TcpBufferHandler');
+function packetBuffer(socket, handler) {
+  debug('new packetBuffer');
 
   this.socket = socket;
   this.packet = {};
@@ -20,7 +20,7 @@ function TcpBufferHandler(socket, handler) {
   this.handler = handler;
 }
 
-TcpBufferHandler.prototype.init = function () {
+packetBuffer.prototype.init = function () {
 debug('init');	
   this.socket.on('data', (data) => {
     this.bufferedBytes += data.length;
@@ -33,7 +33,7 @@ debug('init');
   this.socket.on('served', this.handler);
 };
 
-TcpBufferHandler.prototype.hasEnough = function (size) {
+packetBuffer.prototype.hasEnough = function (size) {
   if (this.bufferedBytes >= size) {
     return true;
   }
@@ -41,7 +41,7 @@ TcpBufferHandler.prototype.hasEnough = function (size) {
   return false;
 }
 
-TcpBufferHandler.prototype.readBytes = function (size) {
+packetBuffer.prototype.readBytes = function (size) {
   let result;
   this.bufferedBytes -= size;
 
@@ -77,7 +77,7 @@ TcpBufferHandler.prototype.readBytes = function (size) {
   return result;
 }
 
-TcpBufferHandler.prototype.getHeader = function () {
+packetBuffer.prototype.getHeader = function () {
   if (this.hasEnough(4)) {
     this.bodySzie = this.readBytes(4).readUInt32LE(0, true);
     debug('[getHeader] this.bodySzie =', this.bodySzie);
@@ -85,7 +85,7 @@ TcpBufferHandler.prototype.getHeader = function () {
   }
 }
 
-TcpBufferHandler.prototype.getBody = function () {
+packetBuffer.prototype.getBody = function () {
   if (this.hasEnough(this.bodySzie)) {
     let received = this.readBytes(this.bodySzie);
     this.socket.emit('served', received);
@@ -93,7 +93,7 @@ TcpBufferHandler.prototype.getBody = function () {
   }
 }
 
-TcpBufferHandler.prototype.onData = function (data) {
+packetBuffer.prototype.onData = function (data) {
   debug('[onData] this.process =', this.process);
   while (this.process) {
     switch (this.state) {
@@ -107,18 +107,18 @@ TcpBufferHandler.prototype.onData = function (data) {
   }
 }
 
-TcpBufferHandler.prototype.send = function (message) {
+packetBuffer.prototype.send = function (message) {
   let buffer = Buffer.from(message);
   this.header(buffer.length);
   this.packet.message = buffer;
   this._send();
 }
 
-TcpBufferHandler.prototype.header = function (messageLength) {
+packetBuffer.prototype.header = function (messageLength) {
   this.packet.header = { length: messageLength };
 };
 
-TcpBufferHandler.prototype._send = function () {
+packetBuffer.prototype._send = function () {
   //let contentLength = Buffer.allocUnsafe(2);
   //contentLength.writeUInt16BE(this._packet.header.length);
   let contentLength = Buffer.allocUnsafe(4);

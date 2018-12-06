@@ -1,13 +1,8 @@
-// 방입장시 / 누가들어오면 ? 현재 커넥션 개수 클라에게 보냄
-
-// 2명이상 참가시 5초 기다리고 방에 들어오지 않으면 게임 시작
-// 팀번호 지정
-// 팀킬 스코어 지정
-
-const server = require('./TcpServer');
-const packetModel = require('./PacketModel');
+const connection = require('./connection');
+const models = require('./packetModels');
 const room = require('./Room');
-const debug = require('debug')('GameMain');
+const debug = require('debug')('gameMain');
+const bson = require('bson');
 
 const maxPlayerCount = 20;
 const minPlayerCount = 2 
@@ -135,29 +130,29 @@ function isRemainWaitingTime() {
 }
 
 function broadcastStartGame() {
-	let model = new packetModel.gameContext(this.playTime, this.maxPlayTime,  room.getTeamNumbers(), this.scoreRed, this.scoreBlue)
-	let bytes = BSON.serialize(model);
-	let noti = new packetModel.notificationFormat('startGame', successCode, "success", bytes);
-	server.broadcastAll(noti);
+	let model = new models.gameContext(this.playTime, this.maxPlayTime,  room.getTeamNumbers(), this.scoreRed, this.scoreBlue)
+	let bytes = bson.serialize(model);
+	let noti = new models.notificationFormat('startGame', successCode, "success", bytes);
+	connection.broadcastAll(noti);
 }
 
 function broadcastWaitingStatus() {
-	let model = new packetModel.waitingStatus(this.joinedPlayerCount, this.maxPlayerCount, isRemainWaitingTime());
-	let bytes = BSON.serialize(model);
-	let noti = new packetModel.notificationFormat('waitingPlayer', successCode, "success", bytes);
-	server.broadcastAll(noti);
+	let model = new models.waitingStatus(this.joinedPlayerCount, this.maxPlayerCount, isRemainWaitingTime());
+	let bytes = bson.serialize(model);
+	let noti = new models.notificationFormat('waitingPlayer', successCode, "success", bytes);
+	connection.broadcastAll(noti);
 }
 
 function broadcastEndGame() {
-	let model = new packetModel.updateScore(this.scoreRed, this.scoreBlue);
-	let bytes = BSON.serialize(model);
-	let noti = new packetModel.notificationFormat('endGame', successCode, "success", bytes);
-	server.broadcastAll(noti);
+	let model = new models.updateScore(this.scoreRed, this.scoreBlue);
+	let bytes = bson.serialize(model);
+	let noti = new models.notificationFormat('endGame', successCode, "success", bytes);
+	connection.broadcastAll(noti);
 }
 
 function broadcastUpdateGameTime() {
-	let model = new packetModel.gameTime(this.playTime);
-	let bytes = BSON.serialize(model);
-	let noti = new packetModel.notificationFormat('updateGameTime', successCode, "success", bytes);
-	server.broadcastAll(noti);
+	let model = new models.gameTime(this.playTime);
+	let bytes = bson.serialize(model);
+	let noti = new models.notificationFormat('updateGameTime', successCode, "success", bytes);
+	connection.broadcastAll(noti);
 }

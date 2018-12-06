@@ -6,11 +6,11 @@ const timeOutDuration = 5000;
 const net = require('net');
 const util = require('util');
 const color = require("colors");
-const debug = require('debug')('TcpServer');
-const receiver = require('./TcpReceiver');
-const BSON = require('bson');
+const debug = require('debug')('connection');
+const responseHandler = require('./socketResponse');
+const bson = require('bson');
 
-var TcpBufferHandler = require('./TcpBufferHandler');
+var packetBuffer = require('./packetBuffer');
 var sockets = [];
 
 module.exports.send = send;
@@ -24,10 +24,10 @@ var server = net.createServer(function(socket) {
        console.log("Connections: " + count +" /  maxConnections = " + server.maxConnections);
     });
 
-  let bufferHandler = new TcpBufferHandler(socket, (data) => {
-  	debug(' received:', data.toString());
-  	debug(' received from socket / bytesRead = ' + socket.bytesRead + " / data length = " + data.length);
-    receive(socket, data);
+  let bufferHandler = new packetBuffer(socket, (data) => {
+  	debug(' response:', data.toString());
+  	debug(' response from socket / bytesRead = ' + socket.bytesRead + " / data length = " + data.length);
+    response(socket, data);
   });
 
   bufferHandler.init();
@@ -64,12 +64,12 @@ server.listen(connectPort, function() {
   });
 });
 
-function receive(socket, data){
-  receiver.receiveFromClient(socket, data);
+function response(socket, data){
+  responseHandler.response(socket, data);
 }
 
 function send(socket, data) {
-data = makeSendBuffer(BSON.serialize(data));
+data = makeSendBuffer(bson.serialize(data));
   var success = !socket.write(data);
   if (!success){ (function(socket, data) {
       	socket.once('drain', function() {
@@ -81,7 +81,7 @@ data = makeSendBuffer(BSON.serialize(data));
 
 function broadcastAll(message) {
   debug('broadcastAll / msg = ', message);
-    message = makeSendBuffer(BSON.serialize(message));
+    message = makeSendBuffer(bson.serialize(message));
     sockets.forEach(function (socket) {
       socket.write(message);      
     });
@@ -89,7 +89,7 @@ function broadcastAll(message) {
 
 function broadcastExcludedMe(message, sender) {
   debug('broadcastExcludedMe / msg = ', message);
-    message = makeSendBuffer(BSON.serialize(message));
+    message = makeSendBuffer(bson.serialize(message));
     sockets.forEach(function (socket) {
       if (socket != sender) {
           socket.write(message);          
