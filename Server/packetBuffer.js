@@ -55,7 +55,7 @@ packetBuffer.prototype.readBytes = function (size) {
     return result;
   }
   
-  result = Buffer.allocUnsafe(size);
+  result = Buffer.alloc(size);
   let offset = 0;
   let length;
   

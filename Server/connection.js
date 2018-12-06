@@ -100,13 +100,13 @@ function broadcastExcludedMe(message, sender) {
 
 
 function makeSendBuffer(msg) {
-    var buffMsg = Buffer.from(msg);
+    var buffMsg = Buffer.alloc(msg);
     var msgLen = buffMsg.length ;
-    var bufPacketLenInfo = Buffer.allocUnsafe(4);
+    var bufPacketLenInfo = Buffer.alloc(4);
     var headerLen= bufPacketLenInfo.length;
     bufPacketLenInfo.writeUInt32LE(msgLen, 0); 
     
-    var bufTotal = Buffer.allocUnsafe(headerLen + msgLen); //packet length info + msg
+    var bufTotal = Buffer.alloc(headerLen + msgLen); //packet length info + msg
     bufPacketLenInfo.copy(bufTotal, 0, 0, headerLen);
     buffMsg.copy(bufTotal, headerLen, 0, msgLen );
     //debug(color.yellow('[send] header length = '+headerLen+' / msg length = '+ msgLen+ '/ total length = '+(headerLen + msgLen) +' /  msg = ' + buffMsg.toString())); 
