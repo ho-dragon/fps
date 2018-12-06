@@ -29,5 +29,10 @@ public class PacketRequest {
     public void ActionPlayer(int playerNum, PlayerActionType actionType) {
         this.packetManager.Send<PLayerActionModel>(this.packetManager.CreateRequestFormat("actionPlayer", "playerNum", playerNum, "actionType", actionType), null);
     }
-                                            
+
+    public void JoinRunningGame(string playerName, PacketManager.Response<EnterRoomModel> callback) {
+        Logger.DebugHighlight("[PacketREquest.JoinRunningGame]");
+        this.packetManager.Send<EnterRoomModel>(this.packetManager.CreateRequestFormat("enterRoom", "playerName", playerName), callback);
+    }
+
 }

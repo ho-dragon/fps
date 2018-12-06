@@ -56,6 +56,10 @@ public class SocketRequestEntry : IEnumerator {
         }
     }
 
+    public ErrorType GetErrorType() {
+        return (ErrorType)this.response.code;
+    }
+
     public Exception Exception {
         get { return exception; }
         set

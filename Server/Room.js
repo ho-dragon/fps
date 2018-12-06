@@ -11,10 +11,16 @@ module.exports.attackPlayer = attackPlayer;
 module.exports.assingTemaNumber = assingTemaNumber;
 module.exports.getTeamNumbers = getTeamNumbers;
 
-function addPlayer(playerName) {
+function addPlayer(isRunningGame, playerName) {
 	if (isExistPlayer()) {
 		return getPlayer(playerName);
 	}
+
+	if (isRunningGame) {//assignTemCode
+				
+		
+	}
+
 	var playerNum = room.players.length;
 	var player = new models.player(playerName, playerNum, -1, 100, 100, null, 0, false, 0);
 	room.players.push(player);
@@ -53,7 +59,11 @@ function getPlayer(playerNum) {
 	return null;
 }
 
-function assignTemaNumber() {
+function getTeamNumber() {
+
+}
+
+function assignTeam() {
 	let isTeamRed = false;
 	for (let key in room.players) {
 		isTeamRed = !isTeamRed;

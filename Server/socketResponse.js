@@ -12,9 +12,12 @@ const _init = "init";
 const _enterRoom = "enterRoom";
 const _attackPlayer = "attackPlayer";
 const _actionPlayer = "actionPlayer";
+const _joinRuuningGame = "joinRunningGame";
 
-const successCode = 200;
-const failCode_roomIsPlaying = 401;
+const codeSuccess = 200;
+const codeRoomisPlaying = 9001;
+const codeRoomisFull = 9002;
+const codeNoPlayingGame = 9003;
 
 module.exports.response = response;
 
@@ -54,6 +57,9 @@ function response(socket, msg) {
 		case _actionPlayer:
 			actionPlayer(socket, result);
 			break;
+		case _joinRuuningGame:
+			joinRunningGame(socket, result);
+			break;
 	}
 }
 
@@ -65,19 +71,19 @@ function getType(thing) {
 }
  
 function init(socket, result) {
-	let snedData = new models.responseFormat(successCode, result.id, "success", null);
+	let snedData = new models.responseFormat(codeSuccess, result.id, "success", null);
 	connection.send(socket, snedData);
 }
 
-function enterRoom(socket, result) {	
+function enterRoom(socket, result) {
 	 if (gameMain.isRunningGame()) {
-	 	let response = new models.responseFormat(failCode_roomIsPlaying, result.id, "success", null);
+	 	let response = new models.responseFormat(codeRoomisPlaying, result.id, "success", null);
 		connection.send(socket, response);
 		return;
 	 }
 
 	let playerName = result.param["playerName"];
-	let player = room.addPlayer(playerName); 
+	let player = room.addPlayer(false, playerName); 
 	if (player == null) {
 		debug("[enterRoom] added player is null")
 		return;
@@ -87,17 +93,51 @@ function enterRoom(socket, result) {
 	if (model.player == null) {
 		debug("[enterRoom] model.player is null")
 		return;
-	} else {
-		debug("[enterRoom] model.player.name = " + model.player.name);
 	}
-
+	
 	let bytes = bson.serialize(model);
-   	debug("[enterRoom] bytes length = " + bytes.length);
-
-	let response = new models.responseFormat(successCode, result.id, "success", bytes);
+	debug("[enterRoom] bytes length = " + bytes.length);
+	debug("[enterRoom] model.player.name = " + model.player.name);
+	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);
 	connection.send(socket, response);
 
-	let notiResult = new models.notificationFormat('joinPlayer', successCode, "success", bytes);
+	let notiResult = new models.notificationFormat('joinPlayer', codeSuccess, "success", bytes);
+	connection.broadcastExcludedMe(notiResult, socket);
+}
+
+function joinRunningGame(socket, result) {	
+	if (gameMain.isRunningGame() == false) {
+		let response = new models.responseFormat(codeRoomisPlaying, result.id, "success", null);
+		connection.send(socket, response);
+		return;
+	}
+
+	if (gameMain.isFull()) {
+		let response = new models.responseFormat(codeRoomisFull, result.id, "success", null);
+		connection.send(socket, response);
+		return;
+	}
+
+	let playerName = result.param["playerName"];
+	let player = room.addPlayer(true, playerName); 
+	if (player == null) {
+		debug("[enterRoom] added player is null")
+		return;
+	}
+
+	let model = new models.enterRoom(player, room.getOtherPlayers(player.number));
+	if (model.player == null) {
+		debug("[enterRoom] model.player is null")
+		return;
+	}
+	
+	let bytes = bson.serialize(model);
+   	debug("[enterRoom] bytes length = " + bytes.length);
+	debug("[enterRoom] model.player.name = " + model.player.name);
+	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);
+	connection.send(socket, response);
+
+	let notiResult = new models.notificationFormat('joinPlayer', codeSuccess, "success", bytes);
 	connection.broadcastExcludedMe(notiResult, socket);
 }
 
@@ -114,7 +154,7 @@ function movePlayer(socket, result) {
 		, yaw);
 
 	let bytes = bson.serialize(model);
-	let notiResult = new models.notificationFormat('movePlayer', successCode, "success", bytes);
+	let notiResult = new models.notificationFormat('movePlayer', codeSuccess, "success", bytes);
 	room.updateLastPosition(playerNum, [posX, posY, posZ], yaw);
 	connection.broadcastExcludedMe(notiResult, socket);
 }
@@ -125,7 +165,7 @@ function actionPlayer(socket, result) {
 	let actionType = result.param["actionType"];
 	let model = new models.playerAction(playerNum, actionType);
 	let bytes = bson.serialize(model);
-	let notiResult = new models.notificationFormat('actionPlayer', successCode, "success", bytes);
+	let notiResult = new models.notificationFormat('actionPlayer', codeSuccess, "success", bytes);
 	debug("[actionPlayer] bytes length = " + bytes.length);
 	connection.broadcastExcludedMe(notiResult, socket);	
 }
@@ -144,9 +184,9 @@ function attackPlayer(socket, result) {
 	debug("[attackPlayerNumber] damaged player name = " + player.name);
 	let model = new models.playerDamage(attackPlayerNumber, damagedPlayerNumber, 10, player.currentHP, player.maxHP, player.isDead);
 	let bytes = bson.serialize(model);
-	let response = new models.responseFormat(successCode, result.id, "success", bytes);
+	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);
 	connection.send(socket, response);
-	let notiResult = new models.notificationFormat('damagedPlayer', successCode, "success", bytes);
+	let notiResult = new models.notificationFormat('damagedPlayer', codeSuccess, "success", bytes);
 	connection.broadcastExcludedMe(notiResult, socket);
 }
 

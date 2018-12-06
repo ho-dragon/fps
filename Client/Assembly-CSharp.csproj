@@ -76,6 +76,7 @@
     <Compile Include="Assets\Scripts\Main.cs" />
     <Compile Include="Assets\Scripts\Model\DamageModel.cs" />
     <Compile Include="Assets\Scripts\Model\EnterRoomModel.cs" />
+    <Compile Include="Assets\Scripts\Model\enum\ErrorType.cs" />
     <Compile Include="Assets\Scripts\Model\enum\TeamCode.cs" />
     <Compile Include="Assets\Scripts\Model\GameContextModel.cs" />
     <Compile Include="Assets\Scripts\Model\GameTimeModel.cs" />

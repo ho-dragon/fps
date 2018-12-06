@@ -57,47 +57,47 @@ public class Main : MonoBehaviourInstance<Main> {
     public Logger.LogLevel logLevel = Logger.LogLevel.debug;
     public bool isDebugMuted = false;
 
-
-    private void Start() {
+    void Start() {
         Application.targetFrameRate = 60;
         Logger.Debug("[Main] Start!");
         Logger.isMuted = isDebugMuted;
         Logger.SetLogLevel(this.logLevel);
     }
-
     
     public void EnterRoom(string userName) {
         TcpSocket.inst.Request.EnterRoom(userName, (req, result) => {
-            if (result == null) {
-                Logger.Error("[Main.EnterRoom] result is null");
-                return;
-            }
-
-            if (result.player == null) {
-                Logger.Debug("[Main.EnterRoom] player is null");
-            }
-
-
-            Logger.Debug("[Main.EnterRoom] SUCCESS enter room");
-            PlayerManager.inst.JoinedPlayer(result.player, true);
-
-            if (result.otherPlayers != null) {
-                foreach (PlayerModel i in result.otherPlayers) {
-                    PlayerManager.inst.JoinedPlayer(i, false);
-                }
-            } else {
-                Logger.Debug("[Main] otherPlayers is null");
-            }
-            
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-            isOnGUI = false;
+            JoinRoom(false, result);
         });
+    }
+
+    public void JoinRoom(bool isRunningRoom, EnterRoomModel result) {
+        if (result == null) {
+            Logger.Error("[Main.EnterRoom] result is null");
+            return;
+        }
+
+        if (result.player == null) {
+            Logger.Debug("[Main.EnterRoom] player is null");
+            return;
+        }
+
+        Logger.Debug("[Main.EnterRoom] SUCCESS enter room");
+        PlayerManager.inst.JoinedPlayer(result.player, true);
+        if (result.otherPlayers != null) {
+            foreach (PlayerModel i in result.otherPlayers) {
+                PlayerManager.inst.JoinedPlayer(i, false);
+            }
+        } else {
+            Logger.Debug("[Main] otherPlayers is null");
+        }
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        isOnGUI = false;
     }
 
     public void StartGame(GameContextModel result) {        
         PlayerManager.inst.AssignTeam(result.playerTeamNumbers);
-        this.eventManager = new EventManager();        
+        this.eventManager = new EventManager();
         this.context = new GameContext(this.eventManager, result.maxPlayTime, result.playTime, result.scoreRed, result.scoreBlue, PlayerManager.inst.GetPlayerCount());
         //Todo.UI
     }

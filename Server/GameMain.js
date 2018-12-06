@@ -26,6 +26,7 @@ var isWaitingPlayer = false;
 module.exports.checkGameStart = checkGameStart;
 module.exports.isWaitingGame = isWaitingGame;
 module.exports.isRunningGame = isRunningGame;
+module.exports.isFull = isFull;
 
 const waitingTimer = setInterval(() => {
 			if (this.isWaitingPlayer == false) {
@@ -74,6 +75,10 @@ function checkGameStart(playerCount) {
 	}
 }
 
+function isFull() {
+	return this.joinedPlayerCount == this.maxPlayerCount;
+}
+
 function isWaitingGame() {
 	return this.isWaitingPlayer;
 }
@@ -93,7 +98,7 @@ function startGame() {//Todo.GameStart
 	this.isWaitingPlayer = false;
  	this.isGameStarted = true;
  	this.isGameEnd = false;
- 	room.assignTemaNumber();
+ 	room.assignTeam();
  	gameTimer();
  	broadcastStartGame();
 }
