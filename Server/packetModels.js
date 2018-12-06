@@ -7,6 +7,9 @@ module.exports.notificationFormat = notificationFormat;
 module.exports.player = player;
 module.exports.playerAction = playerAction;
 module.exports.deadPlayer = deadPlayer;
+module.exports.gameContext = gameContext;
+module.exports.waitingStatus = waitingStatus;
+module.exports.gameTime  = gameTime;
 
 function playerMove(playerNum, playerPosX, playerPosY, playerPosZ, playerYaw) {
 	this.playerNum = playerNum;
@@ -73,12 +76,13 @@ function playerAction(playerNum, actionType) {
 	this.actionType = actionType;
 }
 
-function gameContext(playTime, maxPlayTime, playerTeamNumbers, scoreRed, scoreBlue) {
+function gameContext(playTime, maxPlayTime, playerTeamNumbers, scoreRed, scoreBlue, scoreGoal) {
+	this.playerTeamNumbers = playerTeamNumbers;
 	this.playTime = playTime;
 	this.maxPlayTime = maxPlayTime;
-	this.playerTeamNumbers = playerTeamNumbers;
 	this.scoreRed = scoreRed;
 	this.scoreBlue = scoreBlue;
+	this.scoreGoal = scoreGoal;
 }
 
 function gameTime(playTime) {

@@ -100,7 +100,7 @@ function broadcastExcludedMe(message, sender) {
 
 
 function makeSendBuffer(msg) {
-    var buffMsg = Buffer.alloc(msg);
+    var buffMsg = Buffer.from(msg);
     var msgLen = buffMsg.length ;
     var bufPacketLenInfo = Buffer.alloc(4);
     var headerLen= bufPacketLenInfo.length;

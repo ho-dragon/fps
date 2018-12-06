@@ -60,7 +60,7 @@ public class Player : MonoBehaviour {
         this.killCount = killCount;
         this.deadCount = deadCount;
         if (this.isLocalPlayer) {
-            UIManager.inst.SetName(nickName);
+            UIManager.inst.hud.SetName(nickName);
         } else {
             this.ui.SetNickName(nickName);
         }
@@ -86,7 +86,7 @@ public class Player : MonoBehaviour {
 
     public void SetHealth(float currentHP, float maxHP) {
         if (this.isLocalPlayer) {
-            UIManager.inst.SetHP(currentHP, maxHP);
+            UIManager.inst.hud.SetHP(currentHP, maxHP);
         } else {
             this.ui.SetHealth(currentHP, maxHP);
         }        

@@ -7,15 +7,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
 
 public partial class PacketManager: MonoBehaviour {
-    public Socket socket;
+    private Socket socket;
     public Exception Exception { get; private set; }
     public delegate void Response<T>(SocketRequestEntry req, T result = null) where T : class;
     public List<IResponse> responseList = new List<IResponse>();
     private long lastRequestId = 0;
     private SocketState state = SocketState.Unconnected;
     private List<SocketRequestEntry> requests = new List<SocketRequestEntry>();
-    private const int RECONNECT_TIMEOUT = 20;
-    private const int RequestTimeout = 5000;
     private Queue<long> RequestIdQueue;
     private TcpBufferHandelr resolver;
     private PacketNotification packetNotification;
@@ -23,7 +21,7 @@ public partial class PacketManager: MonoBehaviour {
 
     public void SetSocket(Socket socket) {
         this.socket = socket;
-        this.state = SocketState.Connecting;
+        this.state = SocketState.Connected;
     }
 
     public PacketRequest PacketRequest {
@@ -85,6 +83,9 @@ public partial class PacketManager: MonoBehaviour {
     }
 
     public void Send<T>(RequestFormat request, Response<T> response) where T : class {
+        if (this.state != SocketState.Connected) {
+            return;
+        }
         SocketRequestEntry ingameRequest = new SocketRequestEntry(request, typeof(T));
         ingameRequest.RequestTime = DateTime.UtcNow;
         requests.Add(ingameRequest);
@@ -99,19 +100,16 @@ public partial class PacketManager: MonoBehaviour {
         this.responseList.Add(new ResponseEntry<T>() { request = ingameRequest, responseCallback = response });
     }
 
-
-
     private void Send(byte[] data) {
-        if (TcpSocket.inst.IsConnected == false) {
-            return;
-        }
         int sendDataLength = data.Length;
         byte[] header = BitConverter.GetBytes(sendDataLength);
         byte[] body = data;
         byte[] sendData = ByteMerge(header, body);
 
         if (this.socket.Connected == false) {
+            this.state = SocketState.Unconnected;
             Logger.Error("[SocketRequest] disconnected from server");
+            UIManager.inst.Alert("게임 서버와 접속이 끊어졌습니다.");
             return;
         }
         this.socket.Send(sendData);

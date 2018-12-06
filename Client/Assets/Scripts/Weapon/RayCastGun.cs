@@ -31,7 +31,7 @@ public class RayCastGun : Weapon {
                     Logger.DebugHighlight("[RayCastGun.Shoot] shoot my body this.ownerPlayerNumber  = {0} hitNumber = {1}", this.ownerPlayerNumber, hitPlayer.Number);
                     return;
                 }
-                UIManager.inst.HitEffect();
+                UIManager.inst.hud.HitEffect();
                 TcpSocket.inst.Request.Attack(this.ownerPlayerNumber, hitPlayer.Number, 0, (req, result) => {
                     PlayerManager.inst.OnDamaged(result);
                 });

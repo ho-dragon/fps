@@ -5,5 +5,5 @@ using UnityEngine;
 public class WaitingStatusModel {
     public int joinedPlayerCount;
     public int maxPlayerCount;
-    public int reaminTimeToPlay;
+    public int remianTimeToPlay;
 }

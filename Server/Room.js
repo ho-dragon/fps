@@ -1,17 +1,16 @@
 const debug = require('debug')('room');
-const models = require('./packetmodelss');
+const models = require('./packetmodels');
 var room = {
 	players : []
 }
-
 module.exports.addPlayer = addPlayer;
 module.exports.getOtherPlayers = getOtherPlayers;
 module.exports.updateLastPosition = updateLastPosition;
-module.exports.attackPlayer = attackPlayer;
-module.exports.assingTemaNumber = assingTemaNumber;
+module.exports.applyDamage = applyDamage;
+module.exports.assignTeam = assignTeam;
 module.exports.getTeamNumbers = getTeamNumbers;
 module.exports.getPlayerByNumber = getPlayerByNumber;
-module.exports.getPlayerByName = getPlayerByName;
+module.exports.getPlayerCount = getPlayerCount;
 
 function addPlayer(isRunningGame, playerName) {
 	if (isExistPlayer()) {
@@ -27,6 +26,13 @@ function addPlayer(isRunningGame, playerName) {
 	room.players.push(player);
 	debug("added player :: name = " + player.name + " / number = " + player.number);
 	return player;
+}
+
+function getPlayerCount() {
+	if (room.players == null) {
+		return 0;
+	}
+	return room.players.length;
 }
 
 function isExistPlayer(playerName) {
@@ -81,7 +87,6 @@ function assignTeam() {
 			room.players[key].teamCode = 2;	
 		}		
 	}
-	return teamNumbers;
 }
 
 function getTeamNumbers() {
@@ -111,10 +116,10 @@ function updateLastPosition(playerNum, lastPosition, lastYaw) {
 	}
 }
 
-function attackPlayer(damagedPlayer, attackPosition) {
+function applyDamage(damagedPlayer, damage) {
 	for(var key in room.players) {
 		if (room.players[key].number == damagedPlayer) {
-			room.players[key].currentHP -= 10;
+			room.players[key].currentHP -= damage;
 			if (room.players[key].currentHP < 0) {
 				room.players[key].currentHP = 0;
 				room.players[key].isDead = true;

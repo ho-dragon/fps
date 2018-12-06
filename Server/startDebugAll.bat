@@ -1,1 +1,1 @@
-set DEBUG=* & node TcpServer.js
+set DEBUG=* & node connection

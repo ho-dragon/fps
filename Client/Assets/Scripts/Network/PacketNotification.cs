@@ -45,7 +45,7 @@ public class PacketNotification {
                 EndGame(BsonSerializer.Deserialize<UpdateScoreModel>(result.bytes));
                 break;
             case _deadPlayer:
-
+                DeadPlayer(BsonSerializer.Deserialize<DeadPlayerModel>(result.bytes));
                 break;
 
         }
@@ -81,7 +81,7 @@ public class PacketNotification {
 
     public void WaitingPlayer(WaitingStatusModel result) {
         Logger.DebugHighlight("[PacketNotification.WaitingPlayer]");
-        UIManager.inst.UpdateWaitingPlayers(result.joinedPlayerCount, result.maxPlayerCount, result.reaminTimeToPlay);
+        UIManager.inst.UpdateWaitingPlayers(result.joinedPlayerCount, result.maxPlayerCount, result.remianTimeToPlay);
     }
 
     public void UpdateGameTime(GameTimeModel result) {
@@ -91,7 +91,7 @@ public class PacketNotification {
 
     public void EndGame(UpdateScoreModel result) {
         Logger.DebugHighlight("[PacketNotification.EndGame");
-        UIManager.inst.ShowServerMassage(string.Format("게임 종료 RED {0} : BLUE {1}", result.scoreRed, result.scoreBlue));
+        UIManager.inst.Alert(string.Format("게임 종료 RED {0} : BLUE {1}", result.scoreRed, result.scoreBlue));
     }
 
     public void DeadPlayer(DeadPlayerModel result) {
@@ -100,15 +100,15 @@ public class PacketNotification {
         Player killer = PlayerManager.inst.GetPlayer(result.killerNumber);
         killer.KillCount = result.killerKillCount;
         if (killer.IsLocalPlayer) {
-            UIManager.inst.SetKillDeath(killer.KillCount, killer.DeadCount);
+            UIManager.inst.hud.SetKillDeath(killer.KillCount, killer.DeadCount);
         }
 
         Player deader = PlayerManager.inst.GetPlayer(result.deaderNumber);
         deader.DeadCount = result.deaderDeadCount;
         if (deader.IsLocalPlayer) {
-            UIManager.inst.SetKillDeath(deader.KillCount, deader.DeadCount);
+            UIManager.inst.hud.SetKillDeath(deader.KillCount, deader.DeadCount);
         }        
-        UIManager.inst.ShowServerMassage(string.Format("{0}가 {1}를 죽였습니다.", killer.name , deader.name));
+        UIManager.inst.Alert(string.Format("{0}가 {1}를 죽였습니다.", killer.name , deader.name));
         Main.inst.context.UpdateScore(result.scoreRed, result.scoreBlue);
     }
 }

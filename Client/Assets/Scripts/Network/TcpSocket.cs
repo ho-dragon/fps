@@ -40,7 +40,7 @@ public class TcpSocket : MonoBehaviourInstance<TcpSocket> {
 			this.socket.Connect(ipEndPoint);
             this.ns = new NetworkStream(this.socket);
             this.isConnected = true;
-            this.packetManager.socket = this.socket;
+            this.packetManager.SetSocket(this.socket);
             callback(this.isConnected, "Connect success.");
         } catch (SocketException e) {
             this.isConnected = false;

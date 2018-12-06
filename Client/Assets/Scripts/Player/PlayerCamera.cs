@@ -119,12 +119,12 @@ public class PlayerCamera : MonoBehaviour {
                 this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(60, 40, duratuonTime);
                 if (this.GetComponent<Camera>().fieldOfView <= 40) {
                     this.isDoneZoomIn = true;
-                    UIManager.inst.SetActiveGunCross(true);
+                    UIManager.inst.hud.SetActiveGunCross(true);
                 }
             }
         } else {
             if (this.isDoneZoomOut == false) {
-                UIManager.inst.SetActiveGunCross(false);
+                UIManager.inst.hud.SetActiveGunCross(false);
                 this.accelerationTime = Mathf.Lerp(0.5f, 0.1f, duratuonTime);
                 duratuonTime -= Time.deltaTime + this.accelerationTime / zoomTime;
                 this.GetComponent<Camera>().fieldOfView = Mathf.Lerp(60, 40, duratuonTime);

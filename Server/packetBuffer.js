@@ -1,4 +1,4 @@
-'use strict';//hoisting을 막기위해 
+'use strict';
 
 const debug = require('debug')('packetBuffer');
 const HEADER = "HEADER";
