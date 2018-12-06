@@ -46,6 +46,7 @@ var server = net.createServer(function(socket) {
   });
 
   socket.on('error', function(err) {
+    debug('Client disconnected by Error');
     debug('Socket Error: ', JSON.stringify(err));
   });
 

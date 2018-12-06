@@ -6,7 +6,7 @@ module.exports.responseFormat = responseFormat;
 module.exports.notificationFormat = notificationFormat;
 module.exports.player = player;
 module.exports.playerAction = playerAction;
-
+module.exports.deadPlayer = deadPlayer;
 
 function playerMove(playerNum, playerPosX, playerPosY, playerPosZ, playerYaw) {
 	this.playerNum = playerNum;
@@ -16,15 +16,22 @@ function playerMove(playerNum, playerPosX, playerPosY, playerPosZ, playerYaw) {
 	this.playerYaw = playerYaw;
 }
 
-function playerDamage(attackPlayer, damagedPlayer, damage, currentHP, maxHP, isDead, scoreTeam1, scoreTeam2) {
+function playerDamage(attackPlayer, damagedPlayer, damage, currentHP, maxHP, isDead) {
 	this.attackPlayer = attackPlayer;
 	this.damagedPlayer = damagedPlayer;
 	this.damage = damage;
 	this.currentHP = currentHP;
 	this.maxHP = maxHP;
 	this.isDead = isDead;
-	this.scoreTeam1 = scoreTeam1;
-	this.scoreTeam2 = scoreTeam2;
+}
+
+function deadPlayer(killerNumber, deaderNumber, killerKillCount, deaderDeadCount, scoreRed, scoreBlue) {
+	this.killerNumber = killerNumber;
+	this.deaderNumber = deaderNumber;
+	this.killerKillCount = killerKillCount;
+	this.deaderDeadCount = deaderDeadCount;
+	this.scoreRed = scoreRed;
+	this.scoreBlue = scoreBlue;
 }
 
 function enterRoom(player, otherPlayers) {
@@ -48,8 +55,7 @@ function notificationFormat(method, code, msg, bytes) {
 	this.bytes = bytes;
 }
 
-
-function player(name, number, teamCode, currentHP, maxHP, lastPosition, lastYaw, isDead, deadCount) {
+function player(name, number, teamCode, currentHP, maxHP, lastPosition, lastYaw, isDead, deadCount, killCount) {
 	this.name = name;
 	this.number = number;
 	this.teamCode = teamCode;
@@ -59,6 +65,7 @@ function player(name, number, teamCode, currentHP, maxHP, lastPosition, lastYaw,
 	this.lastYaw = lastYaw;
 	this.isDead = isDead;
 	this.deadCount = deadCount;
+	this.killCount = killCount;
 }
 
 function playerAction(playerNum, actionType) {
@@ -76,11 +83,6 @@ function gameContext(playTime, maxPlayTime, playerTeamNumbers, scoreRed, scoreBl
 
 function gameTime(playTime) {
 	this.playTime = playTime;
-}
-
-function updateScore(scoreRed, scoreBlue) {
-	this.scoreRed = scoreRed;
-	this.scoreBlue = scoreBlue;
 }
 
 function waitingStatus(joinedPlayerCount, maxPlayerCount, remianTimeToPlay) {

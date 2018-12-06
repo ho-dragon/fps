@@ -65,6 +65,7 @@ public class Main : MonoBehaviourInstance<Main> {
     }
     
     public void EnterRoom(string userName) {
+        Logger.Debug("[Main.EnterRoom]");
         TcpSocket.inst.Request.EnterRoom(userName, (req, result) => {
             JoinRoom(false, result);
         });

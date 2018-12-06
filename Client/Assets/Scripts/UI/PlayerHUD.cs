@@ -6,6 +6,7 @@ using System.Collections;
 public class PlayerHUD : MonoBehaviour {
     public HpGage hp;
     public Text playerName;
+    public Text killDeath;
     public GameObject gunCross;
     public CanvasGroup hitCrossGroup;
     private IEnumerator coFadeOut;
@@ -14,6 +15,7 @@ public class PlayerHUD : MonoBehaviour {
         Assert.IsNotNull(this.hp);
         Assert.IsNotNull(this.playerName);
         Assert.IsNotNull(this.gunCross);
+        Assert.IsNotNull(this.killDeath);
     }
 
     public void SetName(string name) {
@@ -22,6 +24,10 @@ public class PlayerHUD : MonoBehaviour {
 
     public void SetHP(float currentHP, float maxHP) {
         this.hp.SetHP(currentHP, maxHP);
+    }
+
+    public void SetKillDeath(int kill, int death) {
+        this.killDeath.text = string.Format("Kill {0} / death {1}", kill, death);
     }
 
     public void SetActiveGunCross(bool isOn) {

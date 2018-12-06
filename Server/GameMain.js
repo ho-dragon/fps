@@ -27,6 +27,8 @@ module.exports.checkGameStart = checkGameStart;
 module.exports.isWaitingGame = isWaitingGame;
 module.exports.isRunningGame = isRunningGame;
 module.exports.isFull = isFull;
+module.exports.addTeamScore = addTeamScore;
+module.exports.getScore = getScore;
 
 const waitingTimer = setInterval(() => {
 			if (this.isWaitingPlayer == false) {
@@ -85,6 +87,13 @@ function isWaitingGame() {
 
 function isRunningGame() {
 	return this.isGameStarted && this.isGameEnd == false;
+}
+
+function getScore(teamCode) {
+	if (teamCode == 1){
+		return this.scoreRed;
+	} 
+	return this.scoreBlue;
 }
 
 function startGame() {//Todo.GameStart

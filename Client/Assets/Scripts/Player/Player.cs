@@ -12,6 +12,9 @@ public class Player : MonoBehaviour {
     private TeamCode teamCode;
     private int number = 0;
     private string nickName = "";
+    private bool isDead =false;
+    private int killCount = 0;
+    private int deadCount = 0;
     public Transform rightGunBone;
     public Transform leftGunBone;
     public WeaponModel[] weaponModels;
@@ -26,25 +29,43 @@ public class Player : MonoBehaviour {
         }
     }
 
+    public bool IsDead {
+        get {return this.isDead; }
+        set {this.isDead = value; }
+    }
+
+    public int KillCount {
+        get { return this.killCount; }
+        set { this.killCount = value; }
+    }
+
+    public int DeadCount {
+        get { return this.deadCount; }
+        set { this.killCount = value; }
+    }        
+
     void Awake() {
         Assert.IsNotNull(this.actionController);
         Assert.IsNotNull(this.ui);
         
     }
 
-    public void Init(bool isLocalPlayer, TeamCode teamCode, int number, string name, float currentHP, float maxHP, System.Action<int, Vector3, float> moveCallback) {
+    public void Init(bool isLocalPlayer, TeamCode teamCode, int number, string name, float currentHP, float maxHP, bool isDead, int killCount, int deadCount, System.Action<int, Vector3, float> moveCallback) {
         Logger.Debug("[Player] Init number = " + number + " / name = " + name);
         this.isLocalPlayer = isLocalPlayer;
         this.teamCode = teamCode;
         this.number = number;
         this.nickName = name;
+        this.isDead = isDead;
+        this.killCount = killCount;
+        this.deadCount = deadCount;
         if (this.isLocalPlayer) {
             UIManager.inst.SetName(nickName);
         } else {
             this.ui.SetNickName(nickName);
         }
         SetHealth(currentHP, maxHP);
-        InitWeapon(number, "Rifle");//최초 라이플을 들고있도록
+        SetWeapon(number, "Rifle");//최초 라이플을 들고있도록
         this.actionController.Init(this.animationController, this.transform, number, moveCallback);
         this.actionController.SetLocalPlayer(isLocalPlayer);
     }
@@ -79,7 +100,7 @@ public class Player : MonoBehaviour {
 		}
     }
 
-    private void InitWeapon(int ownerNumber, string weaponName) {
+    private void SetWeapon(int ownerNumber, string weaponName) {
         foreach (WeaponModel hand in weaponModels) {
             if (hand.name == weaponName) {
                 if (rightGunBone.childCount > 0)

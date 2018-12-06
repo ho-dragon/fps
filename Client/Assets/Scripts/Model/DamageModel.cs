@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class DamageModel {
+﻿public class DamageModel {
     public int attackPlayer;
     public int damagedPlayer;
     public float damage;

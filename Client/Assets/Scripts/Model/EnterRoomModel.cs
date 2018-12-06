@@ -14,4 +14,7 @@ public class PlayerModel {
     public float maxHP;
     public float[] lastPosition;
     public float lastYaw;
+    public bool isDead;
+    public int deadCount;
+    public int killCount;
 }

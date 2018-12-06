@@ -48,6 +48,9 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
              , player.name
              , player.currentHP
              , player.maxHP
+             , player.isDead
+             , player.killCount
+             , player.deadCount
              , (number, movePos, roationY) => {
                  TcpSocket.inst.Request.MovePlayer(number, movePos, roationY);
              });
@@ -77,6 +80,18 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
                 }               
             }
         }
+    }
+
+    public Player GetPlayer(int playerNumber) {
+        if(localPlayer.Number == playerNumber) {
+            return this.localPlayer;
+        }
+
+        if (this.remotePlayers != null) {
+            return this.remotePlayers.Find(x => x.Number == playerNumber);
+        }
+        Logger.Error("[PlayerManager.GetPlayer] not found player");
+        return null;
     }
 
     public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {

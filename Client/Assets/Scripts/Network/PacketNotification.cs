@@ -15,7 +15,8 @@ public class PacketNotification {
     private const string _StartGame = "startGame";
     private const string _WaitingPlayer = "waitingPlayer";
     private const string _UpdateGameTime = "updateGameTime";
-    private const string _EndGame = "_endGame";
+    private const string _EndGame = "endGame";
+    private const string _deadPlayer = "deadPlayer";
 
     public void RecevieNotification(ResponseFormat result) {        
         switch(result.method){
@@ -42,6 +43,9 @@ public class PacketNotification {
                 break;                
             case _EndGame:
                 EndGame(BsonSerializer.Deserialize<UpdateScoreModel>(result.bytes));
+                break;
+            case _deadPlayer:
+
                 break;
 
         }
@@ -77,9 +81,7 @@ public class PacketNotification {
 
     public void WaitingPlayer(WaitingStatusModel result) {
         Logger.DebugHighlight("[PacketNotification.WaitingPlayer]");
-        //Todo.UI
-        //[플레이어를 기다리고 있습니다..10]
-        //우측 상단 10 / 20
+        UIManager.inst.UpdateWaitingPlayers(result.joinedPlayerCount, result.maxPlayerCount, result.reaminTimeToPlay);
     }
 
     public void UpdateGameTime(GameTimeModel result) {
@@ -89,5 +91,24 @@ public class PacketNotification {
 
     public void EndGame(UpdateScoreModel result) {
         Logger.DebugHighlight("[PacketNotification.EndGame");
+        UIManager.inst.ShowServerMassage(string.Format("게임 종료 RED {0} : BLUE {1}", result.scoreRed, result.scoreBlue));
+    }
+
+    public void DeadPlayer(DeadPlayerModel result) {
+        Logger.DebugHighlight("[PacketNotification.DeadPlayer");
+
+        Player killer = PlayerManager.inst.GetPlayer(result.killerNumber);
+        killer.KillCount = result.killerKillCount;
+        if (killer.IsLocalPlayer) {
+            UIManager.inst.SetKillDeath(killer.KillCount, killer.DeadCount);
+        }
+
+        Player deader = PlayerManager.inst.GetPlayer(result.deaderNumber);
+        deader.DeadCount = result.deaderDeadCount;
+        if (deader.IsLocalPlayer) {
+            UIManager.inst.SetKillDeath(deader.KillCount, deader.DeadCount);
+        }        
+        UIManager.inst.ShowServerMassage(string.Format("{0}가 {1}를 죽였습니다.", killer.name , deader.name));
+        Main.inst.context.UpdateScore(result.scoreRed, result.scoreBlue);
     }
 }

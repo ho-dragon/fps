@@ -15,7 +15,7 @@ public class ResponseEntry<T> : IResponse where T : class {
         if (request.State == SocketRequestState.Error) {
             Logger.Error("[ResponseEntry.ExcuteCallback] error / state = " + request.State.ToString());
             responseCallback(this.request, null);
-            ErrorHandle(request.GetErrorType());
+            HandleError(request.GetErrorType());
             return;
         }
 
@@ -41,18 +41,19 @@ public class ResponseEntry<T> : IResponse where T : class {
         }
     }
 
-    private void ErrorHandle(ErrorType errorType) {
+    private void HandleError(ErrorType errorType) {
         switch(errorType) {
             case ErrorType.NO_PLAYING_GAME://재접속시 게임종료됐을때
-
+                UIManager.inst.ShowServerMassage("진행중인 게임이 없습니다.");
                 break;
-            case ErrorType.ROOM_IS_PLAYING:// 재접속 선택 팝업
+            case ErrorType.ROOM_IS_PLAYING:
+                UIManager.inst.ShowServerMassage("진행중인 게임에 접속중입니다.");
                 TcpSocket.inst.Request.JoinRunningGame(Main.inst.userName, (req, result) => {
                     Main.inst.JoinRoom(true, result);
                 });
                 break;
-            case ErrorType.ROOM_IS_FULL://방 입장이 불가능 .. 대기
-
+            case ErrorType.ROOM_IS_FULL:
+                UIManager.inst.ShowServerMassage("방이 가득 찼습니다. 게임 종료까지  남았습니다.");
                 break;
         }
     }

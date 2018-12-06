@@ -5,7 +5,7 @@ const room = require('./room');
 const bson = require('bson');
 const color = require("colors");
 const debug = require('debug')('socektResponse');
-const gameMain = require('./gameMain')
+const game = require('./gameMain')
 
 const _movePlayer = "movePlayer";
 const _init = "init";
@@ -76,7 +76,7 @@ function init(socket, result) {
 }
 
 function enterRoom(socket, result) {
-	 if (gameMain.isRunningGame()) {
+	 if (game.isRunningGame()) {
 	 	let response = new models.responseFormat(codeRoomisPlaying, result.id, "success", null);
 		connection.send(socket, response);
 		return;
@@ -106,13 +106,13 @@ function enterRoom(socket, result) {
 }
 
 function joinRunningGame(socket, result) {	
-	if (gameMain.isRunningGame() == false) {
+	if (game.isRunningGame() == false) {
 		let response = new models.responseFormat(codeRoomisPlaying, result.id, "success", null);
 		connection.send(socket, response);
 		return;
 	}
 
-	if (gameMain.isFull()) {
+	if (game.isFull()) {
 		let response = new models.responseFormat(codeRoomisFull, result.id, "success", null);
 		connection.send(socket, response);
 		return;
@@ -159,7 +159,6 @@ function movePlayer(socket, result) {
 	connection.broadcastExcludedMe(notiResult, socket);
 }
 
-
 function actionPlayer(socket, result) {
 	let playerNum = result.param["playerNum"];
 	let actionType = result.param["actionType"];
@@ -175,18 +174,25 @@ function attackPlayer(socket, result) {
 	let damagedPlayerNumber = result.param["damagedPlayer"];
 	let attackPosition = result.param["attackPosition"];
 
-	let player = room.attackPlayer(damagedPlayerNumber, attackPosition);
-
-	if (player.isDead) {
-		gameMain.addTeamScore(player.teamCode);
-	}
-	
-	debug("[attackPlayerNumber] damaged player name = " + player.name);
-	let model = new models.playerDamage(attackPlayerNumber, damagedPlayerNumber, 10, player.currentHP, player.maxHP, player.isDead);
+	let damagedPlayer = room.attackPlayer(damagedPlayerNumber, attackPosition);
+	let model = new models.playerDamage(attackPlayerNumber, damagedPlayerNumber, 10, damagedPlayer.currentHP, damagedPlayer.maxHP, damagedPlayer.isDead);
 	let bytes = bson.serialize(model);
 	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);
 	connection.send(socket, response);
+
 	let notiResult = new models.notificationFormat('damagedPlayer', codeSuccess, "success", bytes);
 	connection.broadcastExcludedMe(notiResult, socket);
+	
+	if (damagedPlayer.isDead) {
+		let attakPlayer = room.getPlayerByNumber(attackPlayerNumber);
+		attakPlayer.killCount++;
+		game.addTeamScore(attakPlayer.teamCodeMain);
+
+		let model = new models.deadPlayer(attackPlayerNumber, damagedPlayerNumber, attackPlayer.killCount, deadPlayer.deadCount, game.getScore(1), game.getScore(2)Main);
+		let bytes = bson.serialize(model);
+		let notiResult = new models.notificationFormat('deadPlayer', codeSuccess, "success", bytes);
+		connection.broadcastExcludedMe(notiResult, socket);
+	}	
+	debug("[attackPlayerNumber] damaged player name = " + player.name);	
 }
 

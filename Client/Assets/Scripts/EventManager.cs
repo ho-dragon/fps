@@ -11,4 +11,12 @@ public class EventManager {
         }
     }
 
+
+    public delegate void UpdateScoreHandler(int scoreRed, int scoreBlue);
+    public event UpdateScoreHandler OnUpdateScore;
+    public void UpdateScore(int scoreRed, int scoreBlue) {
+        if (OnUpdateScore != null) {
+            OnUpdateScore(scoreRed, scoreBlue);
+        }
+    }
 }

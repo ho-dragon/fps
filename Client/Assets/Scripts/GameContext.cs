@@ -23,4 +23,10 @@ public class GameContext {
         this.playTime = playTime;
         this.eventManager.UpdatePlayTime(playTime);
     }
+
+    public void UpdateScore(int scoreRed, int scoreBlue) {
+        this.scoreRed = scoreRed;
+        this.scoreBlue = scoreBlue;
+        this.eventManager.UpdateScore(scoreRed, scoreBlue);
+    }
 }
