@@ -4,13 +4,29 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
-    public List<Player> remotePlayers;
-    public Player localPlayer;
+    private List<Player> remotePlayers;
+    private Player localPlayer;
     public GameObject playerPrefab;
 
     protected override void _Awake() {
         Assert.IsNotNull(this.playerPrefab);
         this.remotePlayers = new List<Player>();
+    }
+
+    public Player GetLocalPlayer() {
+        return this.localPlayer;
+    }
+
+    public Player GetPlayer(int playerNumber) {
+        if (localPlayer.Number == playerNumber) {
+            return this.localPlayer;
+        }
+
+        if (this.remotePlayers != null) {
+            return this.remotePlayers.Find(x => x.Number == playerNumber);
+        }
+        Logger.Error("[PlayerManager.GetPlayer] not found player");
+        return null;
     }
 
     public int GetPlayerCount(TeamCode teamCode) {
@@ -56,7 +72,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         newPlayer.Init(isLocalPlayer,
                (TeamCode)player.teamCode
              , player.number
-             , player.name
+             , player.nickName
              , player.currentHP
              , player.maxHP
              , player.isDead
@@ -69,14 +85,14 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         if (isLocalPlayer) {
             this.localPlayer = newPlayer;
             this.localPlayer.AttachCamera();
-            Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.name, player.number);
+            Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.nickName, player.number);
         } else {
             if (this.remotePlayers.Exists(x => x.Number == player.number)) {
                 Logger.Error("[Main.JoinPlayer] already exist player = " + player.number);
                 return;
             }
             this.remotePlayers.Add(newPlayer);
-            Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.name, player.number);
+            Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.nickName, player.number);
         }        
     }
 
@@ -101,18 +117,6 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
     }
 
-    public Player GetPlayer(int playerNumber) {
-        if(localPlayer.Number == playerNumber) {
-            return this.localPlayer;
-        }
-
-        if (this.remotePlayers != null) {
-            return this.remotePlayers.Find(x => x.Number == playerNumber);
-        }
-        Logger.Error("[PlayerManager.GetPlayer] not found player");
-        return null;
-    }
-
     public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if (player != null) {
@@ -131,20 +135,18 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
     }
 
-    public void UpdateHP(DamageModel result) {
-        Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------result / damagedPlayerNumb = " + result.damagedPlayer);
-        if (this.localPlayer.Number == result.damagedPlayer) {
-            Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------SetLocalHP / damagedPlayerNumb = " + result.damagedPlayer);
-            this.localPlayer.SetHealth(result.currentHP, result.maxHP);
+    public void UpdateHP(int playerNumber, float currentHP, float maxHP) {
+        Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------result / damagedPlayerNumb = " + playerNumber);
+        if (this.localPlayer.Number == playerNumber) {
+            this.localPlayer.UpdateHP(currentHP, maxHP);
             return;
         }
 
-        Player player = this.remotePlayers.Find(x => x.Number == result.damagedPlayer);
+        Player player = this.remotePlayers.Find(x => x.Number == playerNumber);
         if (player == null) {
             Logger.Error("[PlayerManager.SetDamage] player is null");
             return;
         }
-        Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------SetRemoteHP / damagedPlayerNumb = " + result.damagedPlayer);
-        player.SetHealth(result.currentHP, result.maxHP);
+        player.UpdateHP(currentHP, maxHP);
     }
 }

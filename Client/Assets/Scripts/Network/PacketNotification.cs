@@ -17,6 +17,7 @@ public class PacketNotification {
     private const string _UpdateGameTime = "updateGameTime";
     private const string _EndGame = "endGame";
     private const string _deadPlayer = "deadPlayer";
+    private const string _respawn = "respawn";
 
     public void RecevieNotification(ResponseFormat result) {        
         switch(result.method){
@@ -47,13 +48,16 @@ public class PacketNotification {
             case _deadPlayer:
                 DeadPlayer(BsonSerializer.Deserialize<DeadPlayerModel>(result.bytes));
                 break;
+            case _respawn:
+                //Respawn(BsonSerializer.Deserialize<DeadPlayerModel>(result.bytes));
+                break;
 
         }
     }
 
     public void DamagedPlayer(DamageModel result) {
         Logger.DebugHighlight("[PacketNotification.DamagedPlayer]");
-        PlayerManager.inst.UpdateHP(result);
+        PlayerManager.inst.UpdateHP(result.damagedPlayer, result.currentHP, result.maxHP);
     }
 
     public void JoinPlayer(EnterRoomModel result) {
@@ -76,7 +80,7 @@ public class PacketNotification {
     
     public void StartGame(GameContextModel result) {
         Logger.DebugHighlight("[PacketNotification.StatGame]");
-        Main.inst.StartGame(result);
+        Main.inst.StartGame(false, result);
     }
 
     public void WaitingPlayer(WaitingStatusModel result) {
@@ -89,31 +93,37 @@ public class PacketNotification {
         Main.inst.context.UpdatePlayTime(result.playTime);
     }
 
-    public void EndGame(UpdateScoreModel result) {
-        Logger.DebugHighlight("[PacketNotification.EndGame");
-        Main.inst.EndGame();
-        UIManager.inst.Alert(string.Format("게임 종료 RED {0} : BLUE {1}", result.scoreRed, result.scoreBlue));
-    }
-
     public void DeadPlayer(DeadPlayerModel result) {
         Logger.DebugHighlight("[PacketNotification.DeadPlayer");
 
-        Player killer = PlayerManager.inst.GetPlayer(result.killerNumber);
+        Player killer = PlayerManager.inst.GetPlayer(result.lastDamageInfo.attackPlayer);
         killer.KillCount = result.killerKillCount;
         if (killer.IsLocalPlayer) {
             UIManager.inst.hud.SetKillDeath(killer.KillCount, killer.DeadCount);
         }
 
-        Player deader = PlayerManager.inst.GetPlayer(result.deaderNumber);
+        Player deader = PlayerManager.inst.GetPlayer(result.lastDamageInfo.damagedPlayer);
+        deader.IsDead = true;
         deader.DeadCount = result.deaderDeadCount;
-
+        deader.UpdateHP(result.lastDamageInfo.currentHP, result.lastDamageInfo.maxHP);
+        
         if (deader.IsLocalPlayer) {
             UIManager.inst.hud.SetKillDeath(deader.KillCount, deader.DeadCount);
-            UIManager.inst.Alert(string.Format("{0}에 의해 죽였습니다...5초 후 부활합니다", killer.name, deader.name));
+            UIManager.inst.ShowToastMessgae(string.Format("{0}에 의해 죽었습니다. 5초 후 부활합니다.", killer.name, deader.name), 5f);
         } else {
             UIManager.inst.Alert(string.Format("{0}가 {1}를 죽였습니다.", killer.name, deader.name));
         }
 
         Main.inst.context.UpdateScore(result.scoreRed, result.scoreBlue);
+    }
+
+    public void Respawn() {
+        Logger.DebugHighlight("[PacketNotification.Respawn");
+    }
+
+    public void EndGame(UpdateScoreModel result) {
+        Logger.DebugHighlight("[PacketNotification.EndGame");
+        Main.inst.EndGame();
+        UIManager.inst.Alert(string.Format("게임 종료 RED {0} : BLUE {1}", result.scoreRed, result.scoreBlue));
     }
 }

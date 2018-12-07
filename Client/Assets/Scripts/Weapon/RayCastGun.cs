@@ -28,6 +28,11 @@ public class RayCastGun : Weapon {
                 Player hitPlayer = hit.transform.GetComponent<Player>();
                 SoundManager.inst.PlayFx(SoundFxType.HitPlayer, hitPlayer.gameObject);
 
+                if (hitPlayer.IsDead) {
+                    Logger.DebugHighlight("[RayCastGun.Shoot] hitPlayer is already dead.");
+                    return;
+                }
+
                 if (this.ownerPlayerNumber == hitPlayer.Number) {
                     Logger.DebugHighlight("[RayCastGun.Shoot] shoot my body this.ownerPlayerNumber  = {0} hitNumber = {1}", this.ownerPlayerNumber, hitPlayer.Number);
                     return;
@@ -40,12 +45,12 @@ public class RayCastGun : Weapon {
 
                 UIManager.inst.hud.HitEffect();
                 TcpSocket.inst.Request.Attack(this.ownerPlayerNumber, hitPlayer.Number, 0, (req, result) => {
-                    PlayerManager.inst.UpdateHP(result);
+                    PlayerManager.inst.UpdateHP(result.damagedPlayer, result.currentHP, result.maxHP);
                 });
             } else if (hit.transform.gameObject.layer.Equals(GameLayers.Rock)) {
                 SoundManager.inst.PlayFx(SoundFxType.HitRock, this.gameObject);
             } else if (hit.transform.gameObject.layer.Equals(GameLayers.Ground)) {
-
+                SoundManager.inst.PlayFx(SoundFxType.HitRock, this.gameObject);
             }
             EffectManager.inst.OnBulletTail(this.muzzleTransform.position, hit.point, 2f);
         } else {

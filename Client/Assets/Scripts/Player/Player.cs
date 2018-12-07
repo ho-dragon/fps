@@ -31,7 +31,11 @@ public class Player : MonoBehaviour {
 
     public bool IsDead {
         get {return this.isDead; }
-        set {this.isDead = value; }
+        set {this.isDead = value;
+            if (value) {
+                animationController.OnAcion(PlayerActionType.Death);
+            }
+        }
     }
 
     public int KillCount {
@@ -42,32 +46,41 @@ public class Player : MonoBehaviour {
     public int DeadCount {
         get { return this.deadCount; }
         set { this.killCount = value; }
-    }        
+    }
+
+    public TeamCode GetTeamCode() {
+        return this.teamCode;
+    }
 
     void Awake() {
         Assert.IsNotNull(this.actionController);
-        Assert.IsNotNull(this.ui);
-        
+        Assert.IsNotNull(this.ui);        
     }
-
-    public void Init(bool isLocalPlayer, TeamCode teamCode, int number, string name, float currentHP, float maxHP, bool isDead, int killCount, int deadCount, System.Action<int, Vector3, float> moveCallback) {
-        Logger.Debug("[Player] Init number = " + number + " / name = " + name);
+        
+    public void Init(bool isLocalPlayer, TeamCode teamCode, int number, string nickName, float currentHP, float maxHP, bool isDead, int killCount, int deadCount, System.Action<int, Vector3, float> moveCallback) {
+        Logger.Debug("[Player] Init number = " + number + " / name = " + nickName);
         this.isLocalPlayer = isLocalPlayer;
         this.teamCode = teamCode;
         this.number = number;
-        this.nickName = name;
+        this.nickName = nickName;
         this.isDead = isDead;
         this.killCount = killCount;
         this.deadCount = deadCount;
         if (this.isLocalPlayer) {
-            UIManager.inst.hud.SetName(nickName);
+            UIManager.inst.hud.SetName(this.nickName);
         } else {
-            this.ui.SetNickName(nickName);
+            this.ui.SetNickName(this.nickName);
+            this.ui.SetDead(isDead);
         }
-        SetHealth(currentHP, maxHP);
+        UpdateHP(currentHP, maxHP);
         AttachWeapon(number, "Rifle");//최초 라이플을 들고있도록
         this.actionController.Init(this.animationController, this.transform, number, moveCallback);
         this.actionController.SetLocalPlayer(isLocalPlayer);
+    }
+
+    public void Respawn() { //Todo.
+        animationController.OnAcion(PlayerActionType.Idle);
+        IsDead = false;
     }
 
     public void SetWeapon(Weapon weapon, int ownerPlayerNumber) {
@@ -87,7 +100,7 @@ public class Player : MonoBehaviour {
         return this.teamCode == teamCode;
     }
 
-    public void SetHealth(float currentHP, float maxHP) {
+    public void UpdateHP(float currentHP, float maxHP) {
         if (this.isLocalPlayer) {
             UIManager.inst.hud.UpdateHP(currentHP, maxHP);
         } else {

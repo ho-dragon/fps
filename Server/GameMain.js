@@ -128,9 +128,9 @@ function endGame() {//Todo. send GameReuslt
 
 function addTeamScore(killerTeam) {
 	if (killerTeam == 1) {
-		scoreTeamRed++;
+		scoreRed++;
 	} else {
-		scoreTeamBlue++;
+		scoreBlue++;
 	}
 	checkGameEnd(scoreRed, scoreBlue);
 }

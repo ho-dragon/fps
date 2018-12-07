@@ -14,4 +14,8 @@ public class PlayerHeaderUI : MonoBehaviour {
     public void SetHealth(float currentHP, float maxHP) {
         this.hpBar.SetHP(currentHP, maxHP);
     }
+
+    public void SetDead(bool isDead) {
+       //Todo. DeadMark
+    }
 }

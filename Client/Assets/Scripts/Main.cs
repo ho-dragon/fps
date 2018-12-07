@@ -115,11 +115,11 @@ public class Main : MonoBehaviourInstance<Main> {
         Cursor.lockState = CursorLockMode.Locked;
         this.isOnGUI = false;
         if (isRunningRoom) {
-            StartGame(result.runningGameContext);
+            StartGame(isRunningRoom, result.runningGameContext);
         }
     }
 
-    public void StartGame(GameContextModel result) {      
+    public void StartGame(bool isRunningGame, GameContextModel result) {      
         if (result == null) {
             Logger.Error("[Main.StartGame] reuslt is null");
             return;
@@ -129,6 +129,14 @@ public class Main : MonoBehaviourInstance<Main> {
         PlayerManager.inst.AssignTeam(result.playerTeamNumbers);
         UIManager.inst.hud.AddEvents(this.eventManager);
         UIManager.inst.hud.EnablePlayerStatus();
+        UIManager.inst.hud.SetMyTeamCode(PlayerManager.inst.GetLocalPlayer().GetTeamCode());
+
+        if (isRunningGame) {
+            UIManager.inst.ShowToastMessgae(string.Format("재접속 완료! 목표 점수 {0}", result.scoreGoal), 5f);
+        } else {
+            UIManager.inst.ShowToastMessgae(string.Format("게임이 시작! 목표 점수 {0}", result.scoreGoal), 5f);
+        }
+        
         this.context = new GameContext(this.eventManager
                                      , result.remainTime
                                      , result.scoreRed

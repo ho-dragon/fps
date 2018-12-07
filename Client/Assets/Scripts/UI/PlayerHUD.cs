@@ -17,6 +17,7 @@ public class PlayerHUD : MonoBehaviour {
     public Text scoreGoal;
     public Text remainTime;
     public Text playerCount;
+    public Text myTeamCode;
 
     private IEnumerator coFadeOut;
 
@@ -29,6 +30,7 @@ public class PlayerHUD : MonoBehaviour {
         Assert.IsNotNull(this.playerName);
         Assert.IsNotNull(this.gunCross);
         Assert.IsNotNull(this.killDeath);
+        Assert.IsNotNull(this.myTeamCode);
     }
 
 
@@ -58,6 +60,11 @@ public class PlayerHUD : MonoBehaviour {
             this.playerName.gameObject.SetActive(true);
         }        
         this.playerName.text = name;
+    }
+
+    public void SetMyTeamCode(TeamCode teamCode) {
+        this.myTeamCode.text = teamCode.GetTeamName();
+        this.myTeamCode.color = teamCode.GetColor(); 
     }
 
     public void UpdateHP(float currentHP, float maxHP) {

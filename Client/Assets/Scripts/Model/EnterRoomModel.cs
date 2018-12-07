@@ -9,7 +9,7 @@ public class EnterRoomModel {
 
 public class PlayerModel {
     public bool isDead;
-    public string name;
+    public string nickName;
     public int number;
     public int teamCode;
     public int deadCount;

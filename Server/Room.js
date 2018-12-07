@@ -127,14 +127,15 @@ function updateLastPosition(playerNum, lastPosition, lastYaw) {
 	}
 }
 
-function applyDamage(damagedPlayer, damage) {
+function applyDamage(attckPlayer, damagedPlayer, damage) {
 	for( let key in room.players) {
-		if (room.players[key].number == damagedPlayer) {
+		if (room.players[key].number == damagedPlayer.number) {
 			room.players[key].currentHP -= damage;
-			if (room.players[key].currentHP < 0) {
+			if (room.players[key].currentHP <= 0) {
 				room.players[key].currentHP = 0;
 				room.players[key].isDead = true;
 				room.players[key].deadCount++;
+				attckPlayer.killCount++;
 			}
 			return room.players[key];
 		}

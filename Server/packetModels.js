@@ -28,9 +28,8 @@ function playerDamage(attackPlayer, damagedPlayer, damage, currentHP, maxHP, isD
 	this.isDead = isDead;
 }
 
-function deadPlayer(killerNumber, deaderNumber, killerKillCount, deaderDeadCount, scoreRed, scoreBlue) {
-	this.killerNumber = killerNumber;
-	this.deaderNumber = deaderNumber;
+function deadPlayer(lastDamageInfo, killerKillCount, deaderDeadCount, scoreRed, scoreBlue) {
+	this.lastDamageInfo = lastDamageInfo;
 	this.killerKillCount = killerKillCount;
 	this.deaderDeadCount = deaderDeadCount;
 	this.scoreRed = scoreRed;
@@ -59,8 +58,8 @@ function notificationFormat(method, code, msg, bytes) {
 	this.bytes = bytes;
 }
 
-function player(name, number, teamCode, currentHP, maxHP, lastPosition, lastYaw, isDead, deadCount, killCount) {
-	this.name = name;
+function player(nickName, number, teamCode, currentHP, maxHP, lastPosition, lastYaw, isDead, deadCount, killCount) {
+	this.nickName = nickName;
 	this.number = number;
 	this.teamCode = teamCode;
 	this.currentHP = currentHP;

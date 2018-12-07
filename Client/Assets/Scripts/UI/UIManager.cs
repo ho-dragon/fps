@@ -17,12 +17,23 @@ public class UIManager : MonoBehaviourInstance<UIManager> {
     public void UpdateWaitingPlayers(int joinedPlayerCount, int maxPlayerCount, int remianTimeToPlay) {
         this.waitingTime.text = string.Format("플레이어를 기다리고 있습니다...{0} 참여인원({1}/{2})", remianTimeToPlay, joinedPlayerCount, maxPlayerCount);
     }
+    
+    public void ShowToastMessgae(string messgae, float duration) {
+        StartCoroutine(ToastMessage(this.waitingTime, messgae, duration));
+    }
 
     public void Alert(string msg) {
         this.serverAlert.text = msg;
     }
 
     public void EndGame() {
+
     }
 
+    IEnumerator ToastMessage(Text label, string messgae, float duration) {
+        label.text = messgae;
+        yield return new WaitForSeconds(duration);
+        label.text = "";
+    }
+        
 }
