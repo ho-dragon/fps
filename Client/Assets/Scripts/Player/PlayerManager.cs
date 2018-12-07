@@ -70,6 +70,14 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
     }
 
     public void AssignTeam(Dictionary<int, int> playerTeamNumbers) {
+        if (playerTeamNumbers == null || playerTeamNumbers.Count > 0 == false) {
+            Logger.Error("[PlayerManger.AssignTeam] playerTeamNumber is empty");
+            return;
+        }
+        foreach (KeyValuePair<int, int> i in playerTeamNumbers) {
+            Logger.DebugHighlight("[PlayerManager.AssignTeam] key = " + i.Key + " / value =" + i.Value);
+        }
+        Logger.DebugHighlight("[PlayerManager.AssignTeam] localPlayer.Number = " + localPlayer.Number);
         this.localPlayer.AssignTeamCode((TeamCode)playerTeamNumbers[localPlayer.Number]);
         if (this.remotePlayers != null) {
             for(int i = 0; i < this.remotePlayers.Count; i++) {

@@ -94,7 +94,7 @@ packetBuffer.prototype.getBody = function () {
 }
 
 packetBuffer.prototype.onData = function (data) {
-  debug('[onData] this.process =', this.process);
+  //debug('[onData] this.process =', this.process);
   while (this.process) {
     switch (this.state) {
       case HEADER:

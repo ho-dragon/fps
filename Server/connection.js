@@ -81,6 +81,11 @@ data = makeSendBuffer(bson.serialize(data));
 }
 
 function broadcastAll(message) {
+  if (sockets.length > 0 == false) {
+    debug('[broadcastAll] socekt is empty');
+    return;
+  }
+
   debug('broadcastAll / msg = ', message);
     message = makeSendBuffer(bson.serialize(message));
     sockets.forEach(function (socket) {
@@ -89,6 +94,11 @@ function broadcastAll(message) {
 }
 
 function broadcastExcludedMe(message, sender) {
+  if (sockets.length > 0 == false) {
+    debug('[broadcastAll] socekt is empty');
+    return;
+  }
+
   debug('broadcastExcludedMe / msg = ', message);
     message = makeSendBuffer(bson.serialize(message));
     sockets.forEach(function (socket) {

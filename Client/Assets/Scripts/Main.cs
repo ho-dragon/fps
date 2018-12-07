@@ -74,10 +74,6 @@ public class Main : MonoBehaviourInstance<Main> {
     public void EnterRoom(string userName) {
         Logger.Debug("[Main.EnterRoom]");
         TcpSocket.inst.Request.EnterRoom(userName, (req, result) => {
-            Logger.DebugHighlight("[Main.EnterRoom] test size = "+ result.test.Count);
-            foreach (KeyValuePair<string, string> i in result.test) {
-                Logger.DebugHighlight("[Main.EnterRoom] test----key = " + i.Key+ " vlaue =" + i.Value);
-            }            
             JoinRoom(false, result);
         });
     }
@@ -116,6 +112,6 @@ public class Main : MonoBehaviourInstance<Main> {
 
     public void EndGame() {//Todo.UI
         this.eventManager = null;
-        this.context = null;
+        this.context = null;        
     }
 }

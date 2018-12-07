@@ -24,7 +24,7 @@ function addPlayer(isRunningGame, playerName) {
 	var playerNum = room.players.length;
 	var player = new models.player(playerName, playerNum, teamCode, 100, 100, null, 0, false, 0, 0);
 	room.players.push(player);
-	debug("added player :: name = " + player.name + " / number = " + player.number);
+	debug("added player :: name = " + player.name + " / number = " + player.number + " / room.players size = " + room.players.length);
 	return player;
 }
 
@@ -90,9 +90,11 @@ function assignTeam() {
 }
 
 function getTeamNumbers() {
+	debug("[getTEamNumbers] room.players size =" + room.players.length);
 	let teamNumbers = {};
 	for (let key in room.players) {
 		teamNumbers[room.players[key].number] = room.players[key].teamCode;
+		debug("[getTEamNumbers] teamNumber =" + teamNumbers[room.players[key].number]);
 	}
 	return teamNumbers;
 }
@@ -117,7 +119,7 @@ function updateLastPosition(playerNum, lastPosition, lastYaw) {
 }
 
 function applyDamage(damagedPlayer, damage) {
-	for(var key in room.players) {
+	for( let key in room.players) {
 		if (room.players[key].number == damagedPlayer) {
 			room.players[key].currentHP -= damage;
 			if (room.players[key].currentHP < 0) {

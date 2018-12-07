@@ -2,13 +2,13 @@
 
 const connection = require('./connection');
 const models = require('./packetModels');
-const room = require('./Room');
+const room = require('./room');
 const debug = require('debug')('gameMain');
 const bson = require('bson');
 
 const maxPlayerCount = 20;
 const minPlayerCount = 2 
-const maxWaitingTime = 20;
+const maxWaitingTime = 5;
 const maxPlayTime = 300;
 const maxScoreGoal = 10;
 const countDownTime = 5;
@@ -103,12 +103,11 @@ function getScore(teamCode) {
 }
 
 function startGame() {//Todo.GameStart
-	debug("[startGame]");
 	if (isGameStarted) {
 		debug("[startGame] game is already started.");
 		return;
 	}
-
+	debug("[startGame]");
 	clearInterval(waitingTimer);
 	gameTimer = setInterval(intervalGameTimer, 1000);
 	isWaiting = false;
@@ -152,7 +151,7 @@ function isRemainWaitingTime() {
 
 function broadcastStartGame() {
 	debug("[broadcastStartGame]");
-	let model = new models.gameContext(playTime, maxPlayTime,  room.getTeamNumbers(), scoreRed, scoreBlue)
+	let model = new models.gameContext(playTime, maxPlayTime, room.getTeamNumbers(), scoreRed, scoreBlue, maxScoreGoal);
 	let bytes = bson.serialize(model);
 	let noti = new models.notificationFormat('startGame', successCode, "success", bytes);
 	connection.broadcastAll(noti);
