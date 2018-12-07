@@ -20,13 +20,18 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         return this.remotePlayers.Count + 1;
     }
 
-    public bool IsExsitPlayer(int playerNum) {
+    private bool IsExsitRemotePlayer(int playerNum) {
         return this.remotePlayers.Exists(x => x.Number == playerNum);
     }
 
-    public void JoinedPlayer(PlayerModel player, bool isLocalPlayer) {
+    public void JoinPlayer(PlayerModel player, bool isLocalPlayer) {
         if (player == null) {
             Logger.Error("[PlayerManager.JoinedPlayer] player is null");
+            return;
+        }
+
+        if (isLocalPlayer == false && IsExsitRemotePlayer(player.number)) {//Todo. updateData
+            Logger.Error("[PlayerManager.JoinedPlayer] player is already joined.");
             return;
         }
 

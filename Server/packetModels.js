@@ -37,9 +37,10 @@ function deadPlayer(killerNumber, deaderNumber, killerKillCount, deaderDeadCount
 	this.scoreBlue = scoreBlue;
 }
 
-function enterRoom(player, otherPlayers) {
+function enterRoom(player, otherPlayers, runningGameContext) {
 	this.player = player;
 	this.otherPlayers = otherPlayers;
+	this.runningGameContext = runningGameContext;
 }
 
 function responseFormat(code, id, msg, bytes) {

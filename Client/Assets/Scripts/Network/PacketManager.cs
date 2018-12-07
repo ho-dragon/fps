@@ -59,8 +59,14 @@ public partial class PacketManager: MonoBehaviour {
     }
 
     private void OnMessage(ResponseFormat response) {
+        if( response == null) {
+            Logger.Error("[OnMessage] response is null");
+            return;
+        }
         if (Logger.IsMutePacket(response.method) == false) {
-            Logger.Debug("[OnMessage] webSocketMsg.id = " + response.id + " / bates length = " + response.bytes.Length);
+            if (response.bytes != null) {
+                Logger.Debug("[OnMessage] webSocketMsg.id = " + response.id + " / bates length = " + response.bytes.Length);
+            }
         }
 
         if (response.IsNotification) {

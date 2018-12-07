@@ -10,6 +10,8 @@ public static class BsonSerializer {
         JsonSerializer deserializaer = new JsonSerializer();
         BsonReader reader = new BsonReader(ms);
         T result = deserializaer.Deserialize<T>(reader);
+
+        Logger.Debug("[--------]" + JsonConvert.SerializeObject(result));
         return result;
     }
 

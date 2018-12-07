@@ -14,7 +14,7 @@ module.exports.getPlayerCount = getPlayerCount;
 
 function addPlayer(isRunningGame, playerName) {
 	if (isExistPlayer()) {
-		return getPlayer(playerName);
+		return getPlayerByName(playerName);
 	}
 
 	let teamCode = 0;	
@@ -46,6 +46,15 @@ function isExistPlayer(playerName) {
 		}
 	}
 	return false;
+}
+
+function getPlayerByName(playerName) {
+	for (let key in room.players) {
+		if (room.players[key].name == playerName) {
+			return room.players[key];
+		}
+	}
+	return null;
 }
 
 function getPlayerByNumber(playerNum) {

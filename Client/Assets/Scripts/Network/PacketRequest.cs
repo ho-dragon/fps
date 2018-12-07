@@ -32,7 +32,6 @@ public class PacketRequest {
 
     public void JoinRunningGame(string playerName, PacketManager.Response<EnterRoomModel> callback) {
         Logger.DebugHighlight("[PacketREquest.JoinRunningGame]");
-        this.packetManager.Send<EnterRoomModel>(this.packetManager.CreateRequestFormat("enterRoom", "playerName", playerName), callback);
+        this.packetManager.Send<EnterRoomModel>(this.packetManager.CreateRequestFormat("joinRunningGame", "playerName", playerName), callback);
     }
-
 }

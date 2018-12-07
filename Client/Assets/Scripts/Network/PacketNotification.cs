@@ -58,7 +58,7 @@ public class PacketNotification {
 
     public void JoinPlayer(EnterRoomModel result) {
         Logger.DebugHighlight("[PacketNotification.JoinPlayer]");
-        PlayerManager.inst.JoinedPlayer(result.player, false);
+        PlayerManager.inst.JoinPlayer(result.player, false);
     }
 
     private void MovePlayer(PlayerMoveModel result) {

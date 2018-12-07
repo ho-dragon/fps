@@ -42,13 +42,14 @@ public class ResponseEntry<T> : IResponse where T : class {
     }
 
     private void HandleError(ErrorType errorType) {
-        switch(errorType) {
+        Logger.Error("[ResponseEntry.HandleError] erroType = " + errorType.ToString());
+        switch (errorType) {
             case ErrorType.NO_PLAYING_GAME://재접속시 게임종료됐을때
                 UIManager.inst.Alert("진행중인 게임이 없습니다.");
                 break;
             case ErrorType.ROOM_IS_PLAYING:
                 UIManager.inst.Alert("진행중인 게임에 접속중입니다.");
-                TcpSocket.inst.Request.JoinRunningGame(Main.inst.userName, (req, result) => {
+                TcpSocket.inst.Request.JoinRunningGame(Main.inst.GetPlayerId(), (req, result) => {
                     Main.inst.JoinRoom(true, result);
                 });
                 break;

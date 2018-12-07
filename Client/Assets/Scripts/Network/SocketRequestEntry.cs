@@ -32,7 +32,7 @@ public class SocketRequestEntry : IEnumerator {
        
     public T Result<T>() {
         try {
-            Logger.Debug("[ingameRequest.Result<T>] Response.bytes.length = " + Response.bytes.Length);
+            //Logger.Debug("[ingameRequest.Result<T>] Response.bytes.length = " + Response.bytes.Length);
             T result = BsonSerializer.Deserialize<T>(Response.bytes);
             return result;
         } catch (System.Exception e) {

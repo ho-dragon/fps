@@ -78,6 +78,7 @@ function init(socket, result) {
 }
 
 function enterRoom(socket, result) {
+	debug("[enterRoom]");
 	 if (game.isRunningGame()) {
 	 	let response = new models.responseFormat(codeRoomisPlaying, result.id, "success", null);
 		connection.send(socket, response);
@@ -85,21 +86,9 @@ function enterRoom(socket, result) {
 	 }
 
 	let playerName = result.param["playerName"];
-	let player = room.addPlayer(false, playerName); 
-	if (player == null) {
-		debug("[enterRoom] added player is null")
-		return;
-	}
-
-	let model = new models.enterRoom(player, room.getOtherPlayers(player.number));
-	if (model.player == null) {
-		debug("[enterRoom] model.player is null")
-		return;
-	}
-	
+	let player = room.addPlayer(false, playerName);
+	let model = new models.enterRoom(player, room.getOtherPlayers(player.number), null);
 	let bytes = bson.serialize(model);
-	debug("[enterRoom] bytes length = " + bytes.length);
-	debug("[enterRoom] model.player.name = " + model.player.name);
 	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);
 	connection.send(socket, response);
 
@@ -108,7 +97,8 @@ function enterRoom(socket, result) {
 	game.checkGameStart(room.getPlayerCount());
 }
 
-function joinRunningGame(socket, result) {	
+function joinRunningGame(socket, result) {
+	debug("[joinRunningGame]");
 	if (game.isRunningGame() == false) {
 		let response = new models.responseFormat(codeRoomisPlaying, result.id, "success", null);
 		connection.send(socket, response);
@@ -122,21 +112,11 @@ function joinRunningGame(socket, result) {
 	}
 
 	let playerName = result.param["playerName"];
-	let player = room.addPlayer(true, playerName); 
-	if (player == null) {
-		debug("[enterRoom] added player is null")
-		return;
-	}
-
-	let model = new models.enterRoom(player, room.getOtherPlayers(player.number));
-	if (model.player == null) {
-		debug("[enterRoom] model.player is null")
-		return;
-	}
-	
+	let player = room.addPlayer(true, playerName);
+	let runningGameContext = game.getRunningGameContext();
+	debug("[runningGameConext] playTime = " + runningGameContext.playTime);
+	let model = new models.enterRoom(player, room.getOtherPlayers(player.number), runningGameContext);	
 	let bytes = bson.serialize(model);
-   	debug("[enterRoom] bytes length = " + bytes.length);
-	debug("[enterRoom] model.player.name = " + model.player.name);
 	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);
 	connection.send(socket, response);
 

@@ -34,6 +34,7 @@ module.exports.isRunningGame = isRunningGame;
 module.exports.isFull = isFull;
 module.exports.addTeamScore = addTeamScore;
 module.exports.getScore = getScore;
+module.exports.getRunningGameContext = getRunningGameContext;
 
 function intervalWaitingTimer() {
 	debug("[intervalWaitingTimer] isWaiting = " + isWaiting);
@@ -149,9 +150,13 @@ function isRemainWaitingTime() {
 	return maxWaitingTime - waitingTime;
 }
 
+function getRunningGameContext() {
+	return new models.gameContext(playTime, maxPlayTime, room.getTeamNumbers(), scoreRed, scoreBlue, maxScoreGoal);
+}
+
 function broadcastStartGame() {
 	debug("[broadcastStartGame]");
-	let model = new models.gameContext(playTime, maxPlayTime, room.getTeamNumbers(), scoreRed, scoreBlue, maxScoreGoal);
+	let model = getRunningGameContext();
 	let bytes = bson.serialize(model);
 	let noti = new models.notificationFormat('startGame', successCode, "success", bytes);
 	connection.broadcastAll(noti);
