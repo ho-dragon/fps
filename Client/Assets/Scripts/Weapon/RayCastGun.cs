@@ -27,13 +27,20 @@ public class RayCastGun : Weapon {
             if (hit.transform.tag.Equals(GameLayers.Player)) {
                 Player hitPlayer = hit.transform.GetComponent<Player>();
                 SoundManager.inst.PlayFx(SoundFxType.HitPlayer, hitPlayer.gameObject);
+
                 if (this.ownerPlayerNumber == hitPlayer.Number) {
                     Logger.DebugHighlight("[RayCastGun.Shoot] shoot my body this.ownerPlayerNumber  = {0} hitNumber = {1}", this.ownerPlayerNumber, hitPlayer.Number);
                     return;
                 }
+
+                if (hitPlayer.IsSameTeam(GetTeamCdoe())) {
+                    Logger.DebugHighlight("[RayCastGun.Shoot] hitPlayer is same team.");
+                    return;
+                }
+
                 UIManager.inst.hud.HitEffect();
                 TcpSocket.inst.Request.Attack(this.ownerPlayerNumber, hitPlayer.Number, 0, (req, result) => {
-                    PlayerManager.inst.OnDamaged(result);
+                    PlayerManager.inst.UpdateHP(result);
                 });
             } else if (hit.transform.gameObject.layer.Equals(GameLayers.Rock)) {
                 SoundManager.inst.PlayFx(SoundFxType.HitRock, this.gameObject);

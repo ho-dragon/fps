@@ -7,7 +7,7 @@ public class Player : MonoBehaviour {
     public PlayerActionController actionController;
     public PlayerAnimationController animationController;
     public PlayerHeaderUI ui;
-    public Weapon weapon;
+    private Weapon weapon;
     private bool isLocalPlayer = false;
     private TeamCode teamCode;
     private int number = 0;
@@ -65,19 +65,22 @@ public class Player : MonoBehaviour {
             this.ui.SetNickName(nickName);
         }
         SetHealth(currentHP, maxHP);
-        SetWeapon(number, "Rifle");//최초 라이플을 들고있도록
+        AttachWeapon(number, "Rifle");//최초 라이플을 들고있도록
         this.actionController.Init(this.animationController, this.transform, number, moveCallback);
         this.actionController.SetLocalPlayer(isLocalPlayer);
     }
 
     public void SetWeapon(Weapon weapon, int ownerPlayerNumber) {
         this.weapon = weapon;        
-        this.weapon.Init(ownerPlayerNumber);
+        this.weapon.Init(ownerPlayerNumber, this.teamCode);
         this.actionController.SetWeapon(weapon); 
     }
 
     public void AssignTeamCode(TeamCode teamCode) {
         this.teamCode = teamCode;
+        if (this.weapon != null) {
+            this.weapon.SetTeamCode(teamCode);
+        }
     }
 
     public bool IsSameTeam(TeamCode teamCode) {
@@ -86,7 +89,7 @@ public class Player : MonoBehaviour {
 
     public void SetHealth(float currentHP, float maxHP) {
         if (this.isLocalPlayer) {
-            UIManager.inst.hud.SetHP(currentHP, maxHP);
+            UIManager.inst.hud.UpdateHP(currentHP, maxHP);
         } else {
             this.ui.SetHealth(currentHP, maxHP);
         }        
@@ -100,7 +103,7 @@ public class Player : MonoBehaviour {
 		}
     }
 
-    private void SetWeapon(int ownerNumber, string weaponName) {
+    private void AttachWeapon(int ownerNumber, string weaponName) {
         foreach (WeaponModel hand in weaponModels) {
             if (hand.name == weaponName) {
                 if (rightGunBone.childCount > 0)

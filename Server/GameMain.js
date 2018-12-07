@@ -11,7 +11,6 @@ const minPlayerCount = 2
 const maxWaitingTime = 5;
 const maxPlayTime = 300;
 const maxScoreGoal = 10;
-const countDownTime = 5;
 const successCode = 200;
 
 var waitingTime = 0;

@@ -22,4 +22,7 @@ public class UIManager : MonoBehaviourInstance<UIManager> {
         this.serverAlert.text = msg;
     }
 
+    public void EndGame() {
+    }
+
 }

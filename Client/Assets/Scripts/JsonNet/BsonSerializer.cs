@@ -11,7 +11,7 @@ public static class BsonSerializer {
         BsonReader reader = new BsonReader(ms);
         T result = deserializaer.Deserialize<T>(reader);
 
-        Logger.Debug("[--------]" + JsonConvert.SerializeObject(result));
+        Logger.Debug("[-------Json Viewer------]" + JsonConvert.SerializeObject(result));//for test
         return result;
     }
 

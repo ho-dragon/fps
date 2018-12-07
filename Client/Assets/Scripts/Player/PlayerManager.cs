@@ -4,20 +4,26 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
-    public GameObject playerPrefab;
     public List<Player> remotePlayers;
     public Player localPlayer;
-  
+    public GameObject playerPrefab;
+
     protected override void _Awake() {
         Assert.IsNotNull(this.playerPrefab);
         this.remotePlayers = new List<Player>();
     }
 
-    public int GetPlayerCount() {
-        if(this.remotePlayers == null) {
-            return 1;
-        }           
-        return this.remotePlayers.Count + 1;
+    public int GetPlayerCount(TeamCode teamCode) {
+        int count = 0;
+        if (this.localPlayer.IsSameTeam(teamCode)) {
+            count++;
+        }
+        this.remotePlayers.ForEach(x => {
+            if (x.IsSameTeam(teamCode)) {
+                count++;
+            };
+        });
+        return count;
     }
 
     private bool IsExsitRemotePlayer(int playerNum) {
@@ -116,7 +122,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
     }
 
-    public void OnACtion(int playerNumb, PlayerActionType actionType) {
+    public void OnAction(int playerNumb, PlayerActionType actionType) {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if (player != null) {
             if (player.IsLocalPlayer == false) {
@@ -125,7 +131,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
     }
 
-    public void OnDamaged(DamageModel result) {
+    public void UpdateHP(DamageModel result) {
         Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------result / damagedPlayerNumb = " + result.damagedPlayer);
         if (this.localPlayer.Number == result.damagedPlayer) {
             Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------SetLocalHP / damagedPlayerNumb = " + result.damagedPlayer);

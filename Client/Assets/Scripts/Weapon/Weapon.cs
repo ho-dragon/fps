@@ -4,6 +4,7 @@ using UnityEngine.Assertions;
 
 public class Weapon : MonoBehaviour {
     protected int ownerPlayerNumber;
+    protected TeamCode ownerTeamCode;
     public Transform muzzleTransform;
 	protected PlayerCamera playerCam;
     protected float fireRate = 0f;
@@ -13,9 +14,18 @@ public class Weapon : MonoBehaviour {
         Assert.IsNotNull(this.muzzleTransform);
     }
 
-    public void Init(int ownerPlayerNumber) {
+    public void Init(int ownerPlayerNumber, TeamCode teamCode) {
         Logger.Debug("[Weapon] Init : ownerPlayerNumber = " + ownerPlayerNumber);
         this.ownerPlayerNumber = ownerPlayerNumber;
+        this.ownerTeamCode = teamCode;
+    }
+
+    public void SetTeamCode(TeamCode teamCode) {
+        this.ownerTeamCode = teamCode;
+    }
+
+    protected TeamCode GetTeamCdoe() {
+        return this.ownerTeamCode;
     }
 
 	public void SetCamera(PlayerCamera camera) {

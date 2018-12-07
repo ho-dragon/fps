@@ -46,7 +46,7 @@ public class Main : MonoBehaviourInstance<Main> {
     #endregion
     public GameContext context;
     private EventManager eventManager;
-    private string playerId = "rejoinTester";
+    private string playerId = "";
     public string ip = "127.0.0.1";
     public string port = "8107";
     public Logger.LogLevel logLevel = Logger.LogLevel.debug;
@@ -104,20 +104,17 @@ public class Main : MonoBehaviourInstance<Main> {
             return;
         }
 
-        Logger.Debug("[Main.JoinRoom] SUCCESS enter room");
         PlayerManager.inst.JoinPlayer(result.player, true);
         if (result.otherPlayers != null) {
             foreach (PlayerModel i in result.otherPlayers) {
                 PlayerManager.inst.JoinPlayer(i, false);
             }
-        } else {
-            Logger.Debug("[Main.JoinRoom] otherPlayers is null");
         }
+
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        isOnGUI = false;
-
-        if(isRunningRoom) {
+        this.isOnGUI = false;
+        if (isRunningRoom) {
             StartGame(result.runningGameContext);
         }
     }
@@ -127,14 +124,23 @@ public class Main : MonoBehaviourInstance<Main> {
             Logger.Error("[Main.StartGame] reuslt is null");
             return;
         }
-        PlayerManager.inst.AssignTeam(result.playerTeamNumbers);
+
         this.eventManager = new EventManager();
-        this.context = new GameContext(this.eventManager, result.maxPlayTime, result.playTime, result.scoreRed, result.scoreBlue, PlayerManager.inst.GetPlayerCount());
-        //Todo.UI
+        PlayerManager.inst.AssignTeam(result.playerTeamNumbers);
+        UIManager.inst.hud.AddEvents(this.eventManager);
+        UIManager.inst.hud.EnablePlayerStatus();
+        this.context = new GameContext(this.eventManager
+                                     , result.remainTime
+                                     , result.scoreRed
+                                     , result.scoreBlue
+                                     , PlayerManager.inst.GetPlayerCount(TeamCode.RED)
+                                     , PlayerManager.inst.GetPlayerCount(TeamCode.BLUE));
+
     }
 
-    public void EndGame() {//Todo.UI
+    public void EndGame() {
+        UIManager.inst.EndGame();
         this.eventManager = null;
-        this.context = null;        
+        this.context = null;
     }
 }

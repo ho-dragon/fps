@@ -53,7 +53,7 @@ public class PacketNotification {
 
     public void DamagedPlayer(DamageModel result) {
         Logger.DebugHighlight("[PacketNotification.DamagedPlayer]");
-        PlayerManager.inst.OnDamaged(result);
+        PlayerManager.inst.UpdateHP(result);
     }
 
     public void JoinPlayer(EnterRoomModel result) {
@@ -71,7 +71,7 @@ public class PacketNotification {
 
     private void ActionPlayer(PLayerActionModel result) {
         Logger.DebugHighlight("[PacketNotification.ActionPlayer] actioType = " + result.actionType);
-        PlayerManager.inst.OnACtion(result.playerNum, result.actionType);
+        PlayerManager.inst.OnAction(result.playerNum, result.actionType);
     }
     
     public void StartGame(GameContextModel result) {
@@ -91,6 +91,7 @@ public class PacketNotification {
 
     public void EndGame(UpdateScoreModel result) {
         Logger.DebugHighlight("[PacketNotification.EndGame");
+        Main.inst.EndGame();
         UIManager.inst.Alert(string.Format("게임 종료 RED {0} : BLUE {1}", result.scoreRed, result.scoreBlue));
     }
 
@@ -105,10 +106,14 @@ public class PacketNotification {
 
         Player deader = PlayerManager.inst.GetPlayer(result.deaderNumber);
         deader.DeadCount = result.deaderDeadCount;
+
         if (deader.IsLocalPlayer) {
             UIManager.inst.hud.SetKillDeath(deader.KillCount, deader.DeadCount);
-        }        
-        UIManager.inst.Alert(string.Format("{0}가 {1}를 죽였습니다.", killer.name , deader.name));
+            UIManager.inst.Alert(string.Format("{0}에 의해 죽였습니다...5초 후 부활합니다", killer.name, deader.name));
+        } else {
+            UIManager.inst.Alert(string.Format("{0}가 {1}를 죽였습니다.", killer.name, deader.name));
+        }
+
         Main.inst.context.UpdateScore(result.scoreRed, result.scoreBlue);
     }
 }
