@@ -90,7 +90,7 @@ function assignTeam() {
 }
 
 function getTeamNumbers() {
-	let teamNumbers = [];
+	let teamNumbers = {};
 	for (let key in room.players) {
 		teamNumbers[room.players[key].number] = room.players[key].teamCode;
 	}

@@ -26,12 +26,7 @@ public class Main : MonoBehaviourInstance<Main> {
             userName = GUI.TextField(GetRectPos(1, 3, 200, 50), userName, 25);
 
             if (GUI.Button(GetRectPos(1, 4, 200, 50), "Connect Socket")) {
-                TcpSocket.inst.Connect(this.ip, System.Convert.ToInt32(this.port), (isConnected, msg) => {
-                    this.isTryConnected = true;
-                    Logger.Error("Connect result = {0}, msg ={1}", isConnected, msg);
-                    this.isConnected = isConnected;
-                    this.connectMsg = msg;
-                });
+                ConnectToServer();
             }            
         }
 
@@ -44,7 +39,7 @@ public class Main : MonoBehaviourInstance<Main> {
         if (this.isConnected) {
             GUI.Label(GetRectPos(0, 1, 500, 50), this.connectMsg + " Click EnterRoom.");
             if (GUI.Button(GetRectPos(0, 2, 200, 50), "EnterRoom")) {
-                EnterRoom(userName);
+                EnterRoom(this.userName);
             }
         }
     }
@@ -62,11 +57,27 @@ public class Main : MonoBehaviourInstance<Main> {
         Logger.Debug("[Main] Start!");
         Logger.isMuted = isDebugMuted;
         Logger.SetLogLevel(this.logLevel);
+        ConnectToServer();
     }
-    
+
+
+    private void ConnectToServer() {
+        TcpSocket.inst.Connect(this.ip, System.Convert.ToInt32(this.port), (isConnected, msg) => {
+            this.isTryConnected = true;
+            Logger.Error("Connect result = {0}, msg ={1}", isConnected, msg);
+            this.isConnected = isConnected;
+            this.connectMsg = msg;
+            EnterRoom(this.userName);
+        });
+    }
+
     public void EnterRoom(string userName) {
         Logger.Debug("[Main.EnterRoom]");
         TcpSocket.inst.Request.EnterRoom(userName, (req, result) => {
+            Logger.DebugHighlight("[Main.EnterRoom] test size = "+ result.test.Count);
+            foreach (KeyValuePair<string, string> i in result.test) {
+                Logger.DebugHighlight("[Main.EnterRoom] test----key = " + i.Key+ " vlaue =" + i.Value);
+            }            
             JoinRoom(false, result);
         });
     }
