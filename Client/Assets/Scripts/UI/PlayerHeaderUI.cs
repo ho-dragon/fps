@@ -1,11 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class PlayerHeaderUI : MonoBehaviour {
     public HpGage hpBar;
     public Text nickName;
+    public Canvas canvas;
+
+    private void Awake() {
+        Assert.IsNotNull(this.hpBar);
+        Assert.IsNotNull(this.nickName);
+        Assert.IsNotNull(this.canvas);
+    }
+
+    public void SetCamera(Camera camera) {
+        this.canvas.worldCamera = camera;
+    }
 
     public void SetNickName(string nickName) {
         this.nickName.text = nickName;

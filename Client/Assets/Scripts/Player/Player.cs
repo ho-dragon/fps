@@ -3,10 +3,9 @@ using UnityEngine.UI;
 using UnityEngine.Assertions;
 
 public class Player : MonoBehaviour {
-    public Transform cameraPivot;
     public PlayerActionController actionController;
     public PlayerAnimationController animationController;
-    public PlayerHeaderUI ui;
+    public PlayerHeaderUI headerUI;
     private Weapon weapon;
     private bool isLocalPlayer = false;
     private TeamCode teamCode;
@@ -55,7 +54,7 @@ public class Player : MonoBehaviour {
 
     void Awake() {
         Assert.IsNotNull(this.actionController);
-        Assert.IsNotNull(this.ui);        
+        Assert.IsNotNull(this.headerUI);        
     }
         
     public void Init(bool isLocalPlayer, TeamCode teamCode, int number, string nickName, float currentHP, float maxHP, bool isDead, int killCount, int deadCount, System.Action<int, Vector3, float> moveCallback) {
@@ -68,10 +67,13 @@ public class Player : MonoBehaviour {
         this.killCount = killCount;
         this.deadCount = deadCount;
         if (this.isLocalPlayer) {
-            UIManager.inst.hud.SetName(this.nickName);
+            this.headerUI.gameObject.SetActive(false);
+            UIManager.inst.hud.SetName(nickName);
         } else {
-            this.ui.SetNickName(this.nickName);
-            this.ui.SetDead(isDead);
+            this.headerUI.SetCamera(CameraController.inst.playerCamera.GetCamera());
+            this.headerUI.gameObject.SetActive(true);
+            this.headerUI.SetNickName(nickName);
+            this.headerUI.SetDead(isDead);
         }
         UpdateHP(currentHP, maxHP);
         AttachWeapon(number, "Rifle");//최초 라이플을 들고있도록
@@ -105,7 +107,7 @@ public class Player : MonoBehaviour {
         if (this.isLocalPlayer) {
             UIManager.inst.hud.UpdateHP(currentHP, maxHP);
         } else {
-            this.ui.SetHealth(currentHP, maxHP);
+            this.headerUI.SetHealth(currentHP, maxHP);
         }        
     }
 
