@@ -87,6 +87,11 @@ function enterRoom(socket, result) {
 
 	let playerName = result.param["playerName"];
 	let player = room.addPlayer(false, playerName);
+	if (player == null) {
+		debug("[enterRoom] player is null")
+	} else {
+		debug("player number =====" + player.number);
+	}
 	let model = new models.enterRoom(player, room.getOtherPlayers(player.number), null);
 	let bytes = bson.serialize(model);
 	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);

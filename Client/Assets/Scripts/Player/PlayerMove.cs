@@ -16,18 +16,24 @@ public class PlayerMove : MonoBehaviour {
     private float runSpeed = 6f;
     private float tilt = 1f;
     private bool isLocalPlayer = false;
+    private bool isDead = false;
     private PlayerActionType currentActionType = PlayerActionType.Idle;
 
     void Awake() {
         Assert.IsNotNull(this.playerRigidbody);
     }
 
-    public void Init(PlayerAnimationController animationController, Transform playerTrans, int number, System.Action<int, Vector3, float> moveCallback) {
+    public void Init(PlayerAnimationController animationController, Transform playerTrans, int number, bool isDead, System.Action<int, Vector3, float> moveCallback) {
         Logger.DebugHighlight("[PlayerMove] Init");
         this.animationController = animationController;
         this.playerTrans = playerTrans;
         this.playerNumber = number;
+        this.isDead = isDead;
         this.moveCallback = moveCallback;
+    }
+
+    public void UpdatePlayerDead(bool isDead) {
+        this.isDead = isDead;
     }
 
     public void SetLocalPlayer(bool isLocalPlayer) {
@@ -46,9 +52,12 @@ public class PlayerMove : MonoBehaviour {
 
     void FixedUpdate() {
         if (this.isLocalPlayer) {
+            if (this.isDead) {
+                return;
+            }
             MoveInput();
         } else {
-            if (isStartMove) {
+            if (isStartMove) {//Todo. t 확인필요 / isStarMode = false
                 this.playerTrans.position = Vector3.Lerp(this.playerTrans.position, this.toPosition, Time.deltaTime * walkSpeed);
             }
         }

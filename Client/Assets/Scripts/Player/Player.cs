@@ -32,6 +32,7 @@ public class Player : MonoBehaviour {
     public bool IsDead {
         get {return this.isDead; }
         set {this.isDead = value;
+            this.actionController.UpdatePlayerDead(value);
             if (value) {
                 animationController.OnAcion(PlayerActionType.Death);
             }
@@ -74,7 +75,7 @@ public class Player : MonoBehaviour {
         }
         UpdateHP(currentHP, maxHP);
         AttachWeapon(number, "Rifle");//최초 라이플을 들고있도록
-        this.actionController.Init(this.animationController, this.transform, number, moveCallback);
+        this.actionController.Init(this.animationController, this.transform, number, isDead, moveCallback);
         this.actionController.SetLocalPlayer(isLocalPlayer);
     }
 

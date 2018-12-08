@@ -13,8 +13,8 @@ public class PlayerActionController : MonoBehaviour {
         Assert.IsNotNull(this.shoot);
     }
 
-    public void Init(PlayerAnimationController animationController, Transform playerTras, int playerNmber, System.Action<int, Vector3, float> moveCallback) {        
-        this.move.Init(animationController, playerTras, playerNmber, moveCallback);
+    public void Init(PlayerAnimationController animationController, Transform playerTras, int playerNmber, bool isDead, System.Action<int, Vector3, float> moveCallback) {        
+        this.move.Init(animationController, playerTras, playerNmber, isDead, moveCallback);
         this.animationController = animationController;
         this.animationController.Init(playerNmber);
     }
@@ -27,6 +27,10 @@ public class PlayerActionController : MonoBehaviour {
         this.isLocalPayer = isLocalPlayer;
         this.move.SetLocalPlayer(isLocalPlayer);
         this.animationController.SetLocalPlayer(isLocalPlayer);
+    }
+
+    public void UpdatePlayerDead(bool isDead) {
+        this.move.UpdatePlayerDead(isDead);
     }
 
     public void OnMove(Vector3 toPosition, float yaw) {
@@ -50,7 +54,7 @@ public class PlayerActionController : MonoBehaviour {
             this.animationController.OnAcion(PlayerActionType.Jump);
         }
 
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.F)) {
             if (this.animationController.IsAiming() && this.shoot.IsShootable) {
                 CameraController.inst.GunRecoil(2f, 0.2f);
                 this.shoot.Shoot();

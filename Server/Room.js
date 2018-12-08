@@ -13,6 +13,7 @@ module.exports.getPlayerByNumber = getPlayerByNumber;
 module.exports.getPlayerCount = getPlayerCount;
 
 function addPlayer(isRunningGame, playerName) {
+	debug("addPlayer :: isRunningGame = " + isRunningGame);
 	if (isExistPlayer()) {
 		return getPlayerByName(playerName);
 	}
@@ -22,9 +23,10 @@ function addPlayer(isRunningGame, playerName) {
 		teamCode = assignTeamInPlaying();		
 	}
 	var playerNum = room.players.length;
+	debug("addPlayer :: playerNumber = " + playerNum);
 	var player = new models.player(playerName, playerNum, teamCode, 100, 100, null, 0, false, 0, 0);
 	room.players.push(player);
-	debug("added player :: name = " + player.name + " / number = " + player.number + " / room.players size = " + room.players.length);
+	debug("added player :: name = " + player.nickName + " / number = " + player.number + " / room.players size = " + room.players.length);
 	return player;
 }
 
@@ -41,7 +43,7 @@ function isExistPlayer(playerName) {
 	}
 
 	for (let key in room.players) {
-		if (room.players[key].name == playerName) {
+		if (room.players[key].nickName == playerName) {
 			return true;
 		}
 	}
@@ -50,7 +52,7 @@ function isExistPlayer(playerName) {
 
 function getPlayerByName(playerName) {
 	for (let key in room.players) {
-		if (room.players[key].name == playerName) {
+		if (room.players[key].nickName == playerName) {
 			return room.players[key];
 		}
 	}

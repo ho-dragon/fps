@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class Main : MonoBehaviourInstance<Main> {
     #region OnGUI
@@ -58,6 +56,12 @@ public class Main : MonoBehaviourInstance<Main> {
         Logger.isMuted = isDebugMuted;
         Logger.SetLogLevel(this.logLevel);
         ConnectToServer();
+    }
+
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            Application.Quit();
+        }
     }
 
     public string GetPlayerId() {
