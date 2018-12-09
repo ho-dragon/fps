@@ -122,7 +122,6 @@ function endGame() {//Todo. send GameReuslt
 	debug("[endGame]");
 	isGameStarted = false;
 	isGameEnd = true;
-	waitingTimer();
 	broadcastEndGame();
 }
 

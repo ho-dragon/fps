@@ -5,16 +5,16 @@ using UnityEngine.Assertions;
 public class PlayerHeaderUI : MonoBehaviour {
     public HpGage hpBar;
     public Text nickName;
-    public Canvas canvas;
+    public BillboardCamera billboardCamera;
 
     private void Awake() {
         Assert.IsNotNull(this.hpBar);
         Assert.IsNotNull(this.nickName);
-        Assert.IsNotNull(this.canvas);
+        Assert.IsNotNull(this.billboardCamera);
     }
 
     public void SetCamera(Camera camera) {
-        this.canvas.worldCamera = camera;
+        this.billboardCamera.SetCamera(camera);
     }
 
     public void SetNickName(string nickName) {
