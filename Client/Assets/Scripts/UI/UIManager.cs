@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviourInstance<UIManager> {
     }
 
     public void ShowToastMessgae(string messgae, float duration, System.Action callback = null) {
+        StopCoroutine("ToastMessage");
         StartCoroutine(ToastMessage(this.waitingTime, messgae, duration, callback));
     }
 
@@ -26,17 +27,19 @@ public class UIManager : MonoBehaviourInstance<UIManager> {
         this.serverAlert.text = msg;
     }
 
-    public void AlertCountDown(int count, string message) {
+    public void AlertCountDown(int count, string message, System.Action callback = null) {
         StopCoroutine("CountDown");
-        StartCoroutine(CountDown(this.serverAlert, count, message));
+        StartCoroutine(CountDown(this.serverAlert, count, message, callback));
     }
 
-    IEnumerator CountDown(Text label, int count, string message) {
-        int currentCount = 0;
+    IEnumerator CountDown(Text label, int count, string message, System.Action callback) {
         for (int i = 0; i < count; i++) {
-            label.text = string.Format(message, count - currentCount);
+            label.text = string.Format(message, count - i);
             yield return new WaitForSeconds(1f);
-            currentCount++;
+        }
+        label.text = "";
+        if (callback != null) {
+            callback();
         }
     }
 

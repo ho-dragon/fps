@@ -9,9 +9,9 @@ const bson = require('bson');
 const maxPlayerCount = 20;
 const minPlayerCount = 2 
 const maxWaitingTime = 5;
-const maxPlayTime = 30;
+const maxPlayTime = 40;
 const maxScoreGoal = 10;
-const successCode = 200;
+const codeSuccess = 200;
 
 var waitingTime = 0;
 var joinedPlayerCount = 0;
@@ -163,7 +163,7 @@ function broadcastStartGame() {
 	debug("[broadcastStartGame]");
 	let model = getRunningGameContext();
 	let bytes = bson.serialize(model);
-	let noti = new models.notificationFormat('startGame', successCode, "success", bytes);
+	let noti = new models.notificationFormat('startGame', codeSuccess, "success", bytes);
 	connection.broadcastAll(noti);
 }
 
@@ -171,7 +171,7 @@ function broadcastWaitingStatus() {
 	debug("[broadcastWaitingStatus]");
 	let model = new models.waitingStatus(joinedPlayerCount, maxPlayerCount, maxWaitingTime - waitingTime);
 	let bytes = bson.serialize(model);
-	let noti = new models.notificationFormat('waitingPlayer', successCode, "success", bytes);
+	let noti = new models.notificationFormat('waitingPlayer', codeSuccess, "success", bytes);
 	connection.broadcastAll(noti);
 }
 
@@ -179,7 +179,7 @@ function broadcastEndGame() {
 	debug("[broadcastEndGame]");
 	let model = getRunningGameContext();
 	let bytes = bson.serialize(model);
-	let noti = new models.notificationFormat('endGame', successCode, "success", bytes);
+	let noti = new models.notificationFormat('endGame', codeSuccess, "success", bytes);
 	connection.broadcastAll(noti);
 }
 
@@ -187,6 +187,6 @@ function broadcastUpdateGameTime() {
 	debug("[broadcastUpdateGameTime]");
 	let model = new models.gameTime(maxPlayTime - playTime);
 	let bytes = bson.serialize(model);
-	let noti = new models.notificationFormat('updateGameTime', successCode, "success", bytes);
+	let noti = new models.notificationFormat('updateGameTime', codeSuccess, "success", bytes);
 	connection.broadcastAll(noti);
 }

@@ -5,7 +5,6 @@ const connection = require('./connection');
 const models = require('./packetModels');
 const room = require('./room');
 const bson = require('bson');
-const color = require("colors");
 const debug = require('debug')('socektResponse');
 const game = require('./gameMain')
 
@@ -20,6 +19,7 @@ const codeSuccess = 200;
 const codeRoomisPlaying = 9001;
 const codeRoomisFull = 9002;
 const codeNoPlayingGame = 9003;
+const codeIsAlreadyDead = 9004;
 
 module.exports.response = response;
 
@@ -165,10 +165,17 @@ function attackPlayer(socket, result) {
 	let attakPlayer = room.getPlayerByNumber(attackPlayerNumber);
 	let targetPlayer = room.getPlayerByNumber(damagedPlayerNumber);
 
+	if(targetPlayer.isDead) {
+		let response = new models.responseFormat(codeIsAlreadyDead, result.id, "success", null);
+		connection.send(socket, response);
+		return;
+	}
+
 	let damage = 0;
 	if (attackPlayer.teamCode != targetPlayer.teamCode) {
-		damage = 10;
+		damage = 20;
 	}
+
 	let damagedPlayer = room.applyDamage(attakPlayer, targetPlayer, damage);
 	debug("[attackPlayerNumber] damaged player name = " + damagedPlayer.name);	
 	let damageModel = new models.playerDamage(attackPlayerNumber, damagedPlayerNumber, damage, damagedPlayer.currentHP, damagedPlayer.maxHP, damagedPlayer.isDead);
@@ -182,9 +189,22 @@ function attackPlayer(socket, result) {
 		let bytes = bson.serialize(model);
 		let notiResult = new models.notificationFormat('deadPlayer', codeSuccess, "success", bytes);
 		connection.broadcastAll(notiResult, socket);
+		setTimeout(broadcastRespawnPlayer, 5000, damagedPlayer.number);
 	} else {
 		let notiResult = new models.notificationFormat('damagedPlayer', codeSuccess, "success", bytes);
 		connection.broadcastExcludedMe(notiResult, socket);
 	}
 }
 
+function broadcastRespawnPlayer(playerNumber) {
+	if (game.isRunningGame() == false) {
+		debug("[broadcastRespawnPlayer] game is already end.");
+		return;
+	}
+	debug("[broadcastRespawnPlayer]");
+	let respawnPlayer = room.respawn(playerNumber);
+	let model = new models.respawnModel(playerNumber, respawnPlayer.currentHP, respawnPlayer.maxHP);
+	let bytes = bson.serialize(model);
+	let noti = new models.notificationFormat('respawn', codeSuccess, "success", bytes);
+	connection.broadcastAll(noti);
+}

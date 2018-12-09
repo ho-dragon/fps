@@ -1,3 +1,6 @@
+
+'use strict';
+
 const debug = require('debug')('room');
 const models = require('./packetmodels');
 var room = {
@@ -12,11 +15,15 @@ module.exports.getTeamNumbers = getTeamNumbers;
 module.exports.getPlayerByNumber = getPlayerByNumber;
 module.exports.getPlayerCount = getPlayerCount;
 module.exports.clearRoom = clearRoom;
+module.exports.respawn = respawn;
 
-function addPlayer(isRunningGame, playerName) {
+const maxHP = 100;
+
+function addPlayer(isRunningGame, nickName) {
 	debug("addPlayer :: isRunningGame = " + isRunningGame);
-	if (isExistPlayer()) {
-		return getPlayerByName(playerName);
+	if (isExistPlayer(nickName)) {
+		debug("isExistPlayer = true / nickName = "+nickName+" :: rejoin!!!!!!!!!!!!!!!!!!!");
+		return getPlayerByName(nickName);
 	}
 
 	let teamCode = 0;	
@@ -25,7 +32,7 @@ function addPlayer(isRunningGame, playerName) {
 	}
 	var playerNum = room.players.length;
 	debug("addPlayer :: playerNumber = " + playerNum);
-	var player = new models.player(playerName, playerNum, teamCode, 100, 100, null, 0, false, 0, 0);
+	var player = new models.player(nickName, playerNum, teamCode, maxHP, maxHP, null, 0, false, 0, 0);
 	room.players.push(player);
 	debug("added player :: name = " + player.nickName + " / number = " + player.number + " / room.players size = " + room.players.length);
 	return player;
@@ -42,22 +49,22 @@ function getPlayerCount() {
 	return room.players.length;
 }
 
-function isExistPlayer(playerName) {
+function isExistPlayer(nickName) {
 	if (room.players == null) {
 		return false;
 	}
 
 	for (let key in room.players) {
-		if (room.players[key].nickName == playerName) {
+		if (room.players[key].nickName == nickName) {
 			return true;
 		}
 	}
 	return false;
 }
 
-function getPlayerByName(playerName) {
+function getPlayerByName(nickName) {
 	for (let key in room.players) {
-		if (room.players[key].nickName == playerName) {
+		if (room.players[key].nickName == nickName) {
 			return room.players[key];
 		}
 	}
@@ -147,5 +154,19 @@ function applyDamage(attckPlayer, damagedPlayer, damage) {
 			return room.players[key];
 		}
 	}	
+	return null;
+}
+
+function respawn(playerNum) {
+	for (let key in room.players) {
+		if (room.players[key].number == playerNum) {
+			if (room.players[key].isDead) {
+				room.players[key].isDead = false;
+				room.players[key].currentHP = maxHP;
+				room.players[key].maxHP = maxHP;
+				return room.players[key];
+			}			
+		}
+	}
 	return null;
 }

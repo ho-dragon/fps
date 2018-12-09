@@ -49,7 +49,7 @@ public class PacketNotification {
                 DeadPlayer(BsonSerializer.Deserialize<DeadPlayerModel>(result.bytes));
                 break;
             case _respawn:
-                //Respawn(BsonSerializer.Deserialize<DeadPlayerModel>(result.bytes));
+                Respawn(BsonSerializer.Deserialize<RespawnModel>(result.bytes));
                 break;
 
         }
@@ -109,16 +109,22 @@ public class PacketNotification {
         
         if (deader.IsLocalPlayer) {
             UIManager.inst.hud.SetKillDeath(deader.KillCount, deader.DeadCount);
-            UIManager.inst.ShowToastMessgae(string.Format("{0}에 의해 죽었습니다. 5초 후 부활합니다.", killer.name, deader.name), 5f);
+            UIManager.inst.ShowToastMessgae(string.Format("{0}에 의해 죽었습니다. 5초 후 부활합니다.", killer.NickName, deader.NickName), 5f);
         } else {
-            UIManager.inst.Alert(string.Format("{0}가 {1}를 죽였습니다.", killer.name, deader.name));
+            UIManager.inst.Alert(string.Format("{0}가 {1}를 죽였습니다.", killer.NickName, deader.NickName));
         }
-
         Main.inst.context.UpdateScore(result.scoreRed, result.scoreBlue);
     }
 
-    public void Respawn() {
+    public void Respawn(RespawnModel result) {
         Logger.DebugHighlight("[PacketNotification.Respawn");
+        UIManager.inst.ShowToastMessgae("부활했습니다.", 3f);
+        Player player = PlayerManager.inst.GetPlayer(result.playerNumber);
+        player.UpdateHP(result.currentHP, result.maxHP);
+        player.IsDead = false;
+        if (player.IsLocalPlayer) {
+            player.Respawn();
+        }
     }
 
     public void EndGame(GameContextModel result) {

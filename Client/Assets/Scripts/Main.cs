@@ -51,13 +51,15 @@ public class Main : MonoBehaviourInstance<Main> {
     public Logger.LogLevel logLevel = Logger.LogLevel.debug;
     public bool isDebugMuted = false;
 
-    void Start() {
-        Cursor.lockState = CursorLockMode.Confined;
+    private void Awake() {
         Application.targetFrameRate = 60;
-        Logger.Debug("[Main] Start!");
+        Logger.Debug("[Main] Awake!");
         Logger.isMuted = isDebugMuted;
         Logger.SetLogLevel(this.logLevel);
-        ConnectToServer();
+    }
+
+    private void Start() {
+        //ConnectToServer();//Test
     }
 
     void Update() {
@@ -99,7 +101,7 @@ public class Main : MonoBehaviourInstance<Main> {
         });
     }
 
-    public void JoinRoom(bool isRunningRoom, EnterRoomModel result) {
+    public void JoinRoom(bool isRunningGame, EnterRoomModel result) {        
         if (result == null) {
             Logger.Error("[Main.JoinRoom] result is null");
             return;
@@ -116,12 +118,11 @@ public class Main : MonoBehaviourInstance<Main> {
                 PlayerManager.inst.JoinPlayer(i, false);
             }
         }
-
-        Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         this.isOnGUI = false;
-        if (isRunningRoom) {
-            StartGame(isRunningRoom, result.runningGameContext);
+        if (isRunningGame) {
+            StartGame(isRunningGame, result.runningGameContext);
         }
     }
 
@@ -133,8 +134,10 @@ public class Main : MonoBehaviourInstance<Main> {
 
         this.eventManager = new EventManager();
         PlayerManager.inst.AssignTeam(result.playerTeamNumbers);
+        PlayerManager.inst.ForceMoveRespawnZone();
         UIManager.inst.hud.AddEvents(this.eventManager);
         UIManager.inst.hud.EnablePlayerStatus();
+        UIManager.inst.hud.SetScoreGoal(result.scoreGoal);
         UIManager.inst.hud.SetMyTeamCode(PlayerManager.inst.GetLocalPlayer().GetTeamCode());
 
         if (isRunningGame) {
@@ -167,8 +170,8 @@ public class Main : MonoBehaviourInstance<Main> {
                                           this.eventManager = null;
                                           this.context = null;
                                           this.isOnGUI = true;
+                                          Cursor.lockState = CursorLockMode.None;
                                           Cursor.visible = true;
-                                          Cursor.lockState = CursorLockMode.Confined;
                                       });
 
         UIManager.inst.AlertCountDown(5, "{0}초 후 방입장이 가능합니다.");

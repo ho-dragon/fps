@@ -61,10 +61,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Resources\Characters\Demo\Scripts\Actions.cs" />
-    <Compile Include="Assets\Resources\Characters\Demo\Scripts\CharacterPanel.cs" />
-    <Compile Include="Assets\Resources\Characters\Demo\Scripts\CharacterViewer.cs" />
-    <Compile Include="Assets\Resources\Characters\Demo\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\BillboardCamera.cs" />
     <Compile Include="Assets\Scripts\BulletEffect.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
@@ -75,6 +71,7 @@
     <Compile Include="Assets\Scripts\JsonNet\BsonSerializer.cs" />
     <Compile Include="Assets\Scripts\Logger.cs" />
     <Compile Include="Assets\Scripts\Main.cs" />
+    <Compile Include="Assets\Scripts\MapInfo.cs" />
     <Compile Include="Assets\Scripts\Model\DamageModel.cs" />
     <Compile Include="Assets\Scripts\Model\DeadPlayerModel.cs" />
     <Compile Include="Assets\Scripts\Model\EnterRoomModel.cs" />

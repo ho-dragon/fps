@@ -17,7 +17,9 @@ public class Player : MonoBehaviour {
     public Transform rightGunBone;
     public Transform leftGunBone;
     public WeaponModel[] weaponModels;
+
     public int Number { get { return this.number; } }
+    public string NickName { get { return this.nickName; } }
     public PlayerActionController ActionController { get { return this.actionController; } }
 
     public bool IsLocalPlayer {
@@ -81,9 +83,10 @@ public class Player : MonoBehaviour {
         this.actionController.SetLocalPlayer(isLocalPlayer);
     }
 
-    public void Respawn() { //Todo.
+    public void Respawn() {
+        this.transform.position = MapInfo.inst.GetRespawnZone(this.teamCode);
+        TcpSocket.inst.Request.MovePlayer(this.number, this.transform.position, this.transform.rotation.eulerAngles.y);
         animationController.OnAcion(PlayerActionType.Idle);
-        IsDead = false;
     }
 
     public void SetWeapon(Weapon weapon, int ownerPlayerNumber) {

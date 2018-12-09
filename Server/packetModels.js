@@ -10,6 +10,7 @@ module.exports.deadPlayer = deadPlayer;
 module.exports.gameContext = gameContext;
 module.exports.waitingStatus = waitingStatus;
 module.exports.gameTime  = gameTime;
+module.exports.respawnModel  = respawnModel;
 
 function playerMove(playerNum, playerPosX, playerPosY, playerPosZ, playerYaw) {
 	this.playerNum = playerNum;
@@ -92,4 +93,10 @@ function waitingStatus(joinedPlayerCount, maxPlayerCount, remianTimeToPlay) {
 	this.joinedPlayerCount = joinedPlayerCount;
 	this.maxPlayerCount = maxPlayerCount;
 	this.remianTimeToPlay = remianTimeToPlay;
+}
+
+function respawnModel(playerNumber,currentHP, maxHP) {
+	this.playerNumber = playerNumber;
+	this.currentHP = currentHP;
+	this.maxHP = maxHP;
 }

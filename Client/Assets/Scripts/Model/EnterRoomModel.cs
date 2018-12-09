@@ -19,3 +19,9 @@ public class PlayerModel {
     public float lastYaw;
     public float[] lastPosition;
 }
+
+public class RespawnModel {
+    public int playerNumber;
+    public float currentHP;
+    public float maxHP;
+}

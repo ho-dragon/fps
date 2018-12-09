@@ -3,6 +3,7 @@
     ROOM_IS_PLAYING = 9001,
     ROOM_IS_FULL = 9002,
     NO_PLAYING_GAME = 9003,
+    ALREADY_DEAD_PLAYER = 9004,
 }
 
 public static class ErrorTypeExtenstion {
@@ -14,6 +15,8 @@ public static class ErrorTypeExtenstion {
                 return "게임이 진행중입니다.";
             case ErrorType.NO_PLAYING_GAME:
                 return "진행중인 게임이 없습니다.";
+            case ErrorType.ALREADY_DEAD_PLAYER:
+                return "이미 죽은 유저입니다.";
         }
         return "";
     }

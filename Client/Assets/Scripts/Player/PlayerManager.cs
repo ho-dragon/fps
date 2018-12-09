@@ -79,8 +79,8 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             clone.transform.position = new Vector3(player.lastPosition[0], player.lastPosition[1], player.lastPosition[2]);
             clone.transform.localRotation = Quaternion.Euler(clone.transform.localRotation.eulerAngles.x, player.lastYaw, clone.transform.localRotation.eulerAngles.z);
         } else {
-            clone.transform.position = new Vector3(UnityEngine.Random.Range(0, 10), UnityEngine.Random.Range(10, 20), UnityEngine.Random.Range(0, 10));
-        }        
+            clone.transform.position = MapInfo.inst.GetRespawnZone((TeamCode)player.teamCode);
+        }
 
         Player newPlayer = clone.GetComponent<Player>();
         newPlayer.Init(isLocalPlayer,
@@ -102,7 +102,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.nickName, player.number);
         } else {
             if (this.remotePlayers.Exists(x => x.Number == player.number)) {
-                Logger.Warning("[Main.JoinPlayer] already exist player = " + player.number);
+                Logger.Warning("[PlayerManager.JoinPlayer] already exist player = " + player.number);
                 return;
             }
             this.remotePlayers.Add(newPlayer);
@@ -115,10 +115,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             Logger.Error("[PlayerManger.AssignTeam] playerTeamNumber is empty");
             return;
         }
-        foreach (KeyValuePair<int, int> i in playerTeamNumbers) {
-            Logger.DebugHighlight("[PlayerManager.AssignTeam] key = " + i.Key + " / value =" + i.Value);
-        }
-        Logger.DebugHighlight("[PlayerManager.AssignTeam] localPlayer.Number = " + localPlayer.Number);
+
         this.localPlayer.AssignTeamCode(true, (TeamCode)playerTeamNumbers[localPlayer.Number]);
         if (this.remotePlayers != null) {
             for(int i = 0; i < this.remotePlayers.Count; i++) {
@@ -129,6 +126,11 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
                 }               
             }
         }
+    }
+
+    public void ForceMoveRespawnZone() {
+        this.localPlayer.transform.position = MapInfo.inst.GetRespawnZone(this.localPlayer.GetTeamCode());
+        TcpSocket.inst.Request.MovePlayer(this.localPlayer.Number, this.localPlayer.transform.position, this.localPlayer.transform.rotation.eulerAngles.y);
     }
 
     public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {
@@ -150,7 +152,6 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
     }
 
     public void UpdateHP(int playerNumber, float currentHP, float maxHP) {
-        Logger.DebugHighlight("[PlayerManager.DamagedPlayer]--------result / damagedPlayerNumb = " + playerNumber);
         if (this.localPlayer.Number == playerNumber) {
             this.localPlayer.UpdateHP(currentHP, maxHP);
             return;
