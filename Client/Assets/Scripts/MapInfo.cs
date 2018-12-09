@@ -32,6 +32,5 @@ public class MapInfo : MonoBehaviourInstance<MapInfo> {
 
     private Vector3 GetWaitingZone() {
         return this.waitingZone.position + new Vector3(UnityEngine.Random.Range(-3f, 3f), UnityEngine.Random.Range(-3f, 3f), 0); ;
-    }
-        
+    }        
 }

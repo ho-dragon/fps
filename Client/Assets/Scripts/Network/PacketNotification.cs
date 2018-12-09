@@ -111,7 +111,7 @@ public class PacketNotification {
             UIManager.inst.hud.SetKillDeath(deader.KillCount, deader.DeadCount);
             UIManager.inst.ShowToastMessgae(string.Format("{0}에 의해 죽었습니다. 5초 후 부활합니다.", killer.NickName, deader.NickName), 5f);
         } else {
-            UIManager.inst.Alert(string.Format("{0}가 {1}를 죽였습니다.", killer.NickName, deader.NickName));
+            UIManager.inst.ShowToastMessgae(string.Format("{0}가 {1}를 죽였습니다.", killer.NickName, deader.NickName), 3f);
         }
         Main.inst.context.UpdateScore(result.scoreRed, result.scoreBlue);
     }

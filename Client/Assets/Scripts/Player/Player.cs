@@ -84,9 +84,10 @@ public class Player : MonoBehaviour {
     }
 
     public void Respawn() {
-        this.transform.position = MapInfo.inst.GetRespawnZone(this.teamCode);
+        this.transform.position = MapInfo.inst.GetRespawnZone(this.teamCode);       
+        animationController.OnAcion(PlayerActionType.Respawn);
         TcpSocket.inst.Request.MovePlayer(this.number, this.transform.position, this.transform.rotation.eulerAngles.y);
-        animationController.OnAcion(PlayerActionType.Idle);
+        TcpSocket.inst.Request.ActionPlayer(this.number, PlayerActionType.Respawn);
     }
 
     public void SetWeapon(Weapon weapon, int ownerPlayerNumber) {

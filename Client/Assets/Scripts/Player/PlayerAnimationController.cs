@@ -75,6 +75,9 @@ public class PlayerAnimationController : MonoBehaviour {
             case PlayerActionType.Walk:
                 Walk();
                 break;
+            case PlayerActionType.Respawn:
+                Respawn();
+                break;
         }
     }
 
@@ -102,11 +105,12 @@ public class PlayerAnimationController : MonoBehaviour {
         animator.SetTrigger("Attack");
     }
 
+    private void Respawn() {
+        animator.Play("Idle", 0);       
+    }
+
     private void Death() {
-        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Death"))
-            animator.Play("Idle", 0);
-        else
-            animator.SetTrigger("Death");
+        animator.SetTrigger("Death");
     }
 
     private void Damage() {

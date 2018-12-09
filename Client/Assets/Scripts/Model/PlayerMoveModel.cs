@@ -23,5 +23,6 @@ public enum PlayerActionType {
     Damage = 5,
     Jump = 6,
     Aiming = 7,
-    Sitting = 8
+    Sitting = 8,
+    Respawn = 9,
 }
