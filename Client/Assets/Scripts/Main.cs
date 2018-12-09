@@ -23,7 +23,7 @@ public class Main : MonoBehaviourInstance<Main> {
             GUI.Label(GetRectPos(1, 3, 100, 50), "NickName");
             playerId = GUI.TextField(GetRectPos(1, 3, 200, 50), playerId, 25);
 
-            if (GUI.Button(GetRectPos(1, 4, 200, 50), "Connect Socket")) {
+            if (GUI.Button(GetRectPos(1, 4, 200, 50), "Connect to server")) {
                 ConnectToServer();
             }            
         }
@@ -41,12 +41,13 @@ public class Main : MonoBehaviourInstance<Main> {
             }
         }
     }
+
     #endregion
     public GameContext context;
     private EventManager eventManager;
     private string playerId = "";
-    public string ip = "127.0.0.1";
-    public string port = "8107";
+    private string ip = "127.0.0.1";
+    private string port = "8107";
     public Logger.LogLevel logLevel = Logger.LogLevel.debug;
     public bool isDebugMuted = false;
 
