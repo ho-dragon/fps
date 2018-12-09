@@ -29,6 +29,22 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         return null;
     }
 
+
+    public void Clear() {
+        if (this.localPlayer != null) {
+            Destroy(this.localPlayer.gameObject);
+            this.localPlayer = null;
+        }
+
+        if (this.remotePlayers != null && remotePlayers.Count > 0) {
+            foreach (Player i in remotePlayers) {
+                Destroy(i.gameObject);
+            }
+        }
+        this.remotePlayers.Clear();
+    }
+        
+
     public int GetPlayerCount(TeamCode teamCode) {
         int count = 0;
         if (this.localPlayer.IsSameTeam(teamCode)) {
@@ -67,8 +83,6 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }        
 
         Player newPlayer = clone.GetComponent<Player>();
-        //newPlayer.hpBar.facing.SetCamara(PlayerCamera.inst.camera);//HP카메라 보는 부분 일단 주석
-
         newPlayer.Init(isLocalPlayer,
                (TeamCode)player.teamCode
              , player.number
@@ -88,7 +102,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.nickName, player.number);
         } else {
             if (this.remotePlayers.Exists(x => x.Number == player.number)) {
-                Logger.Error("[Main.JoinPlayer] already exist player = " + player.number);
+                Logger.Warning("[Main.JoinPlayer] already exist player = " + player.number);
                 return;
             }
             this.remotePlayers.Add(newPlayer);
@@ -105,11 +119,11 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             Logger.DebugHighlight("[PlayerManager.AssignTeam] key = " + i.Key + " / value =" + i.Value);
         }
         Logger.DebugHighlight("[PlayerManager.AssignTeam] localPlayer.Number = " + localPlayer.Number);
-        this.localPlayer.AssignTeamCode((TeamCode)playerTeamNumbers[localPlayer.Number]);
+        this.localPlayer.AssignTeamCode(true, (TeamCode)playerTeamNumbers[localPlayer.Number]);
         if (this.remotePlayers != null) {
             for(int i = 0; i < this.remotePlayers.Count; i++) {
                 if (playerTeamNumbers.ContainsKey(this.remotePlayers[i].Number)) {
-                    this.remotePlayers[i].AssignTeamCode((TeamCode)playerTeamNumbers[this.remotePlayers[i].Number]);
+                    this.remotePlayers[i].AssignTeamCode(false, (TeamCode)playerTeamNumbers[this.remotePlayers[i].Number]);
                 } else {
                     Logger.Error("[PlayerManager.AssignTeam] key is not found.");
                 }               

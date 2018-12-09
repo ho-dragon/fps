@@ -5,11 +5,13 @@ using UnityEngine.Assertions;
 public class PlayerHeaderUI : MonoBehaviour {
     public HpGage hpBar;
     public Text nickName;
+    public Text teamCode;
     public BillboardCamera billboardCamera;
 
     private void Awake() {
         Assert.IsNotNull(this.hpBar);
         Assert.IsNotNull(this.nickName);
+        Assert.IsNotNull(this.teamCode);
         Assert.IsNotNull(this.billboardCamera);
     }
 
@@ -25,7 +27,11 @@ public class PlayerHeaderUI : MonoBehaviour {
         this.hpBar.SetHP(currentHP, maxHP);
     }
 
-    public void SetDead(bool isDead) {
-       //Todo. DeadMark
+    public void SetTeamCode(TeamCode teamCode) {
+        if (teamCode == TeamCode.NONE) {
+            return;
+        }
+        this.teamCode.text =  teamCode.GetTeamName();
+        this.teamCode.color = teamCode.GetColor();
     }
 }

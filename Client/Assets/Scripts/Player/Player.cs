@@ -73,11 +73,11 @@ public class Player : MonoBehaviour {
             this.headerUI.SetCamera(CameraController.inst.playerCamera.GetCamera());
             this.headerUI.gameObject.SetActive(true);
             this.headerUI.SetNickName(nickName);
-            this.headerUI.SetDead(isDead);
+            this.headerUI.SetTeamCode(teamCode);
         }
         UpdateHP(currentHP, maxHP);
         AttachWeapon(number, "Rifle");//최초 라이플을 들고있도록
-        this.actionController.Init(this.animationController, this.transform, number, isDead, moveCallback);
+        this.actionController.Init(this.animationController, this.transform, number, isLocalPlayer, isDead, moveCallback);
         this.actionController.SetLocalPlayer(isLocalPlayer);
     }
 
@@ -92,10 +92,14 @@ public class Player : MonoBehaviour {
         this.actionController.SetWeapon(weapon); 
     }
 
-    public void AssignTeamCode(TeamCode teamCode) {
+    public void AssignTeamCode(bool isLocalPlayer, TeamCode teamCode) {
         this.teamCode = teamCode;
         if (this.weapon != null) {
             this.weapon.SetTeamCode(teamCode);
+        }
+
+        if (isLocalPlayer == false) {
+            this.headerUI.SetTeamCode(teamCode);
         }
     }
 

@@ -43,7 +43,7 @@ public class PacketNotification {
                 UpdateGameTime(BsonSerializer.Deserialize<GameTimeModel>(result.bytes));
                 break;                
             case _EndGame:
-                EndGame(BsonSerializer.Deserialize<UpdateScoreModel>(result.bytes));
+                EndGame(BsonSerializer.Deserialize<GameContextModel>(result.bytes));
                 break;
             case _deadPlayer:
                 DeadPlayer(BsonSerializer.Deserialize<DeadPlayerModel>(result.bytes));
@@ -90,7 +90,7 @@ public class PacketNotification {
 
     public void UpdateGameTime(GameTimeModel result) {
         Logger.DebugHighlight("[PackketNotification.UpdateGameTime");
-        Main.inst.context.UpdatePlayTime(result.playTime);
+        Main.inst.context.UpdateRemainTime(result.remainTime);
     }
 
     public void DeadPlayer(DeadPlayerModel result) {
@@ -121,9 +121,8 @@ public class PacketNotification {
         Logger.DebugHighlight("[PacketNotification.Respawn");
     }
 
-    public void EndGame(UpdateScoreModel result) {
+    public void EndGame(GameContextModel result) {
         Logger.DebugHighlight("[PacketNotification.EndGame");
-        Main.inst.EndGame();
-        UIManager.inst.Alert(string.Format("게임 종료 RED {0} : BLUE {1}", result.scoreRed, result.scoreBlue));
+        Main.inst.EndGame(result);
     }
 }

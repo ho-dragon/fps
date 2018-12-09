@@ -11,6 +11,7 @@ module.exports.assignTeam = assignTeam;
 module.exports.getTeamNumbers = getTeamNumbers;
 module.exports.getPlayerByNumber = getPlayerByNumber;
 module.exports.getPlayerCount = getPlayerCount;
+module.exports.clearRoom = clearRoom;
 
 function addPlayer(isRunningGame, playerName) {
 	debug("addPlayer :: isRunningGame = " + isRunningGame);
@@ -28,6 +29,10 @@ function addPlayer(isRunningGame, playerName) {
 	room.players.push(player);
 	debug("added player :: name = " + player.nickName + " / number = " + player.number + " / room.players size = " + room.players.length);
 	return player;
+}
+
+function clearRoom() {
+	room.players = [];
 }
 
 function getPlayerCount() {

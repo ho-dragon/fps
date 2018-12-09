@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class Main : MonoBehaviourInstance<Main> {
     #region OnGUI
@@ -51,6 +51,7 @@ public class Main : MonoBehaviourInstance<Main> {
     public bool isDebugMuted = false;
 
     void Start() {
+        Cursor.lockState = CursorLockMode.Confined;
         Application.targetFrameRate = 60;
         Logger.Debug("[Main] Start!");
         Logger.isMuted = isDebugMuted;
@@ -136,23 +137,39 @@ public class Main : MonoBehaviourInstance<Main> {
         UIManager.inst.hud.SetMyTeamCode(PlayerManager.inst.GetLocalPlayer().GetTeamCode());
 
         if (isRunningGame) {
-            UIManager.inst.ShowToastMessgae(string.Format("ÀçÁ¢¼Ó ¿Ï·á! ¸ñÇ¥ Á¡¼ö {0}", result.scoreGoal), 5f);
+            UIManager.inst.ShowToastMessgae(string.Format("ì¬ì ‘ì† ì™„ë£Œ! ëª©í‘œ ì ìˆ˜ {0}", result.scoreGoal), 5f);
         } else {
-            UIManager.inst.ShowToastMessgae(string.Format("°ÔÀÓÀÌ ½ÃÀÛ! ¸ñÇ¥ Á¡¼ö {0}", result.scoreGoal), 5f);
-        }
-        
+            UIManager.inst.ShowToastMessgae(string.Format("ê²Œì„ì´ ì‹œì‘! ëª©í‘œ ì ìˆ˜ {0}", result.scoreGoal), 5f);
+        }        
         this.context = new GameContext(this.eventManager
                                      , result.remainTime
                                      , result.scoreRed
                                      , result.scoreBlue
                                      , PlayerManager.inst.GetPlayerCount(TeamCode.RED)
                                      , PlayerManager.inst.GetPlayerCount(TeamCode.BLUE));
-
     }
 
-    public void EndGame() {
-        UIManager.inst.EndGame();
-        this.eventManager = null;
-        this.context = null;
+    public void EndGame(GameContextModel  result) {
+        string desc = string.Empty;
+        if (result.scoreRed > result.scoreBlue) {
+            desc = string.Format("REDíŒ€ ìŠ¹ë¦¬! {0}:{1}", result.scoreRed, result.scoreBlue);
+        } else if (result.scoreBlue > result.scoreRed) {
+            desc = string.Format("BLUEíŒ€ ìŠ¹ë¦¬! {1}:{0}", result.scoreRed, result.scoreBlue);
+        } else {
+            desc = string.Format("ë¬´ìŠ¹ë¶€ {1}:{0}", result.scoreRed, result.scoreBlue);
+        }
+        UIManager.inst.ShowToastMessgae(desc
+                                      , 5f
+                                      , () => {
+                                          CameraController.inst.Stop();
+                                          PlayerManager.inst.Clear();
+                                          this.eventManager = null;
+                                          this.context = null;
+                                          this.isOnGUI = true;
+                                          Cursor.visible = true;
+                                          Cursor.lockState = CursorLockMode.Confined;
+                                      });
+
+        UIManager.inst.AlertCountDown(5, "{0}ì´ˆ í›„ ë°©ì…ì¥ì´ ê°€ëŠ¥í•©ë‹ˆë‹¤.");
     }
 }

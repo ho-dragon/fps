@@ -12,7 +12,7 @@ public class GameContext {
 
     public GameContext(EventManager eventManager, int remainTime, int scoreRed, int scoreBlue, int playerCountRed, int playerCountBlue) {
         this.eventManager = eventManager;
-        UpdatePlayTime(remainTime);
+        UpdateRemainTime(remainTime);
         UpdateScore(scoreRed, scoreBlue);
         UpdatePlayerCount(playerCountRed, playerCountBlue);        
     }
@@ -23,7 +23,7 @@ public class GameContext {
         this.eventManager.UpdatePlayerCount(playerRed, playerBlue);
     }
 
-    public void UpdatePlayTime(int remainTime) {
+    public void UpdateRemainTime(int remainTime) {
         this.remainTime = remainTime;
         this.eventManager.UpdateRemainTime(remainTime);
     }

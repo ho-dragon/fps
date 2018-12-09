@@ -17,23 +17,37 @@ public class UIManager : MonoBehaviourInstance<UIManager> {
     public void UpdateWaitingPlayers(int joinedPlayerCount, int maxPlayerCount, int remianTimeToPlay) {
         this.waitingTime.text = string.Format("플레이어를 기다리고 있습니다...{0} 참여인원({1}/{2})", remianTimeToPlay, joinedPlayerCount, maxPlayerCount);
     }
-    
-    public void ShowToastMessgae(string messgae, float duration) {
-        StartCoroutine(ToastMessage(this.waitingTime, messgae, duration));
+
+    public void ShowToastMessgae(string messgae, float duration, System.Action callback = null) {
+        StartCoroutine(ToastMessage(this.waitingTime, messgae, duration, callback));
     }
 
     public void Alert(string msg) {
         this.serverAlert.text = msg;
     }
 
-    public void EndGame() {
-
+    public void AlertCountDown(int count, string message) {
+        StopCoroutine("CountDown");
+        StartCoroutine(CountDown(this.serverAlert, count, message));
     }
 
-    IEnumerator ToastMessage(Text label, string messgae, float duration) {
-        label.text = messgae;
+    IEnumerator CountDown(Text label, int count, string message) {
+        int currentCount = 0;
+        for (int i = 0; i < count; i++) {
+            label.text = string.Format(message, count - currentCount);
+            yield return new WaitForSeconds(1f);
+            currentCount++;
+        }
+    }
+
+    IEnumerator ToastMessage(Text label, string message, float duration, System.Action callback) {
+        Logger.DebugHighlight("[UIManager.ToastMessage] message = " + message);
+        label.text = message;
         yield return new WaitForSeconds(duration);
         label.text = "";
+        if (callback != null) {
+            callback();
+        }
     }
-        
+
 }

@@ -38,6 +38,9 @@ public class PlayerCamera : MonoBehaviour {
         return this.GetComponent<Camera>();
     }
 
+    public void Stop() {
+        this.isAttachedPlayer = false;
+    }
 
     public void ZoomIn() {
         this.isDoingZoomIn = true;

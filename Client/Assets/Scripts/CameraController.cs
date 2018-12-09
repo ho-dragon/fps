@@ -5,7 +5,6 @@ public class CameraController : MonoBehaviourInstance<CameraController> {
     public Transform pivot;
     public PlayerCamera playerCamera;
     private Transform playerCameraPivot;
-    private bool isAttatchedPlayer = false;
 
     void Awake() {
         Assert.IsNotNull(this.playerCamera);
@@ -14,8 +13,11 @@ public class CameraController : MonoBehaviourInstance<CameraController> {
 
     public void AttatchCameraToPlayer(Transform playerCameraPivot) {
         this.playerCameraPivot = playerCameraPivot;
-        this.playerCamera.AttatchCameraToPlayer(playerCameraPivot, this.pivot);
-        this.isAttatchedPlayer = true;        
+        this.playerCamera.AttatchCameraToPlayer(playerCameraPivot, this.pivot);     
+    }
+
+    public void Stop() {
+        this.playerCamera.Stop();
     }
 
     public void ZoomIn() {

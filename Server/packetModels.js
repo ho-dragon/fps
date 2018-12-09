@@ -76,17 +76,16 @@ function playerAction(playerNum, actionType) {
 	this.actionType = actionType;
 }
 
-function gameContext(playTime, maxPlayTime, playerTeamNumbers, scoreRed, scoreBlue, scoreGoal) {
+function gameContext(remainTime, playerTeamNumbers, scoreRed, scoreBlue, scoreGoal) {
 	this.playerTeamNumbers = playerTeamNumbers;
-	this.playTime = playTime;
-	this.maxPlayTime = maxPlayTime;
+	this.remainTime = remainTime;
 	this.scoreRed = scoreRed;
 	this.scoreBlue = scoreBlue;
 	this.scoreGoal = scoreGoal;
 }
 
-function gameTime(playTime) {
-	this.playTime = playTime;
+function gameTime(remainTime) {
+	this.remainTime = remainTime;
 }
 
 function waitingStatus(joinedPlayerCount, maxPlayerCount, remianTimeToPlay) {

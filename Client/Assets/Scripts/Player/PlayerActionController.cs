@@ -6,14 +6,17 @@ public class PlayerActionController : MonoBehaviour {
     public PlayerMove move;
     public PlayerShoot shoot;
     private PlayerAnimationController animationController;
-    private bool isLocalPayer = false;
+    private bool isLocalPlayer = false;
     private bool isZoomOut = false;
+    private bool isDead = false;
     void Awake() {
         Assert.IsNotNull(this.move);
         Assert.IsNotNull(this.shoot);
     }
 
-    public void Init(PlayerAnimationController animationController, Transform playerTras, int playerNmber, bool isDead, System.Action<int, Vector3, float> moveCallback) {        
+    public void Init(PlayerAnimationController animationController, Transform playerTras, int playerNmber, bool isLocalPlayer, bool isDead, System.Action<int, Vector3, float> moveCallback) {
+        this.isLocalPlayer = isLocalPlayer;
+        this.isDead = isDead;
         this.move.Init(animationController, playerTras, playerNmber, isDead, moveCallback);
         this.animationController = animationController;
         this.animationController.Init(playerNmber);
@@ -24,12 +27,13 @@ public class PlayerActionController : MonoBehaviour {
     }
 
     public void SetLocalPlayer(bool isLocalPlayer) {
-        this.isLocalPayer = isLocalPlayer;
+        this.isLocalPlayer = isLocalPlayer;
         this.move.SetLocalPlayer(isLocalPlayer);
         this.animationController.SetLocalPlayer(isLocalPlayer);
     }
 
     public void UpdatePlayerDead(bool isDead) {
+        this.isDead = isDead;
         this.move.UpdatePlayerDead(isDead);
     }
 
@@ -46,7 +50,11 @@ public class PlayerActionController : MonoBehaviour {
     }
 
     void Update() {
-        if (this.isLocalPayer == false) {
+        if (this.isLocalPlayer == false) {
+            return;
+        }
+
+        if (this.isDead) {
             return;
         }
 

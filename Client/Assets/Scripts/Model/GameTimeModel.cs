@@ -2,5 +2,5 @@
 using System.Collections.Generic;
 
 public class GameTimeModel {
-    public int playTime;
+    public int remainTime;
 }
