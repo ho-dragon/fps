@@ -2,7 +2,7 @@
 using System.Collections;
 using Newtonsoft.Json;
 
-public class SocketRequestEntry : IEnumerator {
+public class SocketRequestEntry {
     public long RequestId { get; private set; }
     public SocketRequestState State { get; private set; }
     public Type ResultType { get; private set; }
@@ -16,14 +16,6 @@ public class SocketRequestEntry : IEnumerator {
         ResultType = responseType;
         RequestMethod = req.method;
         State = SocketRequestState.Unsent;
-    }
-
-    public object Current {
-        get { return null; }
-    }
-
-    public bool MoveNext() {
-        return !State.IsFinal();
     }
 
     public void Reset() {
