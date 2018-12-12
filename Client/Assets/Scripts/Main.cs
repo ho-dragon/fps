@@ -55,11 +55,11 @@ public class Main : MonoBehaviourInstance<Main> {
         Application.targetFrameRate = 60;
         Logger.Debug("[Main] Awake!");
         Logger.isMuted = isDebugMuted;
-        Logger.SetLogLevel(this.logLevel);
+        Logger.SetLogLevel(this.logLevel);        
     }
 
     private void Start() {
-        //ConnectToServer();//Test
+        //ConnectToServer();//for Test
     }
 
     void Update() {
@@ -72,7 +72,7 @@ public class Main : MonoBehaviourInstance<Main> {
         return this.playerId;
     }
 
-    private string CreatePlayerId() {
+    private string GeneratePlayerId() {
         System.Guid guid= System.Guid.NewGuid();
         string nickName = System.Convert.ToBase64String(guid.ToByteArray());
         nickName = nickName.Replace("=", "");
@@ -82,7 +82,7 @@ public class Main : MonoBehaviourInstance<Main> {
 
     private void ConnectToServer() {
         if (string.IsNullOrEmpty(this.playerId)) {
-            this.playerId = CreatePlayerId();
+            this.playerId = GeneratePlayerId();
         }
 
         TcpSocket.inst.Connect(this.ip, System.Convert.ToInt32(this.port), (isConnected, msg) => {
@@ -134,7 +134,7 @@ public class Main : MonoBehaviourInstance<Main> {
 
         this.eventManager = new EventManager();
         PlayerManager.inst.AssignTeam(result.playerTeamNumbers);
-        PlayerManager.inst.ForceMoveRespawnZone();
+        PlayerManager.inst.MoveRespawnZone();
         UIManager.inst.hud.AddEvents(this.eventManager);
         UIManager.inst.hud.EnablePlayerStatus();
         UIManager.inst.hud.SetScoreGoal(result.scoreGoal);

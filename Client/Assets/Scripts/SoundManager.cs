@@ -39,7 +39,7 @@ public enum SoundFxType {
     SpawnPlayer,
     HitPlayer,
     Aming,
-    DeadPlay,
+    DeadPlayer,
 }
 
 public enum SoundBgTpye {

@@ -128,9 +128,10 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
     }
 
-    public void ForceMoveRespawnZone() {
+    public void MoveRespawnZone() {
         this.localPlayer.transform.position = MapInfo.inst.GetRespawnZone(this.localPlayer.GetTeamCode());
         TcpSocket.inst.Request.MovePlayer(this.localPlayer.Number, this.localPlayer.transform.position, this.localPlayer.transform.rotation.eulerAngles.y);
+        SoundManager.inst.PlayFx(SoundFxType.SpawnPlayer, this.localPlayer.gameObject);
     }
 
     public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {

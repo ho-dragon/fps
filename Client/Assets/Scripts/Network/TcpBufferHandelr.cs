@@ -9,7 +9,7 @@ public class Defines {
 public class TcpBufferHandelr {
      public delegate void CompletedMessageCallback(byte[] buffer);
     int messageSize;
-    byte[] message_buffer = new byte[1024];
+    byte[] messageBuffer = new byte[1024];
     int current_position;
     int positionToRead;
     int remain_bytes;
@@ -21,7 +21,7 @@ public class TcpBufferHandelr {
         this.remain_bytes = 0;
     }
 
-    private bool ReadUntil(byte[] buffer, ref int src_position, int offset, int transffered) {
+    private bool Read(byte[] buffer, ref int src_position, int offset, int transffered) {
         if (this.current_position >= offset + transffered) {
             return false;
         }
@@ -31,7 +31,7 @@ public class TcpBufferHandelr {
             copy_size = this.remain_bytes;
         }
 
-        Array.Copy(buffer, src_position, this.message_buffer, this.current_position, copy_size);
+        Array.Copy(buffer, src_position, this.messageBuffer, this.current_position, copy_size);
         src_position += copy_size;
         this.current_position += copy_size;
         this.remain_bytes -= copy_size;
@@ -49,7 +49,7 @@ public class TcpBufferHandelr {
             bool completed = false;
             if (this.current_position < Defines.HEADERSIZE) {
                 this.positionToRead = Defines.HEADERSIZE;
-                completed = ReadUntil(buffer, ref src_position, offset, transffered);
+                completed = Read(buffer, ref src_position, offset, transffered);
                 if (completed == false) {
                     return;
                 }
@@ -60,10 +60,10 @@ public class TcpBufferHandelr {
                 }
                 this.positionToRead = this.messageSize + Defines.HEADERSIZE;
             }
-            completed = ReadUntil(buffer, ref src_position, offset, transffered);
+            completed = Read(buffer, ref src_position, offset, transffered);
 
             if (completed) {
-                callback(this.message_buffer);
+                callback(this.messageBuffer);
                 ClearBuffer();
             }
         }
@@ -72,14 +72,14 @@ public class TcpBufferHandelr {
     private int GetBodySize() {
         Type type = Defines.HEADERSIZE.GetType();
         if (type.Equals(typeof(Int16))) {
-            return BitConverter.ToInt16(this.message_buffer, 0);
+            return BitConverter.ToInt16(this.messageBuffer, 0);
         }
 
-        return BitConverter.ToInt32(this.message_buffer, 0);
+        return BitConverter.ToInt32(this.messageBuffer, 0);
     }
 
     private void ClearBuffer() {
-        Array.Clear(this.message_buffer, 0, this.message_buffer.Length);
+        Array.Clear(this.messageBuffer, 0, this.messageBuffer.Length);
         this.current_position = 0;
         this.messageSize = 0;
     }

@@ -35,6 +35,7 @@ public class Player : MonoBehaviour {
         set {this.isDead = value;
             this.actionController.UpdatePlayerDead(value);
             if (value) {
+                SoundManager.inst.PlayFx(SoundFxType.DeadPlayer, this.gameObject);
                 animationController.OnAcion(PlayerActionType.Death);
             }
         }

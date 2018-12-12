@@ -110,7 +110,7 @@ public partial class PacketManager: MonoBehaviour {
         int sendDataLength = data.Length;
         byte[] header = BitConverter.GetBytes(sendDataLength);
         byte[] body = data;
-        byte[] sendData = ByteMerge(header, body);
+        byte[] sendData = MergeBytes(header, body);
 
         if (this.socket.Connected == false) {
             this.state = SocketState.Unconnected;
@@ -121,7 +121,7 @@ public partial class PacketManager: MonoBehaviour {
         this.socket.Send(sendData);
     }
 
-    private byte[] ByteMerge(byte[] buffer1, byte[] buffer2) {
+    private byte[] MergeBytes(byte[] buffer1, byte[] buffer2) {
         byte[] tmp = new byte[buffer1.Length + buffer2.Length];
         for (int i = 0; i < buffer1.Length; i++) {
             tmp[i] = buffer1[i];

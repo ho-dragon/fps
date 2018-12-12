@@ -136,6 +136,7 @@ public class PlayerAnimationController : MonoBehaviour {
     }
 
     private void Aiming() {
+        SoundManager.inst.PlayFx(SoundFxType.Aming, this.gameObject);
         animator.SetBool("Squat", false);
         animator.SetFloat("Speed", 0f);
         animator.SetBool("Aiming", true);

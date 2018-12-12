@@ -50,14 +50,21 @@ public class PlayerMove : MonoBehaviour {
         this.playerTrans.localRotation = Quaternion.Euler(this.playerTrans.localRotation.eulerAngles.x, yaw, this.playerTrans.localRotation.eulerAngles.z);
     }
 
+    void OnCollisionEnter(Collision collision) {
+        if (collision.gameObject.layer.Equals(GameLayers.Rock) || collision.gameObject.layer.Equals(GameLayers.Ground)) {
+            SoundManager.inst.PlayFx(SoundFxType.HitRock, this.gameObject);
+            SendPosition();
+        }
+    }
+
     void FixedUpdate() {
         if (this.isLocalPlayer) {
             if (this.isDead) {
                 return;
-            }
+            }            
             MoveInput();
-        } else {
-            if (isStartMove) {//Todo. t 확인필요 / isStarMode = false
+        } else {             
+             if (isStartMove) {
                 this.playerTrans.position = Vector3.Lerp(this.playerTrans.position, this.toPosition, Time.deltaTime * walkSpeed);
             }
         }
@@ -99,7 +106,10 @@ public class PlayerMove : MonoBehaviour {
         this.playerRigidbody.MovePosition(this.playerRigidbody.position + movement * Time.deltaTime);
         this.playerRigidbody.rotation = Quaternion.Euler(0.0f, 0.0f, this.playerRigidbody.velocity.x * -tilt);
         this.lastRotationY = this.playerTrans.rotation.eulerAngles.y;
+        SendPosition();
+    }
 
+    private void SendPosition() {
         if (moveCallback != null) {
             moveCallback(this.playerNumber, this.playerTrans.position, this.playerTrans.rotation.eulerAngles.y);
         }
