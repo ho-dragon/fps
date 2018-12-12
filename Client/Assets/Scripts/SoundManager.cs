@@ -38,8 +38,9 @@ public enum SoundFxType {
     HitRock,
     SpawnPlayer,
     HitPlayer,
-    Aming,
+    Aiming,
     DeadPlayer,
+    Jump,
 }
 
 public enum SoundBgTpye {

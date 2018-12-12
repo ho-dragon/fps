@@ -49,10 +49,10 @@ public class PlayerMove : MonoBehaviour {
         this.toPosition = toPosition;
         this.playerTrans.localRotation = Quaternion.Euler(this.playerTrans.localRotation.eulerAngles.x, yaw, this.playerTrans.localRotation.eulerAngles.z);
     }
-
+    
+    private bool isGround = false;
     void OnCollisionEnter(Collision collision) {
         if (collision.gameObject.layer.Equals(GameLayers.Rock) || collision.gameObject.layer.Equals(GameLayers.Ground)) {
-            SoundManager.inst.PlayFx(SoundFxType.HitRock, this.gameObject);
             SendPosition();
         }
     }

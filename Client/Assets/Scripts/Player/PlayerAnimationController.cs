@@ -40,16 +40,21 @@ public class PlayerAnimationController : MonoBehaviour {
         return this.currentAction;
     }
 
+    private bool isChangedAction = false;
     public void OnAcion(PlayerActionType actionType) {
         if (this.currentAction != actionType) {
             this.currentAction = actionType;
+            this.isChangedAction = true;
             if (this.isLocalPlayer) {
                 TcpSocket.inst.Request.ActionPlayer(this.playerNum, actionType);
-            }            
+            }
+        } else {
+            this.isChangedAction = false;
         }
+
         switch (actionType) {
             case PlayerActionType.Aiming:
-                Aiming();
+                Aiming(this.isChangedAction);
                 break;            
             case PlayerActionType.Attack:
                 Attack();
@@ -64,7 +69,7 @@ public class PlayerAnimationController : MonoBehaviour {
                 Stay();
                 break;
             case PlayerActionType.Jump:
-                Jump();
+                Jump(this.isChangedAction);
                 break;
             case PlayerActionType.Run:
                 Run();
@@ -101,7 +106,7 @@ public class PlayerAnimationController : MonoBehaviour {
     }
 
     private void Attack() {
-        Aiming();
+        Aiming(this.isChangedAction);
         animator.SetTrigger("Attack");
     }
 
@@ -128,15 +133,20 @@ public class PlayerAnimationController : MonoBehaviour {
         animator.SetTrigger("Damage");
     }
 
-    private void Jump() {
+    private void Jump(bool isChanged) {
+        if (isChanged) {
+            SoundManager.inst.PlayFx(SoundFxType.Jump, this.gameObject);
+        }        
         animator.SetBool("Squat", false);
         animator.SetFloat("Speed", 0f);
         animator.SetBool("Aiming", false);
         animator.SetTrigger("Jump");
     }
 
-    private void Aiming() {
-        SoundManager.inst.PlayFx(SoundFxType.Aming, this.gameObject);
+    private void Aiming(bool isChanged) {
+        if (isChanged && animator.GetBool("Aiming") == false) {
+            SoundManager.inst.PlayFx(SoundFxType.Aiming, this.gameObject);
+        }        
         animator.SetBool("Squat", false);
         animator.SetFloat("Speed", 0f);
         animator.SetBool("Aiming", true);

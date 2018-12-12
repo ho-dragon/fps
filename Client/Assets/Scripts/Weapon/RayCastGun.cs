@@ -57,9 +57,9 @@ public class RayCastGun : Weapon {
                 PlayerManager.inst.UpdateHP(result.damagedPlayer, result.currentHP, result.maxHP);
             });
         } else if (hit.transform.gameObject.layer.Equals(GameLayers.Rock)) {
-            SoundManager.inst.PlayFx(SoundFxType.HitRock, this.gameObject);
+            //SoundManager.inst.PlayFx(SoundFxType.HitRock, hit.transform.gameObject);
         } else if (hit.transform.gameObject.layer.Equals(GameLayers.Ground)) {
-            SoundManager.inst.PlayFx(SoundFxType.HitRock, this.gameObject);
+            //SoundManager.inst.PlayFx(SoundFxType.HitRock, hit.transform.gameObject);
         }
     }
 
