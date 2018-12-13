@@ -55,7 +55,14 @@ public class Main : MonoBehaviourInstance<Main> {
         Application.targetFrameRate = 60;
         Logger.Debug("[Main] Awake!");
         Logger.isMuted = isDebugMuted;
-        Logger.SetLogLevel(this.logLevel);        
+        Logger.SetLogLevel(this.logLevel);
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("ip")) == false) {
+            this.ip = PlayerPrefs.GetString("ip");
+        }
+    }
+
+    private void SaveIpAddress(string ipAddress) {
+        PlayerPrefs.SetString("ip", ipAddress);
     }
 
     private void Start() {
@@ -96,6 +103,7 @@ public class Main : MonoBehaviourInstance<Main> {
 
     public void EnterRoom(string userName) {
         Logger.Debug("[Main.EnterRoom]");
+        SaveIpAddress(this.ip);
         TcpSocket.inst.Request.EnterRoom(userName, (req, result) => {
             JoinRoom(false, result);
         });
