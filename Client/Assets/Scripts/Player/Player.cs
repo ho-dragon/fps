@@ -35,8 +35,9 @@ public class Player : MonoBehaviour {
         set {this.isDead = value;
             this.actionController.UpdatePlayerDead(value);
             if (value) {
+                Logger.DebugHighlight("--------------DEAD----------True--------");
                 SoundManager.inst.PlayFx(SoundFxType.DeadPlayer, this.gameObject);
-                animationController.OnAcion(PlayerActionType.Death);
+                animationController.OnAcion(PlayerActionType.Death, true);
             }
         }
     }
@@ -86,7 +87,7 @@ public class Player : MonoBehaviour {
 
     public void Respawn() {
         this.transform.position = MapInfo.inst.GetRespawnZone(this.teamCode);       
-        animationController.OnAcion(PlayerActionType.Respawn);
+        animationController.OnAcion(PlayerActionType.Respawn, true);
         TcpSocket.inst.Request.MovePlayer(this.number, this.transform.position, this.transform.rotation.eulerAngles.y);
         TcpSocket.inst.Request.ActionPlayer(this.number, PlayerActionType.Respawn);
     }

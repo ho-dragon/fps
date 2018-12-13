@@ -41,11 +41,11 @@ public class PlayerAnimationController : MonoBehaviour {
     }
 
     private bool isChangedAction = false;
-    public void OnAcion(PlayerActionType actionType) {
+    public void OnAcion(PlayerActionType actionType, bool isFromServerAction = false) {
         if (this.currentAction != actionType) {
             this.currentAction = actionType;
             this.isChangedAction = true;
-            if (this.isLocalPlayer) {
+            if (this.isLocalPlayer && isFromServerAction == false) {
                 TcpSocket.inst.Request.ActionPlayer(this.playerNum, actionType);
             }
         } else {

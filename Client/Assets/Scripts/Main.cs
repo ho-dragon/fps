@@ -97,7 +97,7 @@ public class Main : MonoBehaviourInstance<Main> {
             Logger.Error("Connect result = {0}, msg ={1}", isConnected, msg);
             this.isConnected = isConnected;
             this.connectMsg = msg;
-            EnterRoom(this.playerId);
+            //EnterRoom(this.playerId);//TEST
         });
     }
 

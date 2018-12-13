@@ -134,7 +134,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         SoundManager.inst.PlayFx(SoundFxType.SpawnPlayer, this.localPlayer.gameObject);
     }
 
-    public void OnMove(int playerNumb, Vector3 movePosition, float yaw) {
+    public void UpdatePosition(int playerNumb, Vector3 movePosition, float yaw) {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if (player != null) {
             if (player.IsLocalPlayer == false) {                
@@ -143,11 +143,11 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         }
     }
 
-    public void OnAction(int playerNumb, PlayerActionType actionType) {
+    public void UpdateAction(int playerNumb, PlayerActionType actionType) {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if (player != null) {
             if (player.IsLocalPlayer == false) {
-                player.ActionController.OnAction(actionType);
+                player.ActionController.OnAction(actionType, true);
             }
         }
     }

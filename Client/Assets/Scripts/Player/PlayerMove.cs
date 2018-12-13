@@ -50,9 +50,11 @@ public class PlayerMove : MonoBehaviour {
         this.playerTrans.localRotation = Quaternion.Euler(this.playerTrans.localRotation.eulerAngles.x, yaw, this.playerTrans.localRotation.eulerAngles.z);
     }
     
+
+
     private bool isGround = false;
     void OnCollisionEnter(Collision collision) {
-        if (collision.gameObject.layer.Equals(GameLayers.Rock) || collision.gameObject.layer.Equals(GameLayers.Ground)) {
+        if (this.isLocalPlayer && collision.gameObject.layer.Equals(GameLayers.Rock) || collision.gameObject.layer.Equals(GameLayers.Ground)) {
             SendPosition();
         }
     }

@@ -67,7 +67,7 @@ public class PacketNotification {
 
     private void MovePlayer(PlayerMoveModel result) {
         //Logger.DebugHighlight("[RecevieNtotication.MovePlayer]  = " + result.playerNum + " / movePosition X : {0} Y : {1} : Z : {2}" , result.playerPosX, result.playerPosY, result.playerPosZ);
-        PlayerManager.inst.OnMove(result.playerNum, new Vector3(result.playerPosX
+        PlayerManager.inst.UpdatePosition(result.playerNum, new Vector3(result.playerPosX
                                                                     , result.playerPosY
                                                                     , result.playerPosZ)
                                                                     , result.playerYaw);
@@ -75,7 +75,7 @@ public class PacketNotification {
 
     private void ActionPlayer(PLayerActionModel result) {
         Logger.DebugHighlight("[PacketNotification.ActionPlayer] actioType = " + result.actionType);
-        PlayerManager.inst.OnAction(result.playerNum, result.actionType);
+        PlayerManager.inst.UpdateAction(result.playerNum, result.actionType);
     }
     
     public void StartGame(GameContextModel result) {

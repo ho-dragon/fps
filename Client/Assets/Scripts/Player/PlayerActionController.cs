@@ -41,8 +41,8 @@ public class PlayerActionController : MonoBehaviour {
         this.move.OnMoveTo(toPosition, yaw);
     }
 
-    public void OnAction(PlayerActionType actionType) {
-        this.animationController.OnAcion(actionType);
+    public void OnAction(PlayerActionType actionType, bool isFromServer) {
+        this.animationController.OnAcion(actionType, isFromServer);
     }
 
     public void SetWeapon(Weapon weapon) {
