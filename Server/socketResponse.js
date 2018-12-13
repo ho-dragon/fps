@@ -158,14 +158,21 @@ function actionPlayer(socket, result) {
 }
 
 function attackPlayer(socket, result) {
+	if (game.isRunningGame() == false) {
+		return;
+	}
+
 	let attackPlayerNumber = result.param["attackPlayer"];
 	let damagedPlayerNumber = result.param["damagedPlayer"];
 	let attackPosition = result.param["attackPosition"];
 
 	let attakPlayer = room.getPlayerByNumber(attackPlayerNumber);
 	let targetPlayer = room.getPlayerByNumber(damagedPlayerNumber);
+	if (targetPlayer == null) {
+		debug("[attackPlayer] targetPlayer is null");
+	}
 
-	if(targetPlayer.isDead) {
+	if (targetPlayer.isDead) {
 		let response = new models.responseFormat(codeIsAlreadyDead, result.id, "success", null);
 		connection.send(socket, response);
 		return;
