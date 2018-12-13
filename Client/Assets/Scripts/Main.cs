@@ -65,10 +65,6 @@ public class Main : MonoBehaviourInstance<Main> {
         PlayerPrefs.SetString("ip", ipAddress);
     }
 
-    private void Start() {
-        //ConnectToServer();//for Test
-    }
-
     void Update() {
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Application.Quit();
@@ -84,7 +80,7 @@ public class Main : MonoBehaviourInstance<Main> {
         string nickName = System.Convert.ToBase64String(guid.ToByteArray());
         nickName = nickName.Replace("=", "");
         nickName = nickName.Replace("+", "");
-        return string.Format("User_{0}", nickName);
+        return string.Format("USER-{0}", nickName);
     }
 
     private void ConnectToServer() {
@@ -97,7 +93,6 @@ public class Main : MonoBehaviourInstance<Main> {
             Logger.Error("Connect result = {0}, msg ={1}", isConnected, msg);
             this.isConnected = isConnected;
             this.connectMsg = msg;
-            //EnterRoom(this.playerId);//TEST
         });
     }
 
@@ -147,11 +142,12 @@ public class Main : MonoBehaviourInstance<Main> {
         UIManager.inst.hud.EnablePlayerStatus();
         UIManager.inst.hud.SetScoreGoal(result.scoreGoal);
         UIManager.inst.hud.SetMyTeamCode(PlayerManager.inst.GetLocalPlayer().GetTeamCode());
+        MapInfo.inst.EnableWaitingZone(false);
 
         if (isRunningGame) {
-            UIManager.inst.ShowToastMessgae(string.Format("재접속 완료! 목표 점수 {0}", result.scoreGoal), 5f);
+            UIManager.inst.ShowToastMessgae("재접속 완료!", 5f);
         } else {
-            UIManager.inst.ShowToastMessgae(string.Format("게임이 시작! 목표 점수 {0}", result.scoreGoal), 5f);
+            UIManager.inst.ShowToastMessgae("게임이 시작!", 5f);
         }        
         this.context = new GameContext(this.eventManager
                                      , result.remainTime
@@ -162,13 +158,14 @@ public class Main : MonoBehaviourInstance<Main> {
     }
 
     public void EndGame(GameContextModel  result) {
+        MapInfo.inst.EnableWaitingZone(true);
         string desc = string.Empty;
         if (result.scoreRed > result.scoreBlue) {
-            desc = string.Format("RED팀 승리! {0}:{1}", result.scoreRed, result.scoreBlue);
+            desc = string.Format("RED팀 승리!", result.scoreRed, result.scoreBlue);
         } else if (result.scoreBlue > result.scoreRed) {
-            desc = string.Format("BLUE팀 승리! {1}:{0}", result.scoreRed, result.scoreBlue);
+            desc = string.Format("BLUE팀 승리!", result.scoreRed, result.scoreBlue);
         } else {
-            desc = string.Format("무승부 {1}:{0}", result.scoreRed, result.scoreBlue);
+            desc = string.Format("무승부", result.scoreRed, result.scoreBlue);
         }
         UIManager.inst.ShowToastMessgae(desc
                                       , 5f
@@ -182,6 +179,6 @@ public class Main : MonoBehaviourInstance<Main> {
                                           Cursor.visible = true;
                                       });
 
-        UIManager.inst.AlertCountDown(5, "{0}초 후 방입장이 가능합니다.");
+        UIManager.inst.AlertCountDown(5, "{0}초 후 입장이 가능합니다.");
     }
 }
