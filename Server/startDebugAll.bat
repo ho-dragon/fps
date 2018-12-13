@@ -1,1 +1,0 @@
-set DEBUG=* & node connection
