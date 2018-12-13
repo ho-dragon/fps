@@ -118,8 +118,8 @@ public class PacketNotification {
 
     public void Respawn(RespawnModel result) {
         Logger.DebugHighlight("[PacketNotification.Respawn");
-        UIManager.inst.ShowToastMessgae("부활했습니다.", 3f);
         Player player = PlayerManager.inst.GetPlayer(result.playerNumber);
+        UIManager.inst.ShowToastMessgae(string.Format("{0}팀 {1}이(가) 부활했습니다.", player.GetTeamCode().GetTeamName(), player.NickName), 3f);
         player.UpdateHP(result.currentHP, result.maxHP);
         player.IsDead = false;
         if (player.IsLocalPlayer) {
