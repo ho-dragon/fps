@@ -6,6 +6,7 @@ public class Weapon : MonoBehaviour {
     protected int ownerPlayerNumber;
     protected TeamCode ownerTeamCode;
     public Transform muzzleTransform;
+    public ParticleSystem gunFireEffect;
 	protected PlayerCamera playerCam;
     protected float fireRate = 0f;
     private float nextFire = 0f;
@@ -34,7 +35,10 @@ public class Weapon : MonoBehaviour {
    
     public virtual void Shoot() {
         Logger.Debug("[Weapon] shoot");
-         this.nextFire = Time.time + fireRate;
+        this.nextFire = Time.time + fireRate;
+        if (this.gunFireEffect != null) {
+            this.gunFireEffect.Play();
+        }
     }
 
     public bool IsShootable() {

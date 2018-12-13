@@ -31,7 +31,7 @@ public class PlayerHeaderUI : MonoBehaviour {
         if (teamCode == TeamCode.NONE) {
             return;
         }
-        this.teamCode.text =  teamCode.GetTeamName();
+        this.teamCode.text =  string.Format("-----{0}-----", teamCode.GetTeamName());
         this.teamCode.color = teamCode.GetColor();
     }
 }

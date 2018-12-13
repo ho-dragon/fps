@@ -35,8 +35,8 @@ public class MapInfo : MonoBehaviourInstance<MapInfo> {
     }
 
     public void EnableZone(bool isRunningGame) {
-        this.waitingZone.gameObject.SetActive(!isRunningGame);
-        this.redZone.gameObject.SetActive(isRunningGame);
-        this.blueZone.gameObject.SetActive(isRunningGame);
+        this.waitingZone.parent.gameObject.SetActive(!isRunningGame);
+        this.redZone.parent.gameObject.SetActive(isRunningGame);
+        this.blueZone.parent.gameObject.SetActive(isRunningGame);
     }
 }

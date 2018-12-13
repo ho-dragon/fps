@@ -126,6 +126,8 @@ public class Main : MonoBehaviourInstance<Main> {
         this.isOnGUI = false;
         if (isRunningGame) {
             StartGame(isRunningGame, result.runningGameContext);
+        } else {
+            MapInfo.inst.EnableZone(false);
         }
     }
 

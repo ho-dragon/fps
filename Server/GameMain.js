@@ -8,8 +8,8 @@ const bson = require('bson');
 
 const maxPlayerCount = 20;
 const minPlayerCount = 2 
-const maxWaitingTime = 5;
-const maxPlayTime = 40;
+const maxWaitingTime = 10;
+const maxPlayTime = 60;
 const maxScoreGoal = 10;
 const codeSuccess = 200;
 
