@@ -18,6 +18,7 @@
     "app": "./connection.js"
   },
   "scripts": {
-    "build": "pkg ."
+    "build.win": "pkg . --targets node8-win-x64",
+    "build.mac": "pkg . --targets node8-macos-x64"
   }
 }
