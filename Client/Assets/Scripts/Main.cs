@@ -142,7 +142,7 @@ public class Main : MonoBehaviourInstance<Main> {
         UIManager.inst.hud.EnablePlayerStatus();
         UIManager.inst.hud.SetScoreGoal(result.scoreGoal);
         UIManager.inst.hud.SetMyTeamCode(PlayerManager.inst.GetLocalPlayer().GetTeamCode());
-        MapInfo.inst.EnableWaitingZone(false);
+        MapInfo.inst.EnableZone(true);
 
         if (isRunningGame) {
             UIManager.inst.ShowToastMessgae("재접속 완료!", 5f);
@@ -158,7 +158,7 @@ public class Main : MonoBehaviourInstance<Main> {
     }
 
     public void EndGame(GameContextModel  result) {
-        MapInfo.inst.EnableWaitingZone(true);
+        MapInfo.inst.EnableZone(false);
         string desc = string.Empty;
         if (result.scoreRed > result.scoreBlue) {
             desc = string.Format("RED팀 승리!", result.scoreRed, result.scoreBlue);

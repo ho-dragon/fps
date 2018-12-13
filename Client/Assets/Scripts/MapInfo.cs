@@ -34,7 +34,9 @@ public class MapInfo : MonoBehaviourInstance<MapInfo> {
         return this.waitingZone.position + new Vector3(UnityEngine.Random.Range(-3f, 3f), UnityEngine.Random.Range(-3f, 3f), 0); ;
     }
 
-    public void EnableWaitingZone(bool isOn) {
-        this.waitingZone.gameObject.SetActive(isOn);
+    public void EnableZone(bool isRunningGame) {
+        this.waitingZone.gameObject.SetActive(!isRunningGame);
+        this.redZone.gameObject.SetActive(isRunningGame);
+        this.blueZone.gameObject.SetActive(isRunningGame);
     }
 }
