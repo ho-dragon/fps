@@ -36,6 +36,10 @@ public class Weapon : MonoBehaviour {
     public virtual void Shoot() {
         Logger.Debug("[Weapon] shoot");
         this.nextFire = Time.time + fireRate;
+        GunFireEffect();
+    }
+
+    public void GunFireEffect() {
         if (this.gunFireEffect != null) {
             this.gunFireEffect.Play();
         }

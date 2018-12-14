@@ -75,7 +75,7 @@ public class PacketNotification {
 
     private void ActionPlayer(PLayerActionModel result) {
         Logger.DebugHighlight("[PacketNotification.ActionPlayer] actioType = " + result.actionType);
-        PlayerManager.inst.UpdateAction(result.playerNum, result.actionType);
+        PlayerManager.inst.UpdateAction(result.playerNum, result.actionType);        
     }
     
     public void StartGame(GameContextModel result) {
@@ -90,7 +90,9 @@ public class PacketNotification {
 
     public void UpdateGameTime(GameTimeModel result) {
         Logger.DebugHighlight("[PackketNotification.UpdateGameTime");
-        Main.inst.context.UpdateRemainTime(result.remainTime);
+        if (Main.inst.context != null) {
+            Main.inst.context.UpdateRemainTime(result.remainTime);
+        }                   
     }
 
     public void DeadPlayer(DeadPlayerModel result) {

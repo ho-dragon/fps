@@ -41,8 +41,8 @@ public class PlayerActionController : MonoBehaviour {
         this.move.OnMoveTo(toPosition, yaw);
     }
 
-    public void OnAction(PlayerActionType actionType, bool isFromServer) {
-        this.animationController.OnAcion(actionType, isFromServer);
+    public void UpdateAction(PlayerActionType actionType, bool isFromServer) {
+        this.animationController.UpdateAction(actionType, isFromServer);
     }
 
     public void SetWeapon(Weapon weapon) {
@@ -59,31 +59,31 @@ public class PlayerActionController : MonoBehaviour {
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && this.isZoomOut) {
-            this.animationController.OnAcion(PlayerActionType.Jump);
+            this.animationController.UpdateAction(PlayerActionType.Jump);
         }
 
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.F)) {
             if (this.animationController.IsAiming() && this.shoot.IsShootable) {
                 CameraController.inst.GunRecoil(2f, 0.2f);
                 this.shoot.Shoot();
-                this.animationController.OnAcion(PlayerActionType.Attack);
+                this.animationController.UpdateAction(PlayerActionType.Attack);
             }
         }
 
         if (Input.GetMouseButton(1)) {
             this.isZoomOut = false;
-            this.animationController.OnAcion(PlayerActionType.Aiming);
+            this.animationController.UpdateAction(PlayerActionType.Aiming);
             CameraController.inst.ZoomIn();
         } else {
             if(this.isZoomOut == false) {
-                this.animationController.OnAcion(PlayerActionType.Idle);
+                this.animationController.UpdateAction(PlayerActionType.Idle);
                 CameraController.inst.ZoomOut();
                 this.isZoomOut = true;
             }
         }
 
         if (Input.GetKeyDown(KeyCode.C)) {
-            this.animationController.OnAcion(PlayerActionType.Sitting);
+            this.animationController.UpdateAction(PlayerActionType.Sitting);
         }
     }
 }

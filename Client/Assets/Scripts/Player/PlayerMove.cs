@@ -137,7 +137,7 @@ public class PlayerMove : MonoBehaviour {
     private void PlayAnimation(PlayerActionType actionType) {
         if (this.currentActionType != actionType) {
             this.currentActionType = actionType;
-            this.animationController.OnAcion(actionType);
+            this.animationController.UpdateAction(actionType);
         }
     }
 }

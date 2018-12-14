@@ -147,7 +147,13 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         Player player = this.remotePlayers.Find(x => x.Number == playerNumb);
         if (player != null) {
             if (player.IsLocalPlayer == false) {
-                player.ActionController.OnAction(actionType, true);
+                if (actionType == PlayerActionType.Attack) {
+                    Weapon weapon = player.GetWeapon();
+                    if (weapon != null) {
+                        weapon.GunFireEffect();
+                    }                         
+                }
+                player.ActionController.UpdateAction(actionType, true);
             }
         }
     }

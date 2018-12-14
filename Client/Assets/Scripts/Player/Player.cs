@@ -37,7 +37,7 @@ public class Player : MonoBehaviour {
             if (value) {
                 Logger.DebugHighlight("--------------DEAD----------True--------");
                 SoundManager.inst.PlayFx(SoundFxType.DeadPlayer, this.gameObject);
-                animationController.OnAcion(PlayerActionType.Death, true);
+                animationController.UpdateAction(PlayerActionType.Death, true);
             }
         }
     }
@@ -54,6 +54,10 @@ public class Player : MonoBehaviour {
 
     public TeamCode GetTeamCode() {
         return this.teamCode;
+    }
+
+    public Weapon GetWeapon() {
+        return this.weapon;
     }
 
     void Awake() {
@@ -87,7 +91,7 @@ public class Player : MonoBehaviour {
 
     public void Respawn() {
         this.transform.position = MapInfo.inst.GetRespawnZone(this.teamCode);       
-        animationController.OnAcion(PlayerActionType.Respawn, true);
+        animationController.UpdateAction(PlayerActionType.Respawn, true);
         TcpSocket.inst.Request.MovePlayer(this.number, this.transform.position, this.transform.rotation.eulerAngles.y);
         TcpSocket.inst.Request.ActionPlayer(this.number, PlayerActionType.Respawn);
     }

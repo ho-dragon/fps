@@ -41,7 +41,7 @@ public class PlayerAnimationController : MonoBehaviour {
     }
 
     private bool isChangedAction = false;
-    public void OnAcion(PlayerActionType actionType, bool isFromServerAction = false) {
+    public void UpdateAction(PlayerActionType actionType, bool isFromServerAction = false) {
         if (this.currentAction != actionType) {
             this.currentAction = actionType;
             this.isChangedAction = true;
