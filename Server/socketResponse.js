@@ -23,30 +23,12 @@ const codeIsAlreadyDead = 9004;
 
 module.exports.response = response;
 
-function response(socket, msg) {
-    let buffMsg = new Buffer(msg);
-    //msg = buffMsg.slice(4, buffMsg.length);// remove header buffer// 불피요 : 기존 2.0.0에서 Bson 4.2.0 업그레이드 이후 Bson에서 알아서 앞에 버퍼 부분을 인식하고 디시리얼라이즈해줌
-	//debug(' response : length = %d /  data = %s', msg.length, msg.toString());
+function response(socket, msg) { 
     let result = bson.deserialize(msg);
-
-    if (result.method != 'movePlayer') {//movePlayer는 너무 빈번함
-		debug("** method  = " + result.method);
-	    debug("** id = " + result.id);
-    	debug("** code = " + result.code);
-    	debug("** msg = " + result.msg);
-    	debug("** param = " + result.param);
-
-    	for (let key in result.param) {
-			debug(" key : " + key +", value : type = " + getType(result.param[key]));
-			let x = result.param[key];
-			debug(x);
-     	}
-    }    
-
 	switch(result.method) {
 		case _init:
 			init(socket, result);
-			break;_attackPlayer
+			break;
 		case _enterRoom:
 			enterRoom(socket, result);
 			break;
@@ -78,7 +60,6 @@ function init(socket, result) {
 }
 
 function enterRoom(socket, result) {
-	debug("[enterRoom]");
 	 if (game.isRunningGame()) {
 	 	let response = new models.responseFormat(codeRoomisPlaying, result.id, "success", null);
 		connection.send(socket, response);
@@ -87,11 +68,6 @@ function enterRoom(socket, result) {
 
 	let playerName = result.param["playerName"];
 	let player = room.addPlayer(false, playerName);
-	if (player == null) {
-		debug("[enterRoom] player is null")
-	} else {
-		debug("player number =====" + player.number);
-	}
 	let model = new models.enterRoom(player, room.getOtherPlayers(player.number), null);
 	let bytes = bson.serialize(model);
 	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);
@@ -103,7 +79,6 @@ function enterRoom(socket, result) {
 }
 
 function joinRunningGame(socket, result) {
-	debug("[joinRunningGame]");
 	if (game.isRunningGame() == false) {
 		let response = new models.responseFormat(codeRoomisPlaying, result.id, "success", null);
 		connection.send(socket, response);
@@ -119,7 +94,6 @@ function joinRunningGame(socket, result) {
 	let playerName = result.param["playerName"];
 	let player = room.addPlayer(true, playerName);
 	let runningGameContext = game.getRunningGameContext();
-	debug("[runningGameConext] playTime = " + runningGameContext.playTime);
 	let model = new models.enterRoom(player, room.getOtherPlayers(player.number), runningGameContext);	
 	let bytes = bson.serialize(model);
 	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);
@@ -153,24 +127,20 @@ function actionPlayer(socket, result) {
 	let model = new models.playerAction(playerNum, actionType);
 	let bytes = bson.serialize(model);
 	let notiResult = new models.notificationFormat('actionPlayer', codeSuccess, "success", bytes);
-	debug("[actionPlayer] bytes length = " + bytes.length);
 	connection.broadcastExcludedMe(notiResult, socket);	
 }
 
 function attackPlayer(socket, result) {
 	if (game.isRunningGame() == false) {
+		debug("[broadcastRespawnPlayer] game end.");
 		return;
 	}
 
 	let attackPlayerNumber = result.param["attackPlayer"];
 	let damagedPlayerNumber = result.param["damagedPlayer"];
 	let attackPosition = result.param["attackPosition"];
-
 	let attakPlayer = room.getPlayerByNumber(attackPlayerNumber);
 	let targetPlayer = room.getPlayerByNumber(damagedPlayerNumber);
-	if (targetPlayer == null) {
-		debug("[attackPlayer] targetPlayer is null");
-	}
 
 	if (targetPlayer.isDead) {
 		let response = new models.responseFormat(codeIsAlreadyDead, result.id, "success", null);
@@ -184,7 +154,6 @@ function attackPlayer(socket, result) {
 	}
 
 	let damagedPlayer = room.applyDamage(attakPlayer, targetPlayer, damage);
-	debug("[attackPlayerNumber] damaged player name = " + damagedPlayer.name);	
 	let damageModel = new models.playerDamage(attackPlayerNumber, damagedPlayerNumber, damage, damagedPlayer.currentHP, damagedPlayer.maxHP, damagedPlayer.isDead);
 	let bytes = bson.serialize(damageModel);
 	let response = new models.responseFormat(codeSuccess, result.id, "success", bytes);
@@ -205,10 +174,9 @@ function attackPlayer(socket, result) {
 
 function broadcastRespawnPlayer(playerNumber) {
 	if (game.isRunningGame() == false) {
-		debug("[broadcastRespawnPlayer] game is already end.");
+		debug("[broadcastRespawnPlayer] game end.");
 		return;
 	}
-	debug("[broadcastRespawnPlayer]");
 	let respawnPlayer = room.respawn(playerNumber);
 	let model = new models.respawnModel(playerNumber, respawnPlayer.currentHP, respawnPlayer.maxHP);
 	let bytes = bson.serialize(model);

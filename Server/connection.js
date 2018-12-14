@@ -114,9 +114,8 @@ function makeSendBuffer(msg) {
     var headerLen= bufPacketLenInfo.length;
     bufPacketLenInfo.writeUInt32LE(msgLen, 0); 
     
-    var bufTotal = Buffer.alloc(headerLen + msgLen); //packet length info + msg
+    var bufTotal = Buffer.alloc(headerLen + msgLen);
     bufPacketLenInfo.copy(bufTotal, 0, 0, headerLen);
     buffMsg.copy(bufTotal, headerLen, 0, msgLen );
-    //debug(color.yellow('[send] header length = '+headerLen+' / msg length = '+ msgLen+ '/ total length = '+(headerLen + msgLen) +' /  msg = ' + buffMsg.toString())); 
     return bufTotal;
 }

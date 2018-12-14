@@ -20,9 +20,7 @@ module.exports.respawn = respawn;
 const maxHP = 100;
 
 function addPlayer(isRunningGame, nickName) {
-	debug("addPlayer :: isRunningGame = " + isRunningGame);
 	if (isExistPlayer(nickName)) {
-		debug("isExistPlayer = true / nickName = "+nickName+" :: rejoin!!!!!!!!!!!!!!!!!!!");
 		return getPlayerByName(nickName);
 	}
 
@@ -31,10 +29,8 @@ function addPlayer(isRunningGame, nickName) {
 		teamCode = assignTeamInPlaying();		
 	}
 	var playerNum = room.players.length;
-	debug("addPlayer :: playerNumber = " + playerNum);
 	var player = new models.player(nickName, playerNum, teamCode, maxHP, maxHP, null, 0, false, 0, 0);
 	room.players.push(player);
-	debug("added player :: name = " + player.nickName + " / number = " + player.number + " / room.players size = " + room.players.length);
 	return player;
 }
 
@@ -113,11 +109,9 @@ function assignTeam() {
 }
 
 function getTeamNumbers() {
-	debug("[getTEamNumbers] room.players size =" + room.players.length);
 	let teamNumbers = {};
 	for (let key in room.players) {
 		teamNumbers[room.players[key].number] = room.players[key].teamCode;
-		debug("[getTEamNumbers] teamNumber =" + teamNumbers[room.players[key].number]);
 	}
 	return teamNumbers;
 }

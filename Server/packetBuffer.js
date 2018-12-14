@@ -7,8 +7,6 @@ const BODY = "BODY";
 module.exports = packetBuffer;
 
 function packetBuffer(socket, handler) {
-  debug('new packetBuffer');
-
   this.socket = socket;
   this.packet = {};
   
@@ -21,7 +19,6 @@ function packetBuffer(socket, handler) {
 }
 
 packetBuffer.prototype.init = function () {
-debug('init');	
   this.socket.on('data', (data) => {
     this.bufferedBytes += data.length;
     this.queue.push(data);
@@ -80,7 +77,6 @@ packetBuffer.prototype.readBytes = function (size) {
 packetBuffer.prototype.getHeader = function () {
   if (this.hasEnough(4)) {
     this.bodySzie = this.readBytes(4).readUInt32LE(0, true);
-    debug('[getHeader] this.bodySzie =', this.bodySzie);
     this.state = BODY;
   }
 }
@@ -94,7 +90,6 @@ packetBuffer.prototype.getBody = function () {
 }
 
 packetBuffer.prototype.onData = function (data) {
-  //debug('[onData] this.process =', this.process);
   while (this.process) {
     switch (this.state) {
       case HEADER:
@@ -119,8 +114,6 @@ packetBuffer.prototype.header = function (messageLength) {
 };
 
 packetBuffer.prototype._send = function () {
-  //let contentLength = Buffer.allocUnsafe(2);
-  //contentLength.writeUInt16BE(this._packet.header.length);
   let contentLength = Buffer.allocUnsafe(4);
   contentLength.writeUInt32LE(this.packet.header.length);
   this.socket.write(contentLength);

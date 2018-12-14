@@ -9,7 +9,7 @@ const bson = require('bson');
 const maxPlayerCount = 20;
 const minPlayerCount = 2 
 const maxWaitingTime = 10;
-const maxPlayTime = 60;
+const maxPlayTime = 360;
 const maxScoreGoal = 10;
 const codeSuccess = 200;
 
@@ -36,27 +36,24 @@ module.exports.getScore = getScore;
 module.exports.getRunningGameContext = getRunningGameContext;
 
 function intervalWaitingTimer() {
-	debug("[intervalWaitingTimer] isWaiting = " + isWaiting);
 	if (isWaiting == false) {
-		debug("[waitingTimer] isWaiting is false");
 		clearInterval(waitingTimer);
 		return;
 	}
 
 	waitingTime++;
-	debug("[waitingTimer] waitingTime = " + waitingTime);
-	if (isRemainWaitingTime() == false) {//시간초과
-		if (minPlayerCount <= joinedPlayerCount) {//최소 시작 인원 달성
+	if (isRemainWaitingTime() == false) {
+		if (minPlayerCount <= joinedPlayerCount) {
 			startGame();
 			return;
 		} else {
-			waitingTime -= 5; //5초 더 추가
+			waitingTime -= 5;
 			if (waitingTime < 0) {
 				waitingTime = 0;
 			}
 		}
 	} else {
-		if (joinedPlayerCount >= maxPlayerCount) {//바로 시작
+		if (joinedPlayerCount >= maxPlayerCount) {
 			startGame();
 			return;
 		}
@@ -67,16 +64,13 @@ function intervalWaitingTimer() {
 function intervalGameTimer() {
 	playTime++;
 	broadcastUpdateGameTime();
-	debug("[gameTimer] playTime = " + playTime);
 	if (isRemainTimeToEnd() == false) {
 		endGame();
 	}
 }
 
-
 function checkGameStart(playerCount) {
 	joinedPlayerCount = playerCount;
-	debug("[checkGameStart] joinedPlayerCount = " + joinedPlayerCount + "/  isWaiting = "+ isWaiting);
 	if (isWaiting == false) {
 		isWaiting = true;
 		waitingTimer =  setInterval(intervalWaitingTimer, 1000);
@@ -102,12 +96,11 @@ function getScore(teamCode) {
 	return scoreBlue;
 }
 
-function startGame() {//Todo.GameStart
+function startGame() {
 	if (isGameStarted) {
 		debug("[startGame] game is already started.");
 		return;
 	}
-	debug("[startGame]");
 	clearInterval(waitingTimer);
 	gameTimer = setInterval(intervalGameTimer, 1000);
 	scoreRed = 0;
@@ -120,9 +113,8 @@ function startGame() {//Todo.GameStart
  	broadcastStartGame();
 }
 
-function endGame() {//Todo. send GameReuslt
+function endGame() {
 	clearInterval(gameTimer);
-	debug("[endGame]");
 	isGameStarted = false;
 	isGameEnd = true;
 	isWaiting = false;
@@ -160,7 +152,6 @@ function getRunningGameContext() {
 }
 
 function broadcastStartGame() {
-	debug("[broadcastStartGame]");
 	let model = getRunningGameContext();
 	let bytes = bson.serialize(model);
 	let noti = new models.notificationFormat('startGame', codeSuccess, "success", bytes);
@@ -168,7 +159,6 @@ function broadcastStartGame() {
 }
 
 function broadcastWaitingStatus() {
-	debug("[broadcastWaitingStatus]");
 	let model = new models.waitingStatus(joinedPlayerCount, maxPlayerCount, maxWaitingTime - waitingTime);
 	let bytes = bson.serialize(model);
 	let noti = new models.notificationFormat('waitingPlayer', codeSuccess, "success", bytes);
@@ -176,7 +166,6 @@ function broadcastWaitingStatus() {
 }
 
 function broadcastEndGame() {
-	debug("[broadcastEndGame]");
 	let model = getRunningGameContext();
 	let bytes = bson.serialize(model);
 	let noti = new models.notificationFormat('endGame', codeSuccess, "success", bytes);
@@ -184,7 +173,6 @@ function broadcastEndGame() {
 }
 
 function broadcastUpdateGameTime() {
-	debug("[broadcastUpdateGameTime]");
 	let model = new models.gameTime(maxPlayTime - playTime);
 	let bytes = bson.serialize(model);
 	let noti = new models.notificationFormat('updateGameTime', codeSuccess, "success", bytes);
