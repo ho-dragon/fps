@@ -149,7 +149,7 @@ public class Main : MonoBehaviourInstance<Main> {
         if (isRunningGame) {
             UIManager.inst.ShowToastMessgae("재접속 완료!", 5f);
         } else {
-            UIManager.inst.ShowToastMessgae("게임이 시작!", 5f);
+            UIManager.inst.ShowToastMessgae("게임 시작!", 3f);
         }        
         this.context = new GameContext(this.eventManager
                                      , result.remainTime
