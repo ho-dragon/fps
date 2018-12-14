@@ -78,11 +78,6 @@ public class PlayerCamera : MonoBehaviour {
     }
 
     void Update() {
-        //if(isShaking) {
-        //    UpdateRecoil(this.durationRecoil);
-        //   return;
-        //}
-
         if (this.isAttachedPlayer == false) {
             return;
         }

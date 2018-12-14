@@ -14,9 +14,12 @@ public class PlayerMove : MonoBehaviour {
     private float aimingSpeed = 1f;
     private float walkSpeed = 3f;
     private float runSpeed = 6f;
+    private float currentSpeed = 0f;
     private float tilt = 1f;
     private bool isLocalPlayer = false;
     private bool isDead = false;
+    private float lastRotationY = 0f;
+    private const float minimumRotationY = 3f;
     private PlayerActionType currentActionType = PlayerActionType.Idle;
 
     void Awake() {
@@ -24,7 +27,6 @@ public class PlayerMove : MonoBehaviour {
     }
 
     public void Init(PlayerAnimationController animationController, Transform playerTrans, int number, bool isDead, System.Action<int, Vector3, float> moveCallback) {
-        Logger.DebugHighlight("[PlayerMove] Init");
         this.animationController = animationController;
         this.playerTrans = playerTrans;
         this.playerNumber = number;
@@ -117,16 +119,13 @@ public class PlayerMove : MonoBehaviour {
         }
     }
 
-    private float currentSpeed = 0f;
     private float GetAccelerationSpped(float currentSpeed, float targetSpeed, float accelerationTime) {
         this.currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, accelerationTime * Time.deltaTime);
         return this.currentSpeed;
     }
 
-    private float lastRotationY = 0f;
-    private const float MinimumRotationY = 3f;
     private bool IsChangeRotationY(float currentRotationY) {
-        if (Mathf.Abs(this.lastRotationY - currentRotationY) > MinimumRotationY) {
+        if (Mathf.Abs(this.lastRotationY - currentRotationY) > minimumRotationY) {
             this.lastRotationY = currentRotationY;
             return true;
         } else {

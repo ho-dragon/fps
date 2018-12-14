@@ -56,17 +56,14 @@ public class PacketNotification {
     }
 
     public void DamagedPlayer(DamageModel result) {
-        Logger.DebugHighlight("[PacketNotification.DamagedPlayer]");
         PlayerManager.inst.UpdateHP(result.damagedPlayer, result.currentHP, result.maxHP);
     }
 
     public void JoinPlayer(EnterRoomModel result) {
-        Logger.DebugHighlight("[PacketNotification.JoinPlayer]");
         PlayerManager.inst.JoinPlayer(result.player, false);
     }
 
     private void MovePlayer(PlayerMoveModel result) {
-        //Logger.DebugHighlight("[RecevieNtotication.MovePlayer]  = " + result.playerNum + " / movePosition X : {0} Y : {1} : Z : {2}" , result.playerPosX, result.playerPosY, result.playerPosZ);
         PlayerManager.inst.UpdatePosition(result.playerNum, new Vector3(result.playerPosX
                                                                     , result.playerPosY
                                                                     , result.playerPosZ)
@@ -74,30 +71,24 @@ public class PacketNotification {
     }
 
     private void ActionPlayer(PLayerActionModel result) {
-        Logger.DebugHighlight("[PacketNotification.ActionPlayer] actioType = " + result.actionType);
-        PlayerManager.inst.UpdateAction(result.playerNum, result.actionType);        
+        PlayerManager.inst.UpdateAction(result.playerNum, result.actionType);
     }
     
     public void StartGame(GameContextModel result) {
-        Logger.DebugHighlight("[PacketNotification.StatGame]");
         Main.inst.StartGame(false, result);
     }
 
     public void WaitingPlayer(WaitingStatusModel result) {
-        Logger.DebugHighlight("[PacketNotification.WaitingPlayer]");
         UIManager.inst.UpdateWaitingPlayers(result.joinedPlayerCount, result.maxPlayerCount, result.remianTimeToPlay);
     }
 
     public void UpdateGameTime(GameTimeModel result) {
-        Logger.DebugHighlight("[PackketNotification.UpdateGameTime");
         if (Main.inst.context != null) {
             Main.inst.context.UpdateRemainTime(result.remainTime);
         }                   
     }
 
     public void DeadPlayer(DeadPlayerModel result) {
-        Logger.DebugHighlight("[PacketNotification.DeadPlayer");
-
         Player killer = PlayerManager.inst.GetPlayer(result.lastDamageInfo.attackPlayer);
         killer.KillCount = result.killerKillCount;
         if (killer.IsLocalPlayer) {
@@ -119,7 +110,6 @@ public class PacketNotification {
     }
 
     public void Respawn(RespawnModel result) {
-        Logger.DebugHighlight("[PacketNotification.Respawn");
         Player player = PlayerManager.inst.GetPlayer(result.playerNumber);
         UIManager.inst.ShowToastMessgae(string.Format("{0}팀 {1}이(가) 부활했습니다.", player.GetTeamCode().GetTeamName(), player.NickName), 3f);
         player.UpdateHP(result.currentHP, result.maxHP);
@@ -130,7 +120,6 @@ public class PacketNotification {
     }
 
     public void EndGame(GameContextModel result) {
-        Logger.DebugHighlight("[PacketNotification.EndGame");
         Main.inst.EndGame(result);
     }
 }

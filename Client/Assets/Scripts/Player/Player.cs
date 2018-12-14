@@ -35,7 +35,6 @@ public class Player : MonoBehaviour {
         set {this.isDead = value;
             this.actionController.UpdatePlayerDead(value);
             if (value) {
-                Logger.DebugHighlight("--------------DEAD----------True--------");
                 SoundManager.inst.PlayFx(SoundFxType.DeadPlayer, this.gameObject);
                 animationController.UpdateAction(PlayerActionType.Death, true);
             }
@@ -66,7 +65,6 @@ public class Player : MonoBehaviour {
     }
         
     public void Init(bool isLocalPlayer, TeamCode teamCode, int number, string nickName, float currentHP, float maxHP, bool isDead, int killCount, int deadCount, System.Action<int, Vector3, float> moveCallback) {
-        Logger.Debug("[Player] Init number = " + number + " / name = " + nickName);
         this.isLocalPlayer = isLocalPlayer;
         this.teamCode = teamCode;
         this.number = number;
@@ -84,7 +82,7 @@ public class Player : MonoBehaviour {
             this.headerUI.SetTeamCode(teamCode);
         }
         UpdateHP(currentHP, maxHP);
-        AttachWeapon(number, "Rifle");//최초 라이플을 들고있도록
+        AttachWeapon(number, "Rifle");
         this.actionController.Init(this.animationController, this.transform, number, isLocalPlayer, isDead, moveCallback);
         this.actionController.SetLocalPlayer(isLocalPlayer);
     }

@@ -68,7 +68,7 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
             return;
         }
 
-        if (isLocalPlayer == false && IsExsitRemotePlayer(player.number)) {//Todo. updateData
+        if (isLocalPlayer == false && IsExsitRemotePlayer(player.number)) {
             Logger.Error("[PlayerManager.JoinedPlayer] player is already joined.");
             return;
         }
@@ -99,14 +99,11 @@ public class PlayerManager : MonoBehaviourInstance<PlayerManager> {
         if (isLocalPlayer) {
             this.localPlayer = newPlayer;
             this.localPlayer.AttachCamera();
-            Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added local player / name  = {0} / number = {1}", player.nickName, player.number);
         } else {
             if (this.remotePlayers.Exists(x => x.Number == player.number)) {
-                Logger.Warning("[PlayerManager.JoinPlayer] already exist player = " + player.number);
                 return;
             }
             this.remotePlayers.Add(newPlayer);
-            Logger.DebugHighlight("[PlayerManager.JoinedPlayer] added remote player / name  = {0} / number = {1}", player.nickName, player.number);
         }        
     }
 

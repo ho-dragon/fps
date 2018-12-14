@@ -29,12 +29,6 @@ public class RequestFormat {
             int length = args.Length;
             for (int i = 0; i < length; i += 2) {
                param.Add(args[i] as string, i + 1 >= length ? null : args[i + 1]);
-            }
-
-            if (Logger.IsMutePacket(method) == false) {
-                foreach (KeyValuePair<string, object> i in param) {
-                    Logger.Debug("[SocketRequestFormat] key = " + i.Key + " / value = " + i.Value);
-                }
             }            
         }
     }

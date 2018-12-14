@@ -12,7 +12,6 @@ public class HpGage : MonoBehaviour {
     }
 
     public void SetHP(float currentHP, float maxHP) {
-        Logger.DebugHighlight("[HpGage.SetHP] currentHP = {0} / maxHP = {1}", currentHP, maxHP);
         if (this.text != null) {
             if (currentHP <= 0f) {
                 this.text.text = "DEAD";

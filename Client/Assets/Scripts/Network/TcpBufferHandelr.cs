@@ -2,17 +2,14 @@
 using System.Collections;
 using System;
 
-public class Defines {
-    public static readonly int HEADERSIZE = 4;
-}
-
 public class TcpBufferHandelr {
-     public delegate void CompletedMessageCallback(byte[] buffer);
-    int messageSize;
-    byte[] messageBuffer = new byte[1024];
-    int current_position;
-    int positionToRead;
-    int remain_bytes;
+    private const int HEADERSIZE = 4;
+    public delegate void CompletedMessageCallback(byte[] buffer);
+    private int messageSize;
+    private byte[] messageBuffer = new byte[1024];
+    private int current_position;
+    private int positionToRead;
+    private int remain_bytes;
 
     public TcpBufferHandelr() {
         this.messageSize = 0;
@@ -47,8 +44,8 @@ public class TcpBufferHandelr {
         int src_position = offset;
         while (this.remain_bytes > 0) {
             bool completed = false;
-            if (this.current_position < Defines.HEADERSIZE) {
-                this.positionToRead = Defines.HEADERSIZE;
+            if (this.current_position < HEADERSIZE) {
+                this.positionToRead = HEADERSIZE;
                 completed = Read(buffer, ref src_position, offset, transffered);
                 if (completed == false) {
                     return;
@@ -58,7 +55,7 @@ public class TcpBufferHandelr {
                 if (this.messageSize == 0) {
                     break;
                 }
-                this.positionToRead = this.messageSize + Defines.HEADERSIZE;
+                this.positionToRead = this.messageSize + HEADERSIZE;
             }
             completed = Read(buffer, ref src_position, offset, transffered);
 
@@ -70,7 +67,7 @@ public class TcpBufferHandelr {
     }
 
     private int GetBodySize() {
-        Type type = Defines.HEADERSIZE.GetType();
+        Type type = HEADERSIZE.GetType();
         if (type.Equals(typeof(Int16))) {
             return BitConverter.ToInt16(this.messageBuffer, 0);
         }

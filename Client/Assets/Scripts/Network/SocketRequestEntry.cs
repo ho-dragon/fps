@@ -23,8 +23,7 @@ public class SocketRequestEntry {
     }
        
     public T Result<T>() {
-        try {
-            //Logger.Debug("[ingameRequest.Result<T>] Response.bytes.length = " + Response.bytes.Length);
+        try {         
             T result = BsonSerializer.Deserialize<T>(Response.bytes);
             return result;
         } catch (System.Exception e) {

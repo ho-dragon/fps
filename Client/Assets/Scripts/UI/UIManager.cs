@@ -44,7 +44,6 @@ public class UIManager : MonoBehaviourInstance<UIManager> {
     }
 
     IEnumerator ToastMessage(Text label, string message, float duration, System.Action callback) {
-        Logger.DebugHighlight("[UIManager.ToastMessage] message = " + message);
         label.text = message;
         yield return new WaitForSeconds(duration);
         label.text = "";

@@ -16,7 +16,6 @@ public class Weapon : MonoBehaviour {
     }
 
     public void Init(int ownerPlayerNumber, TeamCode teamCode) {
-        Logger.Debug("[Weapon] Init : ownerPlayerNumber = " + ownerPlayerNumber);
         this.ownerPlayerNumber = ownerPlayerNumber;
         this.ownerTeamCode = teamCode;
     }
@@ -34,7 +33,6 @@ public class Weapon : MonoBehaviour {
 	}
    
     public virtual void Shoot() {
-        Logger.Debug("[Weapon] shoot");
         this.nextFire = Time.time + fireRate;
         GunFireEffect();
     }

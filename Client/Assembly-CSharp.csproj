@@ -104,11 +104,11 @@
     <Compile Include="Assets\Scripts\UI\PlayerHeaderUI.cs" />
     <Compile Include="Assets\Scripts\UI\PlayerHUD.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
-    <Compile Include="Assets\Scripts\Util\MathUtility.cs" />
     <Compile Include="Assets\Scripts\Util\MonoBehaviourInstance.cs" />
     <Compile Include="Assets\Scripts\Weapon\RayCastGun.cs" />
     <Compile Include="Assets\Scripts\Weapon\Weapon.cs" />
     <None Include="Assets\Resources\Characters\Shaders\SkinShader.shader" />
+    <None Include="Assets\Resources\Materials\UnlitVertexColour_Alpha.shader" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Projects/Unity/tcp/Client/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
