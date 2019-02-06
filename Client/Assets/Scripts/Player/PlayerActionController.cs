@@ -58,7 +58,7 @@ public class PlayerActionController : MonoBehaviour {
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && this.isZoomOut) {
+        if (Input.GetKeyDown(KeyCode.Space)) {
             this.animationController.UpdateAction(PlayerActionType.Jump);
         }
 

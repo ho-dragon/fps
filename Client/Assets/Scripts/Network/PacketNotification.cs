@@ -58,6 +58,7 @@ public class PacketNotification {
     public void DamagedPlayer(DamageModel result) {
         Logger.DebugHighlight("[PacketNotification.DamagedPlayer]");
         PlayerManager.inst.UpdateHP(result.damagedPlayer, result.currentHP, result.maxHP);
+        PlayerManager.inst.UpdateAction(result.damagedPlayer, PlayerActionType.Damage);
     }
 
     public void JoinPlayer(EnterRoomModel result) {

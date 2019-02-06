@@ -19,7 +19,7 @@ public class PlayerAnimationController : MonoBehaviour {
     #endregion
 
     public Animator animator;
-    const int countOfDamageAnimations = 3;
+    private const int damagedAniMaxCount = 3;
     public int lastDamageAnimation = -1;
     private bool isLocalPlayer = false;
     private int playerNum = 0;
@@ -122,10 +122,10 @@ public class PlayerAnimationController : MonoBehaviour {
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("Death")) {
             return;
         }
-        int id = Random.Range(0, countOfDamageAnimations);
-        if (countOfDamageAnimations > 1) {
+        int id = Random.Range(0, damagedAniMaxCount);
+        if (damagedAniMaxCount > 1) {
             while (id == this.lastDamageAnimation) {
-                id = Random.Range(0, countOfDamageAnimations);
+                id = Random.Range(0, damagedAniMaxCount);
             }              
         }            
         this.lastDamageAnimation = id;
@@ -137,9 +137,9 @@ public class PlayerAnimationController : MonoBehaviour {
         if (isChanged) {
             SoundManager.inst.PlayFx(SoundFxType.Jump, this.gameObject);
         }        
-        animator.SetBool("Squat", false);
-        animator.SetFloat("Speed", 0f);
-        animator.SetBool("Aiming", false);
+        //animator.SetBool("Squat", false);
+        //animator.SetFloat("Speed", 0f);
+        //animator.SetBool("Aiming", false);
         animator.SetTrigger("Jump");
     }
 
