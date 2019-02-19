@@ -134,12 +134,6 @@ public class PlayerAnimationController : MonoBehaviour {
     }
 
     private void Jump(bool isChanged) {
-        if (isChanged) {
-            SoundManager.inst.PlayFx(SoundFxType.Jump, this.gameObject);
-        }        
-        //animator.SetBool("Squat", false);
-        //animator.SetFloat("Speed", 0f);
-        //animator.SetBool("Aiming", false);
         animator.SetTrigger("Jump");
     }
 
